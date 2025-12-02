@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['game_0',['game',['../namespacepoly__4.html#a2f18e9b9aa3888bf5ca72d26106f4457',1,'poly_4']]]
+  ['l_0',['l',['../classpoly__4_1_1Plateau.html#a1b76d6b50cd80d4eb0d7c2b1e6a63e01',1,'poly_4::Plateau']]]
 ];

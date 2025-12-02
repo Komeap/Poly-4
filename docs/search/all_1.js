@@ -1,4 +1,4 @@
 var searchData=
 [
-  ['c_0',['c',['../classpoly__4_1_1Plateau.html#a3de9926ea588cbe07b61252b04cd5ed4',1,'poly_4::Plateau']]]
+  ['add_5fcoup_5fbitboard_0',['add_coup_bitboard',['../classpoly__4_1_1Plateau.html#afec9ed3a82430456e098db473bce2554',1,'poly_4::Plateau']]]
 ];

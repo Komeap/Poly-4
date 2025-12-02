@@ -5,22 +5,24 @@
 \item 
 \mbox{\hyperlink{classpoly__4_1_1Plateau_a66eefa4cada16d5c287863b89365a167}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, lignes, colones, win\+\_\+conditon)
 \begin{DoxyCompactList}\small\item\em Initialisation du plateau de puissance 4. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{classpoly__4_1_1Plateau_ab9db6d096bc894698e5d514b73adb572}{print\+\_\+tab}} (self)
-\begin{DoxyCompactList}\small\item\em Permet l\textquotesingle{}affichage du plateau et de ca matrice de remplissage qui indique le nombre de jeton jouer sur cette colonnes. \end{DoxyCompactList}\item 
-\mbox{\hyperlink{classpoly__4_1_1Plateau_af1c4caf2892e26c4d2fd444ad3b56495}{play}} (self, play\+\_\+colone)
-\begin{DoxyCompactList}\small\item\em Joue sur la colone play\+\_\+colone. \end{DoxyCompactList}\end{DoxyCompactItemize}
+\mbox{\hyperlink{classpoly__4_1_1Plateau_afec9ed3a82430456e098db473bce2554}{add\+\_\+coup\+\_\+bitboard}} (self, pos)
+\begin{DoxyCompactList}\small\item\em permet d\textquotesingle{}ajouter le coup a la bitbord du joueur \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classpoly__4_1_1Plateau_a36d689c6e18728d0b7c1cffa9de317b3}{play}} (self, play\+\_\+colone, joueur)
+\begin{DoxyCompactList}\small\item\em Joue sur la colone play\+\_\+colone. \end{DoxyCompactList}\item 
+\mbox{\hyperlink{classpoly__4_1_1Plateau_a92c9395a76a0eb92ad8fa9f4ea632539}{check\+\_\+win\+\_\+bitboard}} (self, joueur)
+\begin{DoxyCompactList}\small\item\em Verifie si il y a une victoire Comment ca marche, Magic bitboard -\/\texorpdfstring{$>$}{>} explication pour détection en ligne \+: On prend notre bitboard on la décale de 1, et on compare les deux ex \+: 0110 devient 1100 Pourquoi, si on compare on obtient 0100 signification on avait deux 1 a coté si on a 0 on avait pas de 1 a coté il suffit de fait cette opération de comparaison et de décalage le nombre de fois qu\textquotesingle{}on veut de chiffre a coté et si le chiffre est différent de 0 alors c\textquotesingle{}est good exemple 3 1 a cote 001110 -\/\texorpdfstring{$>$}{>} 00110 -\/\texorpdfstring{$>$}{>} 00100 si on décale de H(hauteur) on obtient on verifie si deux 1 sont l\textquotesingle{}un sur l\textquotesingle{}autre si on decale de H + 1 -\/\texorpdfstring{$>$}{>} au dessus décaler a droite -\/\texorpdfstring{$>$}{>} diag / H -\/ 1 -\/\texorpdfstring{$>$}{>} diag . \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{classpoly__4_1_1Plateau_a1b76d6b50cd80d4eb0d7c2b1e6a63e01}{l}}
 \item 
-\mbox{\hyperlink{classpoly__4_1_1Plateau_a3de9926ea588cbe07b61252b04cd5ed4}{c}}
-\item 
 \mbox{\hyperlink{classpoly__4_1_1Plateau_a54b30003436dc476b826b7c5fafae941}{win}}
-\item 
+\begin{DoxyCompactList}\small\item\em nombre de lignes \texorpdfstring{$<$}{<}=\texorpdfstring{$>$}{>} hauteur d\textquotesingle{}uen colone \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classpoly__4_1_1Plateau_aa745284231640fe73ccd406f37abe6c7}{matrice}}
 \item 
 \mbox{\hyperlink{classpoly__4_1_1Plateau_a12b62197c41ae257d3bd1337b9d5e72d}{fill\+\_\+matrice}}
+\item 
+\mbox{\hyperlink{classpoly__4_1_1Plateau_aab3a01b4ad1cf13f872d7154c6f56c35}{bitboards}}
 \end{DoxyCompactItemize}
 
 
@@ -47,34 +49,57 @@ Initialisation du plateau de puissance 4.
 
 
 \doxysubsection{Member Function Documentation}
-\Hypertarget{classpoly__4_1_1Plateau_af1c4caf2892e26c4d2fd444ad3b56495}\label{classpoly__4_1_1Plateau_af1c4caf2892e26c4d2fd444ad3b56495} 
+\Hypertarget{classpoly__4_1_1Plateau_afec9ed3a82430456e098db473bce2554}\label{classpoly__4_1_1Plateau_afec9ed3a82430456e098db473bce2554} 
+\index{poly\_4.Plateau@{poly\_4.Plateau}!add\_coup\_bitboard@{add\_coup\_bitboard}}
+\index{add\_coup\_bitboard@{add\_coup\_bitboard}!poly\_4.Plateau@{poly\_4.Plateau}}
+\doxysubsubsection{\texorpdfstring{add\_coup\_bitboard()}{add\_coup\_bitboard()}}
+{\footnotesize\ttfamily poly\+\_\+4.\+Plateau.\+add\+\_\+coup\+\_\+bitboard (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{pos }\end{DoxyParamCaption})}
+
+
+
+permet d\textquotesingle{}ajouter le coup a la bitbord du joueur 
+
+\Hypertarget{classpoly__4_1_1Plateau_a92c9395a76a0eb92ad8fa9f4ea632539}\label{classpoly__4_1_1Plateau_a92c9395a76a0eb92ad8fa9f4ea632539} 
+\index{poly\_4.Plateau@{poly\_4.Plateau}!check\_win\_bitboard@{check\_win\_bitboard}}
+\index{check\_win\_bitboard@{check\_win\_bitboard}!poly\_4.Plateau@{poly\_4.Plateau}}
+\doxysubsubsection{\texorpdfstring{check\_win\_bitboard()}{check\_win\_bitboard()}}
+{\footnotesize\ttfamily poly\+\_\+4.\+Plateau.\+check\+\_\+win\+\_\+bitboard (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{joueur }\end{DoxyParamCaption})}
+
+
+
+Verifie si il y a une victoire Comment ca marche, Magic bitboard -\/\texorpdfstring{$>$}{>} explication pour détection en ligne \+: On prend notre bitboard on la décale de 1, et on compare les deux ex \+: 0110 devient 1100 Pourquoi, si on compare on obtient 0100 signification on avait deux 1 a coté si on a 0 on avait pas de 1 a coté il suffit de fait cette opération de comparaison et de décalage le nombre de fois qu\textquotesingle{}on veut de chiffre a coté et si le chiffre est différent de 0 alors c\textquotesingle{}est good exemple 3 1 a cote 001110 -\/\texorpdfstring{$>$}{>} 00110 -\/\texorpdfstring{$>$}{>} 00100 si on décale de H(hauteur) on obtient on verifie si deux 1 sont l\textquotesingle{}un sur l\textquotesingle{}autre si on decale de H + 1 -\/\texorpdfstring{$>$}{>} au dessus décaler a droite -\/\texorpdfstring{$>$}{>} diag / H -\/ 1 -\/\texorpdfstring{$>$}{>} diag . 
+
+
+\begin{DoxyParams}{Parameters}
+{\em joueur} & le joueur pour le qu\textquotesingle{}elle on verifie si ca gagne \\
+\hline
+\end{DoxyParams}
+\Hypertarget{classpoly__4_1_1Plateau_a36d689c6e18728d0b7c1cffa9de317b3}\label{classpoly__4_1_1Plateau_a36d689c6e18728d0b7c1cffa9de317b3} 
 \index{poly\_4.Plateau@{poly\_4.Plateau}!play@{play}}
 \index{play@{play}!poly\_4.Plateau@{poly\_4.Plateau}}
 \doxysubsubsection{\texorpdfstring{play()}{play()}}
-{\footnotesize\ttfamily poly\+\_\+4.\+Plateau.\+play (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{play\+\_\+colone }\end{DoxyParamCaption})}
+{\footnotesize\ttfamily poly\+\_\+4.\+Plateau.\+play (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{play\+\_\+colone,  }\item[{}]{joueur }\end{DoxyParamCaption})}
 
 
 
 Joue sur la colone play\+\_\+colone. 
 
-\Hypertarget{classpoly__4_1_1Plateau_ab9db6d096bc894698e5d514b73adb572}\label{classpoly__4_1_1Plateau_ab9db6d096bc894698e5d514b73adb572} 
-\index{poly\_4.Plateau@{poly\_4.Plateau}!print\_tab@{print\_tab}}
-\index{print\_tab@{print\_tab}!poly\_4.Plateau@{poly\_4.Plateau}}
-\doxysubsubsection{\texorpdfstring{print\_tab()}{print\_tab()}}
-{\footnotesize\ttfamily poly\+\_\+4.\+Plateau.\+print\+\_\+tab (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-
-
-Permet l\textquotesingle{}affichage du plateau et de ca matrice de remplissage qui indique le nombre de jeton jouer sur cette colonnes. 
-
+\begin{DoxyParams}{Parameters}
+{\em joueur} & 1 ou 2 celon le joueur (Peut etre d\textquotesingle{}autre chiffre celon les bonus, ...) \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+!!!!!! Return 1 si ca peut pas jouer, et return (ligne, colone, num du joueur) si c\textquotesingle{}est ok et ca joue !!!!!!! 
+\end{DoxyReturn}
 
 
 \doxysubsection{Member Data Documentation}
-\Hypertarget{classpoly__4_1_1Plateau_a3de9926ea588cbe07b61252b04cd5ed4}\label{classpoly__4_1_1Plateau_a3de9926ea588cbe07b61252b04cd5ed4} 
-\index{poly\_4.Plateau@{poly\_4.Plateau}!c@{c}}
-\index{c@{c}!poly\_4.Plateau@{poly\_4.Plateau}}
-\doxysubsubsection{\texorpdfstring{c}{c}}
-{\footnotesize\ttfamily poly\+\_\+4.\+Plateau.\+c}
+\Hypertarget{classpoly__4_1_1Plateau_aab3a01b4ad1cf13f872d7154c6f56c35}\label{classpoly__4_1_1Plateau_aab3a01b4ad1cf13f872d7154c6f56c35} 
+\index{poly\_4.Plateau@{poly\_4.Plateau}!bitboards@{bitboards}}
+\index{bitboards@{bitboards}!poly\_4.Plateau@{poly\_4.Plateau}}
+\doxysubsubsection{\texorpdfstring{bitboards}{bitboards}}
+{\footnotesize\ttfamily poly\+\_\+4.\+Plateau.\+bitboards}
 
 \Hypertarget{classpoly__4_1_1Plateau_a12b62197c41ae257d3bd1337b9d5e72d}\label{classpoly__4_1_1Plateau_a12b62197c41ae257d3bd1337b9d5e72d} 
 \index{poly\_4.Plateau@{poly\_4.Plateau}!fill\_matrice@{fill\_matrice}}
@@ -99,6 +124,10 @@ Permet l\textquotesingle{}affichage du plateau et de ca matrice de remplissage q
 \index{win@{win}!poly\_4.Plateau@{poly\_4.Plateau}}
 \doxysubsubsection{\texorpdfstring{win}{win}}
 {\footnotesize\ttfamily poly\+\_\+4.\+Plateau.\+win}
+
+
+
+nombre de lignes \texorpdfstring{$<$}{<}=\texorpdfstring{$>$}{>} hauteur d\textquotesingle{}uen colone 
 
 
 
