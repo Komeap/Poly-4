@@ -100,28 +100,86 @@ def fermer_video(canvas):
     canvas.delete("tag_video")
 
 class Param_case:
-    def __init__(self, canvas, x, y, nom, start_size=(HEIGHT//4, HEIGHT//3), scale=1.0, affiche=True):
+    def __init__(self, canvas, x, y, nom, options=None, start_size=(HEIGHT//4, HEIGHT//3), scale=1.0, affiche=True):
         self.canvas = canvas
         self.nom = nom
         self.ids = []
 
+        # Liste d’options possibles pour ce paramètre
+        self.options = options if options else []
+        self.index = 0  # index actuel dans self.options
+
         w_redim = int(start_size[0] * scale)
         h_redim = int(start_size[1] * scale)
-
         size = (w_redim, h_redim)
 
-        if affiche :
+        if affiche:
+            # Image de fond
             self.img_id = add_canvas_img(canvas, "images/param_case.png", (x,y), size)
             self.ids.append(self.img_id)
 
-            self.texte_id = canvas.create_text(x, y-(size[1]//2) + int(35*scale), text=f"{nom}",font=("Retro Gaming", int(15*scale)) , anchor='center', fill="black")
-            self.ids.append(self.texte_id)
+            # Nom du paramètre ("Volume", "Difficulté", etc.)
+            self.texte_nom = canvas.create_text(
+                x,
+                y - (size[1]//2) + int(35*scale),
+                text=f"{nom}",
+                font=("Retro Gaming", int(15*scale)),
+                anchor='center',
+                fill="black"
+            )
+            self.ids.append(self.texte_nom)
 
-            self.btn_u_id = add_canvas_bouton(canvas, "images/bouton_up.png", (HEIGHT//25, HEIGHT//25), (x, y - size[1]//7 ), lambda: "", True, 10 )
+            # Valeur affichée
+            if self.options:
+                valeur = self.options[self.index]
+            else:
+                valeur = ""
+
+            self.texte_valeur = canvas.create_text(
+                x,
+                y,
+                text=valeur,
+                font=("Retro Gaming", int(20*scale)),
+                anchor='center',
+                fill="white"
+            )
+            self.ids.append(self.texte_valeur)
+
+            # Bouton ↑
+            self.btn_u_id = add_canvas_bouton(
+                canvas,
+                "images/bouton_up.png",
+                (HEIGHT//25, HEIGHT//25),
+                (x , y - size[1]//7),
+                self.next_value,
+                True,
+                10
+            )
             self.ids.append(self.btn_u_id)
 
-            self.btn_d_id = add_canvas_bouton(canvas, "images/bouton_down.png", (HEIGHT//25, HEIGHT//25), (x, y + size[1]//2.7 ), lambda: "", True, 10 )
+            # Bouton ↓
+            self.btn_d_id = add_canvas_bouton(
+                canvas,
+                "images/bouton_down.png",
+                (HEIGHT//25, HEIGHT//25),
+                (x, y + size[1]//2.7),
+                self.prev_value,
+                True,
+                10
+            )
             self.ids.append(self.btn_d_id)
+
+    # Changer de valeur vers HAUT
+    def next_value(self):
+        if not self.options: return
+        self.index = (self.index + 1) % len(self.options)
+        self.canvas.itemconfig(self.texte_valeur, text=self.options[self.index])
+
+    # Changer de valeur vers BAS
+    def prev_value(self):
+        if not self.options: return
+        self.index = (self.index - 1) % len(self.options)
+        self.canvas.itemconfig(self.texte_valeur, text=self.options[self.index])
 
     def destroy(self):
         for item_id in self.ids:
@@ -189,11 +247,12 @@ class MenuDeroulant:
 
 """
 class MenuDeroulant:
-    def __init__(self, canvas, x, y_start, liste_params):
+    def __init__(self, canvas, x, y_start, liste_params, CONFIG_DATA):
         self.canvas = canvas
         self.x = x
         self.y_start = y_start
         self.params_data = liste_params
+        self.config = CONFIG_DATA
         
         self.current_index = 0
         self.max_visible = 3
@@ -220,8 +279,14 @@ class MenuDeroulant:
         for case in self.active_cases: case.destroy()
         self.active_cases = []
 
+        
+
         for j in range(self.max_visible):
             data_index = self.current_index + j
+
+            nom = self.params_data[data_index]
+            options = self.config.get(nom, [])
+
             if data_index >= len(self.params_data): break
             y = self.positions_y_fixes[j]
             s = self.tailles_fixes[j]
@@ -230,7 +295,7 @@ class MenuDeroulant:
                 new_case = Param_case(self.canvas, self.x, y, self.params_data[data_index], scale=s, affiche=False)
                 self.active_cases.append(new_case)
             else :
-                new_case = Param_case(self.canvas, self.x, y, self.params_data[data_index], scale=s)
+                new_case = Param_case(self.canvas, self.x, y,nom, options, scale=s)
                 self.active_cases.append(new_case)
 
     def scroll(self, direction):
@@ -340,9 +405,20 @@ class Param_jeu(tk.Frame):
         ##video transition
         ##lancer_video(self.canva, "images/run2.mp4")
 
+        CONFIG_DATA = {
+            "": [],
+            "Win Condition": ["1", "2", "3"],
+            "Largeur": ["5", "6", "7"],
+            "Hauteur": ["5", "6", "7"],
+            "Difficulté": ["Facile", "Normal", "Hardcore"],
+            "Volume": ["0", "25", "50", "75", "100"],
+            "Luminosité": ["Sombre", "Moyen", "Clair"]
+        }
+        USER_CHOICES = {key: 0 for key in CONFIG_DATA}
+
         mes_parametres = ["", "Win Condition", "Largeur", "Hauteur", "Difficulté", "Volume", "Luminosité"]
 
-        self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, mes_parametres)
+        self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, mes_parametres, CONFIG_DATA)
 
         # --- BOUTONS DE SCROLL (Fixes sur le côté) ---
         # Bouton Monter (Scroll HAUT -> index diminue -> -1)
