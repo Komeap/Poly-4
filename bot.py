@@ -175,7 +175,7 @@ if __name__ == "__main__":
             # --- TOUR IA ---
             # Appel de notre fonction wrapper
             # Profondeur 4 est bien pour commencer (rapide)
-            col_ia = trouver_meilleur_coup(game, game.win) 
+            col_ia = trouver_meilleur_coup(game, 6) 
             
             if col_ia != -1:
                 game.play(col_ia, 2)
