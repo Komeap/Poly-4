@@ -100,7 +100,7 @@ def fermer_video(canvas):
     canvas.delete("tag_video")
 
 class Param_case:
-    def __init__(self, canvas, x, y, nom, start_size=(HEIGHT//4, HEIGHT//3), scale=1.0):
+    def __init__(self, canvas, x, y, nom, start_size=(HEIGHT//4, HEIGHT//3), scale=1.0, affiche=True):
         self.canvas = canvas
         self.nom = nom
         self.ids = []
@@ -110,22 +110,26 @@ class Param_case:
 
         size = (w_redim, h_redim)
 
-        self.img_id = add_canvas_img(canvas, "images/param_case.png", (x,y), size)
-        self.ids.append(self.img_id)
+        if affiche :
+            self.img_id = add_canvas_img(canvas, "images/param_case.png", (x,y), size)
+            self.ids.append(self.img_id)
 
-        self.texte_id = canvas.create_text(x, y-(size[1]//2) + int(35*scale), text=f"{nom}",font=("Retro Gaming", int(15*scale)) , anchor='center', fill="black")
-        self.ids.append(self.texte_id)
+            self.texte_id = canvas.create_text(x, y-(size[1]//2) + int(35*scale), text=f"{nom}",font=("Retro Gaming", int(15*scale)) , anchor='center', fill="black")
+            self.ids.append(self.texte_id)
 
-        self.btn_u_id = add_canvas_bouton(canvas, "images/bouton_up.png", (HEIGHT//25, HEIGHT//25), (x, y - size[1]//7 ), lambda: "", True, 10 )
-        self.ids.append(self.btn_u_id)
+            self.btn_u_id = add_canvas_bouton(canvas, "images/bouton_up.png", (HEIGHT//25, HEIGHT//25), (x, y - size[1]//7 ), lambda: "", True, 10 )
+            self.ids.append(self.btn_u_id)
 
-        self.btn_d_id = add_canvas_bouton(canvas, "images/bouton_down.png", (HEIGHT//25, HEIGHT//25), (x, y + size[1]//2.7 ), lambda: "", True, 10 )
-        self.ids.append(self.btn_d_id)
+            self.btn_d_id = add_canvas_bouton(canvas, "images/bouton_down.png", (HEIGHT//25, HEIGHT//25), (x, y + size[1]//2.7 ), lambda: "", True, 10 )
+            self.ids.append(self.btn_d_id)
 
     def destroy(self):
         for item_id in self.ids:
             self.canvas.delete(item_id)
 
+
+"""
+# Sans scroll
 class MenuDeroulant:
     def __init__(self, canvas, x, y_start, liste_params):
         self.canvas = canvas
@@ -183,8 +187,6 @@ class MenuDeroulant:
              self.current_index = new_index
              self.update_display()
 
-## ca marche a peu pres
-
 """
 class MenuDeroulant:
     def __init__(self, canvas, x, y_start, liste_params):
@@ -195,7 +197,7 @@ class MenuDeroulant:
         
         self.current_index = 0
         self.max_visible = 3
-        self.ecart = HEIGHT // 3 - 30
+        self.ecart = HEIGHT // 3 + 20
         
         # Positions cibles (les Y finaux)
         self.positions_y_fixes = [
@@ -205,7 +207,7 @@ class MenuDeroulant:
         ]
         
         # Tailles cibles
-        self.tailles_fixes = [0.8, 1.0, 0.8] 
+        self.tailles_fixes = [0.7, 1.0, 0.7] 
 
         self.active_cases = []
         
@@ -215,109 +217,83 @@ class MenuDeroulant:
         self.update_display_instantane()
 
     def update_display_instantane(self):
-        # Nettoyage
         for case in self.active_cases: case.destroy()
         self.active_cases = []
 
         for j in range(self.max_visible):
             data_index = self.current_index + j
             if data_index >= len(self.params_data): break
-
-            # On prend les valeurs fixes directes
             y = self.positions_y_fixes[j]
             s = self.tailles_fixes[j]
-            
-            new_case = Param_case(self.canvas, self.x, y, self.params_data[data_index], scale=s)
-            self.active_cases.append(new_case)
+
+            if self.params_data[data_index] == "":
+                new_case = Param_case(self.canvas, self.x, y, self.params_data[data_index], scale=s, affiche=False)
+                self.active_cases.append(new_case)
+            else :
+                new_case = Param_case(self.canvas, self.x, y, self.params_data[data_index], scale=s)
+                self.active_cases.append(new_case)
 
     def scroll(self, direction):
-        # Si on est déjà en train de bouger ou si on est au bout de la liste, on ne fait rien
         if self.is_animating: return
         
         new_index = self.current_index + direction
         if not (0 <= new_index < len(self.params_data)): return
 
-        # C'est parti pour l'animation !
+
         self.animate_transition(direction)
 
     def animate_transition(self, direction):
         self.is_animating = True
         
         # CONFIGURATION DE L'ANIMATION
-        steps = 10  # Nombre d'images pour l'animation (plus c'est haut, plus c'est lent mais fluide)
-        delay = 15  # Temps en ms entre chaque image
+        steps = 3
+        delay = 1
         current_step = 0
         
-        # On détermine quels éléments on va afficher pendant l'animation
-        # Si on descend (direction 1), on affiche du index actuel jusqu'à +4 pour voir celui qui arrive
-        # C'est un peu de gymnastique mentale pour savoir qui va où :
-        
-        # Pour simplifier : On va redessiner frame par frame
-        
         def step_process(step):
-            # 1. Nettoyage
             for case in self.active_cases: case.destroy()
             self.active_cases = []
             
-            # Calcul du pourcentage d'avancement (0.0 à 1.0)
             progress = step / steps 
             
-            # Si on descend (direction = 1), les éléments montent visuellement vers le haut
-            # Donc l'élément 1 va vers la position 0
-            
-            # On boucle sur une case DE PLUS que le max visible pour gérer celle qui entre et celle qui sort
-            # On affiche virtuellement de -1 à 3
             range_start = -1 if direction == -1 else 0
             range_end = self.max_visible if direction == -1 else self.max_visible + 1
 
             for j in range(range_start, range_end):
-                # L'index réel dans la liste de données
-                # C'est compliqué ici : on base l'index sur l'état ACTUEL (avant changement)
                 data_index = self.current_index + j
                 
                 if data_index < 0 or data_index >= len(self.params_data):
                     continue
-
-                # --- CALCUL DE LA POSITION ANIMÉE ---
-                # Position de départ (j) -> Position d'arrivée (j - direction)
                 
                 start_y = self.y_start + (j * self.ecart)
                 target_y = self.y_start + ((j - direction) * self.ecart)
                 
-                # Formule magique : Position actuelle = Départ + (Différence * Progression)
                 current_y = start_y + (target_y - start_y) * progress
 
-                # --- CALCUL DU SCALE ANIMÉ ---
-                # On utilise une logique de distance pour le scale pendant l'animation
-                # C'est plus fluide que d'interpoler les valeurs fixes
                 center_y = self.y_start + self.ecart
                 dist = abs(current_y - center_y)
                 
-                # Même formule que tout à l'heure, mais dynamique !
-                # Max scale 1.0, Min scale 0.8
-                # On suppose que à ecart distance, on est à 0.8
                 ratio = dist / self.ecart
                 if ratio > 1: ratio = 1
                 current_scale = 1.0 - (ratio * 0.2) # 1.0 - 0.2 = 0.8
                 
                 # Création de la case temporaire
-                case = Param_case(self.canvas, self.x, current_y, self.params_data[data_index], scale=current_scale)
-                self.active_cases.append(case)
+                if self.params_data[data_index] == "":
+                    case = Param_case(self.canvas, self.x, current_y, self.params_data[data_index], scale=current_scale, affiche=False)
+                    self.active_cases.append(case)
+                else :
+                    case = Param_case(self.canvas, self.x, current_y, self.params_data[data_index], scale=current_scale)
+                    self.active_cases.append(case)
 
-            # --- FIN DE BOUCLE ---
             if step < steps:
-                # On continue l'animation
                 self.canvas.after(delay, lambda: step_process(step + 1))
             else:
-                # Animation finie ! On valide les nouvelles positions fixes
                 self.current_index += direction
                 self.is_animating = False
-                self.update_display_instantane() # On remet au propre pour être sûr d'être bien aligné
+                self.update_display_instantane()
 
-        # Lancement de la première étape
         step_process(1)
 
-"""
 
 # ------- Différentes page -------- #
 
@@ -364,7 +340,7 @@ class Param_jeu(tk.Frame):
         ##video transition
         ##lancer_video(self.canva, "images/run2.mp4")
 
-        mes_parametres = ["Win Condition", "Largeur", "Hauteur", "Difficulté", "Volume", "Luminosité"]
+        mes_parametres = ["", "Win Condition", "Largeur", "Hauteur", "Difficulté", "Volume", "Luminosité"]
 
         self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, mes_parametres)
 
