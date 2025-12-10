@@ -100,19 +100,20 @@ def fermer_video(canvas):
     canvas.delete("tag_video")
 
 class Param_case:
-    def __init__(self, canvas, x, y, nom, size=(HEIGHT//4, HEIGHT//3)):
+    def __init__(self, canvas, x, y, nom, start_size=(HEIGHT//4, HEIGHT//3), scale=1.0):
         self.canvas = canvas
         self.nom = nom
-        self.size = size
         self.ids = []
 
+        w_redim = int(start_size[0] * scale)
+        h_redim = int(start_size[1] * scale)
 
-        ## a remplcer par l'image 
-        ##self.rect = canvas.create_rectangle(x, y, x + 200, y + 60, fill="gray")
+        size = (w_redim, h_redim)
+
         self.img_id = add_canvas_img(canvas, "images/param_case.png", (x,y), size)
         self.ids.append(self.img_id)
 
-        self.texte_id = canvas.create_text(x, y-(size[1]//2) + 35, text=f"{nom}",font=("Retro Gaming", 15) , anchor='center', fill="black")
+        self.texte_id = canvas.create_text(x, y-(size[1]//2) + int(35*scale), text=f"{nom}",font=("Retro Gaming", int(15*scale)) , anchor='center', fill="black")
         self.ids.append(self.texte_id)
 
         self.btn_u_id = add_canvas_bouton(canvas, "images/bouton_up.png", (HEIGHT//25, HEIGHT//25), (x, y - size[1]//7 ), lambda: "", True, 10 )
@@ -133,39 +134,190 @@ class MenuDeroulant:
         self.params_data = liste_params
         
         self.current_index = 0 
-        self.max_visible = 2
+        self.max_visible = 3
         self.ecart = HEIGHT//3 + 20
+
+        self.tailles_fixes = [0.7, 1.0, 0.7]
         
-        self.active_cases = []
-        
-        self.update_display()
+        self.active_cases = []     
+        self.update_display()   
 
     def update_display(self):
-
+        # 1. On nettoie tout
         for case in self.active_cases:
             case.destroy()
         self.active_cases = []
 
-        end_index = min(self.current_index + self.max_visible, len(self.params_data))
-        
-        for i in range(self.current_index, end_index):
-            display_pos = i - self.current_index 
+        # 2. On affiche les 3 cases (ou moins si on est à la fin de la liste)
+        for j in range(self.max_visible):
             
-            y_pos = self.y_start + (display_pos * self.ecart)
-            nom_param = self.params_data[i]
+            # L'index réel dans ta liste de données (ex: "Son", "Lumière"...)
+            data_index = self.current_index + j
+            
+            # Si on a dépassé la fin de la liste de données, on arrête
+            if data_index >= len(self.params_data):
+                break
 
-            new_case = Param_case(self.canvas, self.x, y_pos, nom_param)
+            # Calcul de la position Y (La case 0 est en haut, la 1 au milieu, etc.)
+            y_pos = self.y_start + (j * self.ecart)
+            
+            # On récupère le scale correspondant à la position j (0, 1 ou 2)
+            # Si j vaut 0 -> scale = 0.8
+            # Si j vaut 1 -> scale = 1.0
+            # Si j vaut 2 -> scale = 0.8
+            scale_actuel = self.tailles_fixes[j]
+            
+            nom_param = self.params_data[data_index]
+            
+            # On crée la case avec le scale imposé
+            new_case = Param_case(self.canvas, self.x, y_pos, nom_param, scale=scale_actuel)
             self.active_cases.append(new_case)
 
     def scroll(self, direction):
+        # On calcule le nouvel index
         new_index = self.current_index + direction
         
-        if 0 <= new_index <= len(self.params_data) - self.max_visible:
-            self.current_index = new_index
-            self.update_display()
-        elif 0 <= new_index < len(self.params_data):
+        # On vérifie qu'on ne sort pas des limites
+        # (On peut aller jusqu'à len - 1 pour afficher le dernier élément tout seul en haut si on veut)
+        if 0 <= new_index < len(self.params_data):
              self.current_index = new_index
              self.update_display()
+
+## ca marche a peu pres
+
+"""
+class MenuDeroulant:
+    def __init__(self, canvas, x, y_start, liste_params):
+        self.canvas = canvas
+        self.x = x
+        self.y_start = y_start
+        self.params_data = liste_params
+        
+        self.current_index = 0
+        self.max_visible = 3
+        self.ecart = HEIGHT // 3 - 30
+        
+        # Positions cibles (les Y finaux)
+        self.positions_y_fixes = [
+            self.y_start,                # Position 0 (Haut)
+            self.y_start + self.ecart,   # Position 1 (Milieu)
+            self.y_start + self.ecart*2  # Position 2 (Bas)
+        ]
+        
+        # Tailles cibles
+        self.tailles_fixes = [0.8, 1.0, 0.8] 
+
+        self.active_cases = []
+        
+        # Variable pour empêcher de spammer le bouton pendant l'animation
+        self.is_animating = False
+        
+        self.update_display_instantane()
+
+    def update_display_instantane(self):
+        # Nettoyage
+        for case in self.active_cases: case.destroy()
+        self.active_cases = []
+
+        for j in range(self.max_visible):
+            data_index = self.current_index + j
+            if data_index >= len(self.params_data): break
+
+            # On prend les valeurs fixes directes
+            y = self.positions_y_fixes[j]
+            s = self.tailles_fixes[j]
+            
+            new_case = Param_case(self.canvas, self.x, y, self.params_data[data_index], scale=s)
+            self.active_cases.append(new_case)
+
+    def scroll(self, direction):
+        # Si on est déjà en train de bouger ou si on est au bout de la liste, on ne fait rien
+        if self.is_animating: return
+        
+        new_index = self.current_index + direction
+        if not (0 <= new_index < len(self.params_data)): return
+
+        # C'est parti pour l'animation !
+        self.animate_transition(direction)
+
+    def animate_transition(self, direction):
+        self.is_animating = True
+        
+        # CONFIGURATION DE L'ANIMATION
+        steps = 10  # Nombre d'images pour l'animation (plus c'est haut, plus c'est lent mais fluide)
+        delay = 15  # Temps en ms entre chaque image
+        current_step = 0
+        
+        # On détermine quels éléments on va afficher pendant l'animation
+        # Si on descend (direction 1), on affiche du index actuel jusqu'à +4 pour voir celui qui arrive
+        # C'est un peu de gymnastique mentale pour savoir qui va où :
+        
+        # Pour simplifier : On va redessiner frame par frame
+        
+        def step_process(step):
+            # 1. Nettoyage
+            for case in self.active_cases: case.destroy()
+            self.active_cases = []
+            
+            # Calcul du pourcentage d'avancement (0.0 à 1.0)
+            progress = step / steps 
+            
+            # Si on descend (direction = 1), les éléments montent visuellement vers le haut
+            # Donc l'élément 1 va vers la position 0
+            
+            # On boucle sur une case DE PLUS que le max visible pour gérer celle qui entre et celle qui sort
+            # On affiche virtuellement de -1 à 3
+            range_start = -1 if direction == -1 else 0
+            range_end = self.max_visible if direction == -1 else self.max_visible + 1
+
+            for j in range(range_start, range_end):
+                # L'index réel dans la liste de données
+                # C'est compliqué ici : on base l'index sur l'état ACTUEL (avant changement)
+                data_index = self.current_index + j
+                
+                if data_index < 0 or data_index >= len(self.params_data):
+                    continue
+
+                # --- CALCUL DE LA POSITION ANIMÉE ---
+                # Position de départ (j) -> Position d'arrivée (j - direction)
+                
+                start_y = self.y_start + (j * self.ecart)
+                target_y = self.y_start + ((j - direction) * self.ecart)
+                
+                # Formule magique : Position actuelle = Départ + (Différence * Progression)
+                current_y = start_y + (target_y - start_y) * progress
+
+                # --- CALCUL DU SCALE ANIMÉ ---
+                # On utilise une logique de distance pour le scale pendant l'animation
+                # C'est plus fluide que d'interpoler les valeurs fixes
+                center_y = self.y_start + self.ecart
+                dist = abs(current_y - center_y)
+                
+                # Même formule que tout à l'heure, mais dynamique !
+                # Max scale 1.0, Min scale 0.8
+                # On suppose que à ecart distance, on est à 0.8
+                ratio = dist / self.ecart
+                if ratio > 1: ratio = 1
+                current_scale = 1.0 - (ratio * 0.2) # 1.0 - 0.2 = 0.8
+                
+                # Création de la case temporaire
+                case = Param_case(self.canvas, self.x, current_y, self.params_data[data_index], scale=current_scale)
+                self.active_cases.append(case)
+
+            # --- FIN DE BOUCLE ---
+            if step < steps:
+                # On continue l'animation
+                self.canvas.after(delay, lambda: step_process(step + 1))
+            else:
+                # Animation finie ! On valide les nouvelles positions fixes
+                self.current_index += direction
+                self.is_animating = False
+                self.update_display_instantane() # On remet au propre pour être sûr d'être bien aligné
+
+        # Lancement de la première étape
+        step_process(1)
+
+"""
 
 # ------- Différentes page -------- #
 
@@ -214,14 +366,14 @@ class Param_jeu(tk.Frame):
 
         mes_parametres = ["Win Condition", "Largeur", "Hauteur", "Difficulté", "Volume", "Luminosité"]
 
-        self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//3, mes_parametres)
+        self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, mes_parametres)
 
         # --- BOUTONS DE SCROLL (Fixes sur le côté) ---
         # Bouton Monter (Scroll HAUT -> index diminue -> -1)
-        add_canvas_bouton(self.canva, "images/bouton_up.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 - 50), lambda: self.menu.scroll(-1), True, 5)
+        add_canvas_bouton(self.canva, "images/bouton_up.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 - 50), lambda: self.menu.scroll(1), True, 5)
         
         # Bouton Descendre (Scroll BAS -> index augmente -> 1)
-        add_canvas_bouton(self.canva, "images/bouton_down.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 + 50), lambda: self.menu.scroll(1), True, 5)
+        add_canvas_bouton(self.canva, "images/bouton_down.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 + 50), lambda: self.menu.scroll(-1), True, 5)
 
         """
         x_depart = WIDTH//2
