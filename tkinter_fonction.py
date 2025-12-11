@@ -105,19 +105,22 @@ class Param_case:
         self.ids = []
         self.on_change = on_change
 
+        # choix options
         self.options = options if options else []
         self.index = index
 
+        # dimension pour la resizer et l'effet de déroulement du menu
         w_redim = int(start_size[0] * scale)
         h_redim = int(start_size[1] * scale)
         size = (w_redim, h_redim)
 
+        # si on affiche la case, on veut pas afficher certain case pour pouvoir d&rouler jusqu'au bout sans avoir de case vide
         if affiche:
             # Image de fond
             self.img_id = add_canvas_img(canvas, "images/param_case.png", (x,y), size)
             self.ids.append(self.img_id)
 
-            # Nom du paramètre ("Volume", "Difficulté", etc.)
+            # titre des paramétre
             self.texte_nom = canvas.create_text(
                 x,
                 y - (size[1]//2) + int(35*scale),
@@ -126,14 +129,15 @@ class Param_case:
                 anchor='center',
                 fill="black"
             )
-            self.ids.append(self.texte_nom)
+            self.ids.append(self.texte_nom) # ajout au id pour pas le perdre
 
             # Valeur affichée
             if self.options:
                 valeur = self.options[self.index]
             else:
                 valeur = ""
-
+            
+            # valeur du paramétre affichage
             self.texte_valeur = canvas.create_text(
                 x,
                 y + 25*scale,
@@ -144,7 +148,7 @@ class Param_case:
             )
             self.ids.append(self.texte_valeur)
 
-            # Bouton ↑
+            # Bouton up
             self.btn_u_id = add_canvas_bouton(
                 canvas,
                 "images/bouton_up.png",
@@ -156,7 +160,7 @@ class Param_case:
             )
             self.ids.append(self.btn_u_id)
 
-            # Bouton ↓
+            # Bouton down
             self.btn_d_id = add_canvas_bouton(
                 canvas,
                 "images/bouton_down.png",
@@ -170,43 +174,47 @@ class Param_case:
 
     # Changer de valeur vers HAUT
     def next_value(self):
-        if not self.options: return
-        self.index = (self.index + 1) % len(self.options)
-        self.canvas.itemconfig(self.texte_valeur, text=self.options[self.index])
-        self.on_change(self.index)
+        if not self.options: 
+            return
+        self.index = (self.index + 1) % len(self.options) # modification de l'index ( si on fait +1 a l'index max ca remet au debut (modulo %))
+        self.canvas.itemconfig(self.texte_valeur, text=self.options[self.index]) # Changelent des valeurs
+        self.on_change(self.index)  # Fait le changement
 
-    # Changer de valeur vers BAS
+    # Changer de valeur vers BAS (Pareil que haut mais avec - 1)
     def prev_value(self):
         if not self.options: return
         self.index = (self.index - 1) % len(self.options)
         self.canvas.itemconfig(self.texte_valeur, text=self.options[self.index])
         self.on_change(self.index)
 
+    # détruit la case pour l'animation
     def destroy(self):
         for item_id in self.ids:
-            self.canvas.delete(item_id)
+            self.canvas.delete(item_id) # Détruire tous puisque tous bouge 
 
 class MenuDeroulant:
     def __init__(self, canvas, x, y_start, CONFIG_DATA):
         self.canvas = canvas
         self.x = x
         self.y_start = y_start
+        # Gestion des valeur des paramétres
         self.params_data = list(CONFIG_DATA.keys())
         self.config =  CONFIG_DATA
         self.choices = {key: 0 for key in CONFIG_DATA}
         
+        #Gestion des index
         self.current_index = 0
         self.max_visible = 3
         self.ecart = HEIGHT // 3 + 20
         
-        # Positions cibles (les Y finaux)
+        # Positions cible après mouvement
         self.positions_y_fixes = [
-            self.y_start,                # Position 0 (Haut)
-            self.y_start + self.ecart,   # Position 1 (Milieu)
-            self.y_start + self.ecart*2  # Position 2 (Bas)
+            self.y_start,                # Position haut
+            self.y_start + self.ecart,   # Position millieu
+            self.y_start + self.ecart*2  # Position bas
         ]
         
-        # Tailles cibles
+        # % de la taille pour l'effet de style
         self.tailles_fixes = [0.7, 1.0, 0.7] 
 
         self.active_cases = []

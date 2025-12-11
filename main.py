@@ -35,17 +35,21 @@ class Acceuil(tk.Frame):
 class Param_jeu(tk.Frame):
     def __init__(self, parent):
         super().__init__(parent, bg="")
-        
+
+
+        # Création du canva de la page
         self.canva = tk.Canvas(self, width=parent.winfo_screenwidth(), height=parent.winfo_screenheight(), highlightthickness=0, bg="grey")
         self.canva.pack(fill="both", expand=True)
 
+        # bouton back next de la page
         add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Acceuil), True, 20)
         add_canvas_bouton(self.canva, "images/boutonNext.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT) - HEIGHT//10), lambda: self.menu.print_all_choices(), True, 20)
-        add_bakground(self.canva, "images/parametre_bg.png")
+        add_bakground(self.canva, "images/parametre_bg.png") # ajout background
 
         ##video transition
         ##lancer_video(self.canva, "images/run2.mp4")
 
+        # Dictionnaire des paramétres et des valeurs
         CONFIG_DATA = {
             "": [],
             "Win Condition": [i for i in range(3,50)],
@@ -56,10 +60,11 @@ class Param_jeu(tk.Frame):
             "couleur": ["bleu", "rouge", "orange", "jaune"]
         }
 
+        # ajoute le Menu Déroulant des paramétre (cf.tkinter_fonction.py)
         self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, CONFIG_DATA)
 
+        # ajout des bouton de scroll du Menu déroulant
         add_canvas_bouton(self.canva, "images/bouton_up.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 - 50), lambda: self.menu.scroll(1), True, 5)
-
         add_canvas_bouton(self.canva, "images/bouton_down.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 + 50), lambda: self.menu.scroll(-1), True, 5)
 
 
