@@ -100,14 +100,14 @@ def fermer_video(canvas):
     canvas.delete("tag_video")
 
 class Param_case:
-    def __init__(self, canvas, x, y, nom, options=None, start_size=(HEIGHT//4, HEIGHT//3), scale=1.0, affiche=True):
+    def __init__(self, canvas, x, y, nom, options=None, start_size=(HEIGHT//4, HEIGHT//3), scale=1.0, affiche=True, index=0, on_change=lambda i: None):
         self.canvas = canvas
         self.nom = nom
         self.ids = []
+        self.on_change = on_change
 
-        # Liste d’options possibles pour ce paramètre
         self.options = options if options else []
-        self.index = 0  # index actuel dans self.options
+        self.index = index
 
         w_redim = int(start_size[0] * scale)
         h_redim = int(start_size[1] * scale)
@@ -137,11 +137,11 @@ class Param_case:
 
             self.texte_valeur = canvas.create_text(
                 x,
-                y,
+                y + 25*scale,
                 text=valeur,
                 font=("Retro Gaming", int(20*scale)),
                 anchor='center',
-                fill="white"
+                fill="black"
             )
             self.ids.append(self.texte_valeur)
 
@@ -174,85 +174,27 @@ class Param_case:
         if not self.options: return
         self.index = (self.index + 1) % len(self.options)
         self.canvas.itemconfig(self.texte_valeur, text=self.options[self.index])
+        self.on_change(self.index)
 
     # Changer de valeur vers BAS
     def prev_value(self):
         if not self.options: return
         self.index = (self.index - 1) % len(self.options)
         self.canvas.itemconfig(self.texte_valeur, text=self.options[self.index])
+        self.on_change(self.index)
 
     def destroy(self):
         for item_id in self.ids:
             self.canvas.delete(item_id)
 
-
-"""
-# Sans scroll
 class MenuDeroulant:
-    def __init__(self, canvas, x, y_start, liste_params):
+    def __init__(self, canvas, x, y_start, CONFIG_DATA):
         self.canvas = canvas
         self.x = x
         self.y_start = y_start
-        self.params_data = liste_params
-        
-        self.current_index = 0 
-        self.max_visible = 3
-        self.ecart = HEIGHT//3 + 20
-
-        self.tailles_fixes = [0.7, 1.0, 0.7]
-        
-        self.active_cases = []     
-        self.update_display()   
-
-    def update_display(self):
-        # 1. On nettoie tout
-        for case in self.active_cases:
-            case.destroy()
-        self.active_cases = []
-
-        # 2. On affiche les 3 cases (ou moins si on est à la fin de la liste)
-        for j in range(self.max_visible):
-            
-            # L'index réel dans ta liste de données (ex: "Son", "Lumière"...)
-            data_index = self.current_index + j
-            
-            # Si on a dépassé la fin de la liste de données, on arrête
-            if data_index >= len(self.params_data):
-                break
-
-            # Calcul de la position Y (La case 0 est en haut, la 1 au milieu, etc.)
-            y_pos = self.y_start + (j * self.ecart)
-            
-            # On récupère le scale correspondant à la position j (0, 1 ou 2)
-            # Si j vaut 0 -> scale = 0.8
-            # Si j vaut 1 -> scale = 1.0
-            # Si j vaut 2 -> scale = 0.8
-            scale_actuel = self.tailles_fixes[j]
-            
-            nom_param = self.params_data[data_index]
-            
-            # On crée la case avec le scale imposé
-            new_case = Param_case(self.canvas, self.x, y_pos, nom_param, scale=scale_actuel)
-            self.active_cases.append(new_case)
-
-    def scroll(self, direction):
-        # On calcule le nouvel index
-        new_index = self.current_index + direction
-        
-        # On vérifie qu'on ne sort pas des limites
-        # (On peut aller jusqu'à len - 1 pour afficher le dernier élément tout seul en haut si on veut)
-        if 0 <= new_index < len(self.params_data):
-             self.current_index = new_index
-             self.update_display()
-
-"""
-class MenuDeroulant:
-    def __init__(self, canvas, x, y_start, liste_params, CONFIG_DATA):
-        self.canvas = canvas
-        self.x = x
-        self.y_start = y_start
-        self.params_data = liste_params
-        self.config = CONFIG_DATA
+        self.params_data = list(CONFIG_DATA.keys())
+        self.config =  CONFIG_DATA
+        self.choices = {key: 0 for key in CONFIG_DATA}
         
         self.current_index = 0
         self.max_visible = 3
@@ -276,27 +218,32 @@ class MenuDeroulant:
         self.update_display_instantane()
 
     def update_display_instantane(self):
-        for case in self.active_cases: case.destroy()
+        for case in self.active_cases: 
+            case.destroy()
         self.active_cases = []
-
-        
 
         for j in range(self.max_visible):
             data_index = self.current_index + j
 
+            if data_index >= len(self.params_data): 
+                break
+
             nom = self.params_data[data_index]
             options = self.config.get(nom, [])
-
-            if data_index >= len(self.params_data): break
             y = self.positions_y_fixes[j]
             s = self.tailles_fixes[j]
 
-            if self.params_data[data_index] == "":
+            saved_index = self.choices.get(nom, 0)
+
+            if nom == "":
                 new_case = Param_case(self.canvas, self.x, y, self.params_data[data_index], scale=s, affiche=False)
                 self.active_cases.append(new_case)
             else :
-                new_case = Param_case(self.canvas, self.x, y,nom, options, scale=s)
+                new_case = Param_case(self.canvas, self.x, y,nom, options, scale=s ,index=self.choices[nom], on_change=lambda idx, cle=nom: self.save_choice(cle, idx))
                 self.active_cases.append(new_case)
+    
+    def save_choice(self, nom, idx):
+        self.choices[nom] = idx
 
     def scroll(self, direction):
         if self.is_animating: return
@@ -313,10 +260,10 @@ class MenuDeroulant:
         # CONFIGURATION DE L'ANIMATION
         steps = 3
         delay = 1
-        current_step = 0
         
         def step_process(step):
-            for case in self.active_cases: case.destroy()
+            for case in self.active_cases:
+                case.destroy()
             self.active_cases = []
             
             progress = step / steps 
@@ -329,25 +276,28 @@ class MenuDeroulant:
                 
                 if data_index < 0 or data_index >= len(self.params_data):
                     continue
+
+                nom = self.params_data[data_index]
+                options = self.config.get(nom, [])
                 
                 start_y = self.y_start + (j * self.ecart)
                 target_y = self.y_start + ((j - direction) * self.ecart)
-                
                 current_y = start_y + (target_y - start_y) * progress
 
                 center_y = self.y_start + self.ecart
                 dist = abs(current_y - center_y)
-                
                 ratio = dist / self.ecart
                 if ratio > 1: ratio = 1
-                current_scale = 1.0 - (ratio * 0.2) # 1.0 - 0.2 = 0.8
+                current_scale = 1.0 - (ratio * 0.2)
+
+                saved_index = self.choices.get(nom, 0)
                 
-                # Création de la case temporaire
-                if self.params_data[data_index] == "":
-                    case = Param_case(self.canvas, self.x, current_y, self.params_data[data_index], scale=current_scale, affiche=False)
+
+                if nom == "":
+                    case = Param_case(self.canvas, self.x, current_y, nom, scale=current_scale, affiche=False)
                     self.active_cases.append(case)
                 else :
-                    case = Param_case(self.canvas, self.x, current_y, self.params_data[data_index], scale=current_scale)
+                    case = Param_case(self.canvas, self.x, current_y, nom, options, scale=current_scale, index=saved_index, on_change=lambda idx, cle=nom: self.save_choice(cle, idx))
                     self.active_cases.append(case)
 
             if step < steps:
@@ -407,18 +357,15 @@ class Param_jeu(tk.Frame):
 
         CONFIG_DATA = {
             "": [],
-            "Win Condition": ["1", "2", "3"],
-            "Largeur": ["5", "6", "7"],
-            "Hauteur": ["5", "6", "7"],
+            "Win Condition": [i for i in range(3,50)],
+            "Largeur": [i for i in range(1,50)],
+            "Hauteur": [i for i in range(1,50)],
             "Difficulté": ["Facile", "Normal", "Hardcore"],
-            "Volume": ["0", "25", "50", "75", "100"],
-            "Luminosité": ["Sombre", "Moyen", "Clair"]
+            "Bonus": ["nothing","bombe", "help", "undo"],
+            "couleur": ["bleu", "rouge", "orange", "jaune"]
         }
-        USER_CHOICES = {key: 0 for key in CONFIG_DATA}
 
-        mes_parametres = ["", "Win Condition", "Largeur", "Hauteur", "Difficulté", "Volume", "Luminosité"]
-
-        self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, mes_parametres, CONFIG_DATA)
+        self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, CONFIG_DATA)
 
         # --- BOUTONS DE SCROLL (Fixes sur le côté) ---
         # Bouton Monter (Scroll HAUT -> index diminue -> -1)
