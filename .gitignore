@@ -4,4 +4,4 @@ docs/html/
 docs/latex/
 
 *.log
-.DS_Store
+.DS_Store__pycache__/
