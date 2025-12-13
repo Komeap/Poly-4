@@ -1,28 +1,42 @@
+## @file bot_MinMax.py
+## Fonctions d'implémentations d'un bot utilisant MinMax
 
-# main.py
 from Plateau import Plateau
 import numpy as np
 
-# === Victoire / nul (MATRICE uniquement) ===
 
-def victoire_ou_nul(grille, joueur_affichage):
+def victoire_ou_nul(grille, joueur):
     """
-    Renvoie (True, 1) si victoire du joueur affiché,
-    (True, 0) si match nul,
-    (False, -1) sinon
+    @brief Vérifie l'état de la partie pour un joueur donné (Victoire ou nul)
+    @param grille Plateau du jeu en cours
+           joueur Humain ou bot 
+    @return (True, 1) si victoire du joueur
+            (True, 0) si match nul
+            (False, -1) sinon
     """
-    if check_win_matrix(grille, joueur_affichage):
+    if check_victoire_matrice(grille, joueur):
         return (True, 1)
-    if is_full(grille):
+    if est_pleine(grille):
         return (True, 0)
     return (False, -1)
 
-def is_full(grille):
-    """True si la grille est pleine (match nul)."""
+def est_pleine(grille):
+    """
+    @brief Vérifie si la grille est pleine (match nul)
+    @param grille Plateau du jeu en cours
+    @return True si la grille est pleine
+            False sinon
+    """
     return all(grille.fill_matrice[col] >= grille.l for col in range(grille.c))
 
-def check_win_matrix(grille, joueur):
-    """Vérifie si 'joueur' (1 ou 2) a une victoire dans la matrice."""
+def check_victoire_matrice(grille, joueur):
+    """
+    @brief Vérifie si joueur a gagné. Ici, nous n'utilisons pas les bitboards.
+    @param grille Plateau du jeu en cours
+           joueur Humain ou bot 
+    @return True si le joueur a une victoire 
+            False sinon
+    """
     mat = grille.matrice
     l, c, w = grille.l, grille.c, grille.win
 
@@ -50,18 +64,20 @@ def check_win_matrix(grille, joueur):
                 return True
     return False
 
-# === Détections immédiates ===
 
-def quel_coup(grille, joueur_affichage):
+def quel_coup_matrice(grille, joueur):
     """
-    Renvoie un coup gagnant immédiat pour le joueur j_affichage s'il existe, sinon -1.
-    Utilise la matrice uniquement.
+    @brief Vérifie si il existe un coup gagnant immédiat pour joueur et le renvoit immédiatement si il existe. Ici, nous n'utilisons pas les bitboards.
+    @param grille Plateau du jeu en cours
+        joueur Humain ou bot 
+    @return Renvoit le coup gagnant si il existe
+            -1 sinon
     """
     for col in range(grille.c):
         if grille.fill_matrice[col] >= grille.l:
             continue
-        grille.play(col, joueur_affichage)
-        if check_win_matrix(grille, joueur_affichage):
+        grille.play(col, joueur)
+        if check_victoire_matrice(grille, joueur):
             grille.undo(col)
             return col
         grille.undo(col)
@@ -69,25 +85,34 @@ def quel_coup(grille, joueur_affichage):
 
 def coup_bloquant(grille, adversaire):
     """
-    Renvoie un coup qui bloque une victoire immédiate de l'adversaire, sinon -1.
+    @brief Vérifie si il existe un coup gagnant immédiat pour adversaire et le renvoit immédiatement si il existe. Ici, nous n'utilisons pas les bitboards.
+    @param grille Plateau du jeu en cours
+        joueur Humain ou bot 
+    @return Renvoit le coup permettant de bloquer l'adversaire si il existe
+            -1 sinon
     """
     for col in range(grille.c):
         if grille.fill_matrice[col] >= grille.l:
             continue
         grille.play(col, adversaire)
-        if check_win_matrix(grille, adversaire):
+        if check_victoire_matrice(grille, adversaire):
             grille.undo(col)
             return col
         grille.undo(col)
     return -1
 
-# === Heuristique ===
+
 
 def evaluate_window(window, joueur_max, joueur_min):
+
     """
-    Eval d'une fenêtre de 4 cellules.
-    Score positif si bon pour joueur_max (IA = 2), négatif si bon pour joueur_min (humain = 1).
+    @brief Évalue heuristiquement une fenêtre de 4 cases pour le MinMax.
+    @param window Liste/array de 4 entiers (0 = vide, 1 = humain, 2 = IA)
+           joueur_max Entier du joueur à maximiser (ex. 2 pour l'IA)
+           joueur_min Entier du joueur à minimiser (ex. 1 pour l'humain)
+    @return Renvoit le score de la fenêtre (positif si favorable à joueur_max, négatif si favorable à joueur_min)
     """
+
     score = 0
     window = list(window)
     count_max = window.count(joueur_max)
@@ -111,10 +136,13 @@ def evaluate_window(window, joueur_max, joueur_min):
 
 def score_position(grille, joueur_max=2, joueur_min=1):
     """
-    Heuristique globale:
-    - Bonus centre
-    - Somme des évaluations sur toutes les fenêtres de 4 (horiz/vert/diag)
+    @brief Calcule le score heuristique global d'une position pour le MinMax.
+    @param grille Plateau du jeu en cours
+           joueur_max Joueur à maximiser (ex. 2 pour l'IA)
+           joueur_min Joueur à minimiser (ex. 1 pour l'humain)
+    @return Renvoit le score global (positif si favorable à joueur_max, négatif si favorable à joueur_min)
     """
+
     mat = grille.matrice
     l, c, w = grille.l, grille.c, grille.win
     score = 0
@@ -154,8 +182,9 @@ def score_position(grille, joueur_max=2, joueur_min=1):
 
 def colonnes_ordonnees(grille):
     """
-    Ordre des colonnes: centre -> proche du centre -> extérieur, filtrées par jouabilité.
-    (Pas obligatoire, mais aide le MinMax basique.)
+    @brief Génère la liste des colonnes jouables dans un ordre optimisé (centre → bords).
+    @param grille Plateau du jeu en cours
+    @return Renvoit la liste des indices de colonnes jouables, triées par priorité (centre en premier)
     """
     c = grille.c
     centre = c // 2
@@ -171,16 +200,19 @@ def colonnes_ordonnees(grille):
 
 def minmax(grille, profondeur, maximising=True):
     """
-    MinMax basique sur la MATRICE (sans alpha-beta).
-    maximising: True pour l'IA (joueur 2), False pour humain (joueur 1).
-    Retourne un score.
+    @brief Calcule le score d'une position par MinMax sur la matrice.
+    @param grille Plateau du jeu en cours
+           profondeur Profondeur de recherche restante 
+           maximising Booléen : True si c'est le tour du joueur à maximiser (IA=2), False sinon (humain=1)
+    @return Renvoit le score évalué de la position (positif si favorable à l'IA, négatif si favorable à l'humain)
     """
+
     # États terminaux
-    if check_win_matrix(grille, 2):
+    if check_victoire_matrice(grille, 2):
         return 1000000
-    if check_win_matrix(grille, 1):
+    if check_victoire_matrice(grille, 1):
         return -1000000
-    if is_full(grille) or profondeur == 0:
+    if est_pleine(grille) or profondeur == 0:
         return score_position(grille, joueur_max=2, joueur_min=1)
 
     cols = colonnes_ordonnees(grille)
@@ -205,13 +237,13 @@ def minmax(grille, profondeur, maximising=True):
 
 def meilleur_coup(grille, profondeur):
     """
-    Politique IA:
-    1) Coup gagnant immédiat (IA)
-    2) Blocage du coup gagnant adverse
-    3) MinMax basique
+    @brief Sélectionne le meilleur coup pour l'IA en priorisant: coup gagnant, blocage, puis MinMax.
+    @param grille Plateau du jeu en cours
+           profondeur Profondeur de recherche pour MinMax
+    @return Renvoit l'index de la colonne choisie pour jouer (0..grille.c-1)
     """
     # 1) Coup gagnant immédiat
-    cg = quel_coup(grille, 2)
+    cg = quel_coup_matrice(grille, 2)
     if cg != -1:
         return cg
 
@@ -237,8 +269,7 @@ def meilleur_coup(grille, profondeur):
         best_col = valid[0] if valid else 0
     return best_col
 
-# === Partie CLI ===
-
+##Il me reste ça refaire et à doxygen
 def partie_vs_bot(grille, profondeur=4):
     joueur = 1  # humain commence
 
@@ -297,5 +328,4 @@ def partie_vs_bot(grille, profondeur=4):
 
 if __name__ == "__main__":
     g = Plateau(lignes=6, colones=7, win_conditon=4)
-    # Profondeur 4 ou 5 selon la vitesse désirée (MinMax sans pruning est plus lent qu'alpha-beta)
     partie_vs_bot(g, profondeur=4)

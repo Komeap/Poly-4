@@ -1,4 +1,5 @@
 from tkinter_fonction import *
+from bot2 import victoire_ou_nul, meilleur_coup
 
 # ------- Différentes page -------- #
 
@@ -43,7 +44,7 @@ class Param_jeu(tk.Frame):
 
         # bouton back next de la page
         add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Acceuil), True, 20)
-        add_canvas_bouton(self.canva, "images/boutonNext.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT) - HEIGHT//10), lambda: self.menu.print_all_choices(), True, 20)
+        add_canvas_bouton(self.canva, "images/boutonNext.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT) - HEIGHT//10), lambda: (self.menu.print_all_choices(),app.changer_de_page(Jeu)), True, 20)
         add_bakground(self.canva, "images/parametre_bg.png") # ajout background
 
         ##video transition
@@ -64,8 +65,23 @@ class Param_jeu(tk.Frame):
         self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, CONFIG_DATA)
 
         # ajout des bouton de scroll du Menu déroulant
-        add_canvas_bouton(self.canva, "images/bouton_up.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 - 50), lambda: self.menu.scroll(1), True, 5)
-        add_canvas_bouton(self.canva, "images/bouton_down.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 + 50), lambda: self.menu.scroll(-1), True, 5)
+        add_canvas_bouton(self.canva, "images/bouton_up.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 - 50), lambda: self.menu.scroll(-1), True, 5)
+        add_canvas_bouton(self.canva, "images/bouton_down.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 + 50), lambda: self.menu.scroll(1), True, 5)
+
+class Jeu(tk.Frame):
+    """
+    @brief Réprésente la page de jeu 
+    """
+    def __init__(self, parent):
+        super().__init__(parent, bg="")
+
+        self.canva = tk.Canvas(self, width=parent.winfo_screenwidth(), height=parent.winfo_screenheight(), highlightthickness=0, bg="grey")
+        self.canva.pack(fill="both", expand=True)
+
+        add_bakground(self.canva, "images/bg.jpg")
+        add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), ((HEIGHT//10)//2 + 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Param_jeu), True, 20)
+        add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
+
 
 
 if __name__ == "__main__":
