@@ -105,5 +105,3 @@ class Plateau:
                 return True
         return False
 
-
-

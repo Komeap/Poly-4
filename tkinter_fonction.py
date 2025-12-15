@@ -325,3 +325,24 @@ class MenuDeroulant:
             valeur = self.config[nom][index]
             print(f"{nom}: {valeur}")
         print("==========================\n")
+
+
+def afficher_plateau(self, largeur, hauteur):
+    marge_globale = 0.8 
+    taille_max_w = (WIDTH * marge_globale) // largeur
+    taille_max_h = (HEIGHT * marge_globale) // hauteur
+        
+    taille_case = int(min(taille_max_w, taille_max_h))
+
+
+    for i in range(largeur):
+        for j in range(hauteur):
+            pos_x = 50 + (c * taille_case) + (taille_case // 2)
+            pos_y = 50 + (l * taille_case) + (taille_case // 2)
+
+            add_canvas_img(
+                    canvas=self.canva,
+                    link="images/case.png", 
+                    pos=(pos_x, pos_y),
+                    size=(self.taille_case, self.taille_case)
+                )
