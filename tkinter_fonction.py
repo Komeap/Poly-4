@@ -352,6 +352,39 @@ def afficher_plateau(canva, largeur, hauteur):
     case_redim = pil_case.resize((taille_case, taille_case), Image.LANCZOS)
     case_tk = ImageTk.PhotoImage(case_redim)
     canva.image_cache.append(case_tk)
+
+    pil_border = Image.open("images/border.png")
+
+    epaisseur_mur = taille_case // 4
+    overlap = 2
+    epaisseur_visuelle = epaisseur_mur + overlap
+
+    w_visuel_horiz = grille_l + overlap
+    h_visuel_verti = grille_h + overlap
+
+    img_r = pil_border.resize((epaisseur_visuelle, h_visuel_verti), Image.LANCZOS)
+    tk_r = ImageTk.PhotoImage(img_r)
+    canva.image_cache.append(tk_r)
+
+    img_l = pil_border.rotate(180).resize((epaisseur_visuelle, h_visuel_verti), Image.LANCZOS)
+    tk_l = ImageTk.PhotoImage(img_l)
+    canva.image_cache.append(tk_l)
+
+    img_t = pil_border.rotate(90, expand=True).resize((w_visuel_horiz, epaisseur_visuelle), Image.LANCZOS)
+    tk_t = ImageTk.PhotoImage(img_t)
+    canva.image_cache.append(tk_t)
+
+    img_b = pil_border.rotate(-90, expand=True).resize((w_visuel_horiz, epaisseur_visuelle), Image.LANCZOS)
+    tk_b = ImageTk.PhotoImage(img_b)
+    canva.image_cache.append(tk_b)
+
+    center_grid_x = start_x + (grille_l // 2)
+    center_grid_y = start_y + (grille_h // 2)
+
+    canva.create_image(center_grid_x, start_y - (epaisseur_mur//2), image=tk_t, anchor=tk.CENTER)
+    canva.create_image(center_grid_x, start_y + grille_h + (epaisseur_mur//2), image=tk_b, anchor=tk.CENTER)
+    canva.create_image(start_x - (epaisseur_mur//2), center_grid_y, image=tk_l, anchor=tk.CENTER)
+    canva.create_image(start_x + grille_l + (epaisseur_mur//2), center_grid_y, image=tk_r, anchor=tk.CENTER)
     
 
     for col in range(largeur):
