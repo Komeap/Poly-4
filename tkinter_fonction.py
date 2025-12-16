@@ -327,22 +327,36 @@ class MenuDeroulant:
         print("==========================\n")
 
 
-def afficher_plateau(self, largeur, hauteur):
-    marge_globale = 0.8 
-    taille_max_w = (WIDTH * marge_globale) // largeur
-    taille_max_h = (HEIGHT * marge_globale) // hauteur
-        
-    taille_case = int(min(taille_max_w, taille_max_h))
+def afficher_plateau(canva, largeur, hauteur):
+    
+    m_larg = WIDTH*0.2
+    m_haut = HEIGHT*0.2
 
+    size_dispo_larg = abs(WIDTH - 2*(m_larg))
+    size_dispo_haut = abs(HEIGHT - 2*(m_haut))
 
-    for i in range(largeur):
-        for j in range(hauteur):
-            pos_x = 50 + (c * taille_case) + (taille_case // 2)
-            pos_y = 50 + (l * taille_case) + (taille_case // 2)
+    size_case_1 = (int)(size_dispo_larg//largeur)
+    size_case_2 = (int)(size_dispo_haut//hauteur)
 
-            add_canvas_img(
-                    canvas=self.canva,
-                    link="images/case.png", 
-                    pos=(pos_x, pos_y),
-                    size=(self.taille_case, self.taille_case)
-                )
+    taille_case = min(size_case_1, size_case_2)
+
+    grille_l = taille_case * largeur
+    grille_h = taille_case * hauteur
+
+    start_x = m_larg + (size_dispo_larg - grille_l)//2
+    start_y = m_haut + (size_dispo_haut - grille_h)//2
+
+    canva.image_cache = []
+    
+    pil_case = Image.open("images/One_case.png")
+    case_redim = pil_case.resize((taille_case, taille_case), Image.LANCZOS)
+    case_tk = ImageTk.PhotoImage(case_redim)
+    canva.image_cache.append(case_tk)
+    
+
+    for col in range(largeur):
+        for lig in range(hauteur):
+            pos_x = start_x + (col * taille_case) + (taille_case // 2)
+            pos_y = start_y + (lig * taille_case) + (taille_case // 2)
+
+            canva.create_image(pos_x, pos_y, image=case_tk, anchor=tk.CENTER)

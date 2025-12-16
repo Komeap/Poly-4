@@ -91,7 +91,7 @@ class Jeu(tk.Frame):
         add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), ((HEIGHT//10)//2 + 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Param_jeu), True, 20)
         add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
 
-        afficher_plateau(self, 6,7)
+        afficher_plateau(self.canva, 12,7)
 
 
 if __name__ == "__main__":
