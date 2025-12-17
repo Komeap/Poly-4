@@ -3,7 +3,7 @@
 
 from Plateau import Plateau
 import numpy as np
-
+import multiprocessing
 
 def victoire_ou_nul(grille, joueur):
     """
@@ -235,9 +235,17 @@ def minmax(grille, profondeur, maximising=True):
                 best = val
         return best
 
+def eval_coup(args):
+    """Fonction pour multiprocessing"""
+    grille, col, profondeur = args
+    grille.play(col, 2)
+    score = minmax(grille, profondeur - 1, maximising=False)
+    grille.undo(col)
+    return col, score
+
 def meilleur_coup(grille, profondeur):
     """
-    @brief Sélectionne le meilleur coup pour l'IA en priorisant: coup gagnant, blocage, puis MinMax.
+    @brief Sélectionne le meilleur coup pour l'IA en priorisant: coup gagnant, blocage, puis MinMax. Pour l'algorithme Minmax, on utilise le multiprocesing.
     @param grille Plateau du jeu en cours
            profondeur Profondeur de recherche pour MinMax
     @return Renvoit l'index de la colonne choisie pour jouer (0..grille.c-1)
@@ -252,22 +260,24 @@ def meilleur_coup(grille, profondeur):
     if cb != -1:
         return cb
 
-    # 3) MinMax (sans alpha-beta)
+    # 3) MinMax
     best_score = -10**9
     best_col = None
-    for col in colonnes_ordonnees(grille):
-        grille.play(col, 2)
-        score = minmax(grille, profondeur - 1, maximising=False)
-        grille.undo(col)
-        if score > best_score:
-            best_score = score
-            best_col = col
 
-    if best_col is None:
-        # fallback si aucune colonne (rare)
-        valid = [c for c in range(grille.c) if grille.fill_matrice[c] < grille.l]
-        best_col = valid[0] if valid else 0
+    cols = colonnes_ordonnees(grille)
+    args_list = [(Plateau(grille.l, grille.c, grille.win), col, profondeur) for col in cols]
+
+    for i, col in enumerate(cols):
+            args_list[i][0].matrice = grille.matrice.copy()
+            args_list[i][0].fill_matrice = grille.fill_matrice.copy()
+            args_list[i][0].bitboards = grille.bitboards.copy()
+
+    with multiprocessing.Pool(processes=min(len(cols), multiprocessing.cpu_count())) as pool :
+        results = pool.map(eval_coup, args_list)
+
+    best_col, best_score = max(results, key=lambda x : x[1])
     return best_col
+
 
 ##Il me reste ça refaire et à doxygen
 def partie_vs_bot(grille, profondeur=4):
