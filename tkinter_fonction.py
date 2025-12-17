@@ -367,33 +367,80 @@ def bouger_fleche(event, canva, fleche_id):
             return
 
 def ajouter_pion(canva, ligne, col, couleur):
-    """
-    @brief Dessine un pion sur la grille
-    @param ligne : Index de la ligne (0 en haut)
-    @param col : Index de la colonne
-    @param couleur : 'red' (Joueur 1) ou 'yellow' (Joueur 2 / Bot)
-    """
     grid = getattr(canva, 'grid_data', None)
     if not grid: return
 
     start_x = grid['start_x']
     start_y = grid['start_y']
     taille = grid['taille']
+    nb_lignes = grid['rows']
 
-    # Calcul du centre de la case
+    # --- 1. CALCULS DE POSITION ---
     x_center = start_x + (col * taille) + (taille // 2)
-    y_center = start_y + (ligne * taille) + (taille // 2)
 
-    # Rayon du pion (légèrement plus petit que la case)
-    rayon = (taille // 2) - 5
+    # Position Y FINALE (le fond de la case cible)
+    ligne_visuelle = (nb_lignes - 1) - ligne
+    y_final = start_y + (ligne_visuelle * taille) + (taille // 2)
 
-    # Dessin du cercle (pion)
+    # Position Y DÉPART (Haut de la grille)
+    y_depart = start_y 
+
+    # Rayon (un peu plus petit que la case pour que ce soit joli)
+    rayon = (taille // 2) - 2 
+
+    # --- 2. CRÉATION DU CERCLE (create_oval) ---
     pion_id = canva.create_oval(
-        x_center - rayon, y_center - rayon,
-        x_center + rayon, y_center + rayon,
-        fill=couleur, outline="black", width=2
+        x_center - rayon, y_depart - rayon,
+        x_center + rayon, y_depart + rayon,
+        fill=couleur, outline="black", width=1
     )
     
+    # On le met derrière la grille (tag "grille" doit exister sur tes images)
+    canva.tag_lower(pion_id, "grille")
+
+    # --- 3. ANIMATION STABILISÉE ---
+    info_anim = {
+        "y_actuel": y_depart,
+        "vitesse": 0,
+        "gravite": 1.5,      # Gravité un peu plus douce pour éviter les bugs
+        "rebond": 0.5,       # Ca rebondit à 50% de la vitesse
+    }
+
+    def anim_chute():
+        # 1. On accélère (Gravité)
+        info_anim["vitesse"] += info_anim["gravite"]
+        
+        v = info_anim["vitesse"]
+        y = info_anim["y_actuel"]
+
+        # 2. Est-ce qu'on va toucher (ou dépasser) le fond ?
+        if y + v >= y_final:
+            
+            # --- IMPACT ---
+            dist_restante = y_final - y
+            canva.move(pion_id, 0, dist_restante) # On se colle au fond
+            info_anim["y_actuel"] = y_final
+
+            # Calcul du rebond (inversion de la vitesse)
+            v_rebond = -v * info_anim["rebond"]
+            
+            # --- CORRECTION DU BUG DE FREEZE ---
+            # Si le rebond est trop faible (moins de 2 pixels/frame), on arrête TOUT.
+            if abs(v_rebond) < 2.0:
+                # On s'assure d'être bien calé au fond
+                return # Fin de l'animation
+            
+            # Sinon, on applique le rebond pour la frame suivante
+            info_anim["vitesse"] = v_rebond
+            canva.after(20, anim_chute)
+
+        else:
+            # --- CHUTE LIBRE ---
+            canva.move(pion_id, 0, v)
+            info_anim["y_actuel"] += v
+            canva.after(20, anim_chute)
+
+    anim_chute()
     return pion_id
 
 def afficher_plateau(canva, largeur, hauteur):
@@ -421,6 +468,7 @@ def afficher_plateau(canva, largeur, hauteur):
         "start_y": start_y,
         "taille": taille_case,
         "cols": largeur,
+        "rows": hauteur,
         "largeur_totale": grille_l
     }
 
@@ -470,4 +518,4 @@ def afficher_plateau(canva, largeur, hauteur):
             pos_x = start_x + (col * taille_case) + (taille_case // 2)
             pos_y = start_y + (lig * taille_case) + (taille_case // 2)
 
-            canva.create_image(pos_x, pos_y, image=case_tk, anchor=tk.CENTER)
+            canva.create_image(pos_x, pos_y, image=case_tk, anchor=tk.CENTER, tags="grille")
