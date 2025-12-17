@@ -326,6 +326,75 @@ class MenuDeroulant:
             print(f"{nom}: {valeur}")
         print("==========================\n")
 
+def init_fleche(canva):
+
+    img_pil = Image.open("images/fleche_in_game.png")
+    
+    taille = getattr(canva, 'taille_case', 50) 
+    
+    img_res = img_pil.resize((int(taille * 0.7), int(taille * 0.7)), Image.LANCZOS)
+    img_tk = ImageTk.PhotoImage(img_res)
+
+    canva.fleche_img = img_tk
+    fleche_id = canva.create_image(-100, -100, image=img_tk, anchor=tk.CENTER)
+    
+    return fleche_id
+
+def bouger_fleche(event, canva, fleche_id):
+    grid_data = getattr(canva, 'grid_data', None)
+    if not grid_data:
+        return
+
+    start_x = grid_data['start_x']
+    start_y = grid_data['start_y']
+    taille = grid_data['taille']
+    cols = grid_data['cols']
+    grille_l = grid_data['largeur_totale']
+
+    mouse_x = event.x
+    
+    if start_x <= mouse_x <= start_x + grille_l:
+        col_index = int((mouse_x - start_x) // taille)
+        
+        if 0 <= col_index < cols:
+            center_x = start_x + (col_index * taille) + (taille // 2)
+
+            pos_y = start_y - (taille // 1.5)
+ 
+            canva.coords(fleche_id, center_x, pos_y)
+
+            canva.itemconfigure(fleche_id, state='normal')
+            return
+
+def ajouter_pion(canva, ligne, col, couleur):
+    """
+    @brief Dessine un pion sur la grille
+    @param ligne : Index de la ligne (0 en haut)
+    @param col : Index de la colonne
+    @param couleur : 'red' (Joueur 1) ou 'yellow' (Joueur 2 / Bot)
+    """
+    grid = getattr(canva, 'grid_data', None)
+    if not grid: return
+
+    start_x = grid['start_x']
+    start_y = grid['start_y']
+    taille = grid['taille']
+
+    # Calcul du centre de la case
+    x_center = start_x + (col * taille) + (taille // 2)
+    y_center = start_y + (ligne * taille) + (taille // 2)
+
+    # Rayon du pion (légèrement plus petit que la case)
+    rayon = (taille // 2) - 5
+
+    # Dessin du cercle (pion)
+    pion_id = canva.create_oval(
+        x_center - rayon, y_center - rayon,
+        x_center + rayon, y_center + rayon,
+        fill=couleur, outline="black", width=2
+    )
+    
+    return pion_id
 
 def afficher_plateau(canva, largeur, hauteur):
     
@@ -345,6 +414,15 @@ def afficher_plateau(canva, largeur, hauteur):
 
     start_x = m_larg + (size_dispo_larg - grille_l)//2
     start_y = m_haut + (size_dispo_haut - grille_h)//2
+
+    canva.taille_case = taille_case 
+    canva.grid_data = {
+        "start_x": start_x,
+        "start_y": start_y,
+        "taille": taille_case,
+        "cols": largeur,
+        "largeur_totale": grille_l
+    }
 
     canva.image_cache = []
     
