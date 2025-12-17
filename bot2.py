@@ -4,6 +4,7 @@
 from Plateau import Plateau
 import numpy as np
 import multiprocessing
+from random import *
 
 def victoire_ou_nul(grille, joueur):
     """
@@ -280,9 +281,10 @@ def meilleur_coup(grille, profondeur):
 
 
 ##Il me reste ça refaire et à doxygen
-def partie_vs_bot(grille, profondeur=4):
+def partie_vs_bot(grille, colones, mode, profondeur=4):
     joueur = 1  # humain commence
-
+    buffer = 0
+    nb_coups = 0
     print("\n=== DÉBUT DE LA PARTIE ===\n")
 
     while True:
@@ -319,10 +321,26 @@ def partie_vs_bot(grille, profondeur=4):
         # Tour de l'IA
         else:
             print("\n🤖 L'IA réfléchit...")
-            col = meilleur_coup(grille, profondeur)
+            if mode=="Normal" and buffer==1 :
+                col = meilleur_coup(grille, profondeur)
+                if nb_coups%3 == 0 :
+                    buffer = 0
+            elif mode=="Normal" and buffer == 0 :
+                col = randint(0, colones)
+                buffer = 1
+            elif mode=="Facile" and buffer==1 :
+                col = meilleur_coup(grille, profondeur)
+                if nb_coups%2 == 0 :
+                    buffer = 0
+            elif mode=="Facile" and buffer == 0 :
+                col = randint(0, colones)
+                buffer = 1
+                
+            else :
+                col = meilleur_coup(grille, profondeur)
             print(f"L'IA joue en colonne {col}")
             grille.play(col, 2)
-
+            nb_coups += 1
             term, etat = victoire_ou_nul(grille, 2)
             if term:
                 if etat == 1:
@@ -330,7 +348,7 @@ def partie_vs_bot(grille, profondeur=4):
                 elif etat == 0:
                     print("😐 Match nul !")
                 break
-
+            
         # Alterner joueur
         joueur = 3 - joueur  # 1 ↔ 2
 
@@ -338,4 +356,5 @@ def partie_vs_bot(grille, profondeur=4):
 
 if __name__ == "__main__":
     g = Plateau(lignes=6, colones=7, win_conditon=4)
-    partie_vs_bot(g, profondeur=4)
+    partie_vs_bot(g, colones=6, mode="Facile", profondeur=4)
+
