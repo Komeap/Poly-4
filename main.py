@@ -1,6 +1,7 @@
 from tkinter_fonction import *
 from bot2 import victoire_ou_nul, meilleur_coup
 from Plateau import Plateau
+import threading
 
 # ------- Différentes page -------- #
 
@@ -14,9 +15,7 @@ class App(tk.Tk):
         x_cordinate = int((screen_width/2) - (WIDTH/2))
         y_cordinate = int((screen_height/2) - (HEIGHT/2))
         
-        # On applique la taille ET la position
         self.geometry("{}x{}+{}+{}".format(WIDTH, HEIGHT, x_cordinate, y_cordinate))
-        ## page en cours -> page qui est entrain d'être utiliser
         self.page_en_cours = None
         self.resizable(width=False, height=False)
 
@@ -24,11 +23,11 @@ class App(tk.Tk):
 
     ## @brief CHangement de page, supprime celle en cours
     ## et en met une autre sans oublier de redéfinir le self
-    def changer_de_page(self, page):
+    def changer_de_page(self, page, **data):
         if self.page_en_cours:
             self.page_en_cours.destroy()
 
-        self.page_en_cours = page(parent=self)
+        self.page_en_cours = page(parent=self, **data)
         self.page_en_cours.pack(fill="both", expand=True)
     
 ## @brief Page d'accueil
@@ -44,52 +43,97 @@ class Acceuil(tk.Frame):
         add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
 
 class Param_jeu(tk.Frame):
-    def __init__(self, parent):
+    def __init__(self, parent, **kwargs):
         super().__init__(parent, bg="")
 
-
-        # Création du canva de la page
+        # 1. Création du canva et background
         self.canva = tk.Canvas(self, width=parent.winfo_screenwidth(), height=parent.winfo_screenheight(), highlightthickness=0, bg="grey")
         self.canva.pack(fill="both", expand=True)
+        add_bakground(self.canva, "images/parametre_bg.png")
 
-        # bouton back next de la page
-        add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Acceuil), True, 20)
-        add_canvas_bouton(self.canva, "images/boutonNext.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT) - HEIGHT//10), lambda: (self.menu.print_all_choices(),app.changer_de_page(Jeu)), True, 20)
-        add_bakground(self.canva, "images/parametre_bg.png") # ajout background
-
-        ##video transition
-        ##lancer_video(self.canva, "images/run2.mp4")
-
-        # Dictionnaire des paramétres et des valeurs
+        # 2. Configuration des données
         CONFIG_DATA = {
             "": [],
             "Win Condition": [i for i in range(3,50)],
-            "Largeur": [i for i in range(1,50)],
-            "Hauteur": [i for i in range(1,50)],
+            "Largeur": [i for i in range(4,50)], 
+            "Hauteur": [i for i in range(4,50)],
             "Difficulté": ["Facile", "Normal", "Hardcore"],
             "Bonus": ["nothing","bombe", "help", "undo"],
             "couleur": ["bleu", "rouge", "orange", "jaune"]
         }
 
-        # ajoute le Menu Déroulant des paramétre (cf.tkinter_fonction.py)
+        # 3. Menu Déroulant et ses boutons
         self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, CONFIG_DATA)
-
-        # ajout des bouton de scroll du Menu déroulant
         add_canvas_bouton(self.canva, "images/bouton_up.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 - 50), lambda: self.menu.scroll(-1), True, 5)
         add_canvas_bouton(self.canva, "images/bouton_down.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 + 50), lambda: self.menu.scroll(1), True, 5)
+
+        # 4. Boutons de Navigation
+        
+        # Bouton RETOUR (Acceuil)
+        add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Acceuil), True, 20)
+        
+        # --- CORRECTION ICI : Bouton SUIVANT (Jeu) ---
+        # On ne met PAS de parenthèses à self.lancer_partie !
+        add_canvas_bouton(
+            self.canva, 
+            "images/boutonNext.png", 
+            (HEIGHT//10, HEIGHT//10), 
+            (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT) - HEIGHT//10), 
+            self.lancer_partie,  # <--- On donne le NOM de la fonction, on ne l'exécute pas.
+            True, 
+            20
+        )
+
+    def lancer_partie(self):
+        """ Cette fonction ne s'exécute que quand on CLIQUE sur le bouton Next """
+        
+        # Récupération des choix
+        choix = self.menu.choices
+        config = self.menu.config
+        
+        # Conversion des choix
+        largeur = config["Largeur"][choix["Largeur"]]
+        hauteur = config["Hauteur"][choix["Hauteur"]]
+        win_cond = config["Win Condition"][choix["Win Condition"]]
+        nom_coul = config["couleur"][choix["couleur"]]
+        
+        # Gestion Difficulté
+        nom_diff = config["Difficulté"][choix["Difficulté"]]
+        profondeur = 4
+        if nom_diff == "Facile": profondeur = 2
+        elif nom_diff == "Hardcore": profondeur = 6
+
+        # Création du colis de données
+        parametres = {
+            "largeur": largeur,
+            "hauteur": hauteur,
+            "win": win_cond,
+            "prof": profondeur,
+            "couleur": nom_coul
+        }
+
+        # Changement de page
+        app.changer_de_page(Jeu, **parametres)
 
 class Jeu(tk.Frame):
     """
     @brief Réprésente la page de jeu 
     """
-    def __init__(self, parent):
+    def __init__(self, parent, **settings):
         super().__init__(parent, bg="")
 
-        NB_LIGNES = 6
-        NB_COLS = 7
-        WIN_COND = 4
+        print(settings)
+
+        self.NB_COLS = settings.get("largeur", 2)
+        self.NB_LIGNES = settings.get("hauteur", 6)
+        self.WIN_COND = settings.get("win", 4)
+        #self.PROFONDEUR_IA = settings.get("prof", 4)
         
-        self.grille = Plateau(lignes=NB_LIGNES, colones=NB_COLS, win_conditon=WIN_COND)
+        coul_choisie = settings.get("couleur", "jaune")
+        dico_couleurs = {"bleu": "cyan", "rouge": "red", "orange": "orange", "jaune": "yellow"}
+        self.COULEUR_IA = dico_couleurs.get(coul_choisie, "yellow")
+        
+        self.grille = Plateau(lignes=self.NB_LIGNES, colones=self.NB_COLS, win_conditon=self.WIN_COND)
         self.joueur_actuel = 1
         self.jeu_actif = True
 
@@ -100,7 +144,7 @@ class Jeu(tk.Frame):
         add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), ((HEIGHT//10)//2 + 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Param_jeu), True, 20)
         add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
 
-        afficher_plateau(self.canva, NB_COLS, NB_LIGNES)
+        afficher_plateau(self.canva, self.NB_COLS, self.NB_LIGNES)
 
         self.fleche_id = init_fleche(self.canva)
         self.canva.bind('<Motion>', lambda event: bouger_fleche(event, self.canva, self.fleche_id))
@@ -147,15 +191,26 @@ class Jeu(tk.Frame):
             self.canva.after(500, self.tour_bot)
     
     def tour_bot(self):
-        """ Logique du bot """
+        """ Lance la réflexion de l'IA dans un thread parallèle """
         if not self.jeu_actif: return
 
-        print("L'IA réfléchit...")
-        # Appel à bot2.py pour trouver le meilleur coup
-        col_bot = meilleur_coup(self.grille, profondeur=4)
+        self.canva.unbind('<Button-1>')
+
+        def process_ia():
+            col_bot = meilleur_coup(self.grille, profondeur=1)
+            self.canva.after(0, lambda: self.action_bot_post_calcul(col_bot))
+
+        thread = threading.Thread(target=process_ia)
+        thread.daemon = True 
+        thread.start()
+
+    def action_bot_post_calcul(self, col):
+        """ Cette fonction est appelée par le main thread quand l'IA a fini """
+        print(f"L'IA joue en {col}")
         
-        print(f"L'IA joue en {col_bot}")
-        self.jouer_coup(col_bot)
+        self.jouer_coup(col)
+        if self.jeu_actif:
+            self.canva.bind('<Button-1>', self.clic_souris)
 
     def fin_de_partie(self, etat):
         """ Affiche le résultat """
@@ -167,13 +222,12 @@ class Jeu(tk.Frame):
             msg = "MATCH NUL !"
             color = "white"
 
-        # Affichage basique du texte de victoire au milieu
         self.canva.create_text(
             WIDTH//2, HEIGHT//2, 
             text=msg, 
             font=("Retro Gaming", 50, "bold"), 
             fill=color,
-            stroke="black", strokewidth=2 # Contour noir si supporté par ta version tk
+            stroke="black", strokewidth=2
         )
         print(msg)
 
