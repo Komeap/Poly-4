@@ -141,7 +141,7 @@ class Jeu(tk.Frame):
         self.COULEUR_IA = settings.get("couleur_b")
         self.COULEUR_J = settings.get("couleur_j")
         self.PREMIER_COUP = settings.get("premier_c")
-        self.PROFONDEUR = 3
+        self.PROFONDEUR = 4
 
         self.buffer = 1
         self.nb_coups_ia = 0
@@ -149,7 +149,8 @@ class Jeu(tk.Frame):
         if self.PREMIER_COUP == "bot" : 
             self.joueur_actuel = 2
         elif self.PREMIER_COUP == "joueur": self.joueur_actuel = 1
-        else : self.joueur_actuel = random.randint(0,1)
+        else : self.joueur_actuel = random.randint(1,2)
+        print(self.joueur_actuel)
 
         if self.COULEUR_IA == self.COULEUR_J :
             if self.COULEUR_J == "yellow" :
@@ -167,6 +168,9 @@ class Jeu(tk.Frame):
         add_bakground(self.canva, "images/bg.jpg")
         add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), ((HEIGHT//10)//2 + 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Param_jeu), True, 20)
         add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
+
+        add_canvas_img(self.canva, "images/gentil_idle.png", (150, (int)(HEIGHT*0.75)), ((int)(HEIGHT*0.3), (int)(HEIGHT*0.3)))
+        add_canvas_img(self.canva, "images/mechant_idle.png", ((int)(WIDTH*0.85), (int)(HEIGHT*0.75)), ((int)(HEIGHT*0.35), (int)(HEIGHT*0.35)))
 
         afficher_plateau(self.canva, self.NB_COLS, self.NB_LIGNES)
 
@@ -274,20 +278,21 @@ class Jeu(tk.Frame):
         """ Affiche le résultat """
         msg = ""
         if etat == 1:
-            msg = "VICTOIRE JOUEUR !" if self.joueur_actuel == 1 else "VICTOIRE BOT !"
-            color = "green" if self.joueur_actuel == 1 else "red"
+            if self.joueur_actuel == 1 :
+                time.sleep(500)
+                add_canvas_img(self.canva, "images/Win.png", (WIDTH//2,HEIGHT//2), (WIDTH, HEIGHT))
+                add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), ((HEIGHT//10)//2 + 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Param_jeu), True, 20)
+                add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
+
+            elif self.joueur_actuel == 2:
+                time.sleep(500)
+                add_canvas_img(self.canva, "images/lose.png", (WIDTH//2,HEIGHT//2), (WIDTH, HEIGHT))
+                add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), ((HEIGHT//10)//2 + 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Param_jeu), True, 20)
+                add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
+
         else:
             msg = "MATCH NUL !"
             color = "white"
-
-        self.canva.create_text(
-            WIDTH//2, HEIGHT//2, 
-            text=msg, 
-            font=("Retro Gaming", 50, "bold"), 
-            fill=color,
-            stroke="black", strokewidth=2
-        )
-        print(msg)
 
 
 if __name__ == "__main__":
