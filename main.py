@@ -2,6 +2,7 @@ from tkinter_fonction import *
 from bot2 import victoire_ou_nul, meilleur_coup
 from Plateau import Plateau
 import threading
+import random
 
 # ------- Différentes page -------- #
 
@@ -51,35 +52,46 @@ class Param_jeu(tk.Frame):
         self.canva.pack(fill="both", expand=True)
         add_bakground(self.canva, "images/parametre_bg.png")
 
-        # 2. Configuration des données
         CONFIG_DATA = {
             "": [],
             "Win Condition": [i for i in range(3,50)],
             "Largeur": [i for i in range(4,50)], 
             "Hauteur": [i for i in range(4,50)],
             "Difficulté": ["Facile", "Normal", "Hardcore"],
+            "Permier coup": ["bot", "joueur", "random"],
             "Bonus": ["nothing","bombe", "help", "undo"],
-            "couleur": ["bleu", "rouge", "orange", "jaune"]
+            "couleur joueur": ["cyan", "red", "orange", "yellow"],
+            "couleur bot":["cyan", "red", "orange", "yellow"]
         }
 
-        # 3. Menu Déroulant et ses boutons
+        DEFAUTS = {
+            "Largeur": 7,          
+            "Hauteur": 6,          
+            "Win Condition": 4,    
+            "Difficulté": "Normal",
+            "Permier coup": "random",
+            "couleur joueur": "red",
+            "couleur bot": "yellow"
+        }
+
         self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, CONFIG_DATA)
+
+        for cle, valeur in DEFAUTS.items():
+            index_par_defaut = CONFIG_DATA[cle].index(valeur)
+            self.menu.choices[cle] = index_par_defaut
+
+
         add_canvas_bouton(self.canva, "images/bouton_up.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 - 50), lambda: self.menu.scroll(-1), True, 5)
         add_canvas_bouton(self.canva, "images/bouton_down.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 + 50), lambda: self.menu.scroll(1), True, 5)
 
-        # 4. Boutons de Navigation
-        
-        # Bouton RETOUR (Acceuil)
         add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Acceuil), True, 20)
         
-        # --- CORRECTION ICI : Bouton SUIVANT (Jeu) ---
-        # On ne met PAS de parenthèses à self.lancer_partie !
         add_canvas_bouton(
             self.canva, 
             "images/boutonNext.png", 
             (HEIGHT//10, HEIGHT//10), 
             (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT) - HEIGHT//10), 
-            self.lancer_partie,  # <--- On donne le NOM de la fonction, on ne l'exécute pas.
+            self.lancer_partie,
             True, 
             20
         )
@@ -95,21 +107,21 @@ class Param_jeu(tk.Frame):
         largeur = config["Largeur"][choix["Largeur"]]
         hauteur = config["Hauteur"][choix["Hauteur"]]
         win_cond = config["Win Condition"][choix["Win Condition"]]
-        nom_coul = config["couleur"][choix["couleur"]]
-        
-        # Gestion Difficulté
+        nom_coul_j = config["couleur joueur"][choix["couleur joueur"]]
+        nom_coul_b = config["couleur bot"][choix["couleur bot"]]
+        premier_c = config["Permier coup"][choix["Permier coup"]]
         nom_diff = config["Difficulté"][choix["Difficulté"]]
-        profondeur = 4
-        if nom_diff == "Facile": profondeur = 2
-        elif nom_diff == "Hardcore": profondeur = 6
+        
 
         # Création du colis de données
         parametres = {
             "largeur": largeur,
             "hauteur": hauteur,
             "win": win_cond,
-            "prof": profondeur,
-            "couleur": nom_coul
+            "diff": nom_diff,
+            "couleur_j": nom_coul_j,
+            "couleur_b": nom_coul_b,
+            "premier_c" : premier_c
         }
 
         # Changement de page
@@ -122,19 +134,31 @@ class Jeu(tk.Frame):
     def __init__(self, parent, **settings):
         super().__init__(parent, bg="")
 
-        print(settings)
+        self.NB_COLS = settings.get("largeur")
+        self.NB_LIGNES = settings.get("hauteur")
+        self.WIN_COND = settings.get("win")
+        self.DIFF = settings.get("diff")
+        self.COULEUR_IA = settings.get("couleur_b")
+        self.COULEUR_J = settings.get("couleur_j")
+        self.PREMIER_COUP = settings.get("premier_c")
+        self.PROFONDEUR = 3
 
-        self.NB_COLS = settings.get("largeur", 2)
-        self.NB_LIGNES = settings.get("hauteur", 6)
-        self.WIN_COND = settings.get("win", 4)
-        #self.PROFONDEUR_IA = settings.get("prof", 4)
-        
-        coul_choisie = settings.get("couleur", "jaune")
-        dico_couleurs = {"bleu": "cyan", "rouge": "red", "orange": "orange", "jaune": "yellow"}
-        self.COULEUR_IA = dico_couleurs.get(coul_choisie, "yellow")
+        self.buffer = 1
+        self.nb_coups_ia = 0
+
+        if self.PREMIER_COUP == "bot" : 
+            self.joueur_actuel = 2
+        elif self.PREMIER_COUP == "joueur": self.joueur_actuel = 1
+        else : self.joueur_actuel = random.randint(0,1)
+
+        if self.COULEUR_IA == self.COULEUR_J :
+            if self.COULEUR_J == "yellow" :
+                self.COULEUR_IA = "red"
+            else :
+                self.COULEUR_IA = "yellow"
+
         
         self.grille = Plateau(lignes=self.NB_LIGNES, colones=self.NB_COLS, win_conditon=self.WIN_COND)
-        self.joueur_actuel = 1
         self.jeu_actif = True
 
         self.canva = tk.Canvas(self, width=parent.winfo_screenwidth(), height=parent.winfo_screenheight(), highlightthickness=0, bg="grey")
@@ -150,7 +174,19 @@ class Jeu(tk.Frame):
         self.canva.bind('<Motion>', lambda event: bouger_fleche(event, self.canva, self.fleche_id))
 
         self.canva.bind('<Button-1>', self.clic_souris)
+
+        # Important sinon l'ia joue avant que le jeu soit afficher
+        if self.joueur_actuel == 2:
+            self.canva.after(1000, self.tour_bot)
     
+    def obtenir_colonne_aleatoire(self):
+        """Sélectionne une colonne non pleine au hasard"""
+        # On regarde quelles colonnes ne sont pas encore remplies
+        cols_valides = [c for c in range(self.grille.c) if self.grille.fill_matrice[c] < self.grille.l]
+        if cols_valides:
+            return random.choice(cols_valides)
+        return 0 # Sécurité si tout est plein
+
     def clic_souris(self, event):
         """ Gère le clic du joueur humain """
         if not self.jeu_actif or self.joueur_actuel != 1:
@@ -176,7 +212,7 @@ class Jeu(tk.Frame):
 
         ligne_jouee = res[0]
 
-        couleur = "red" if self.joueur_actuel == 1 else "yellow"
+        couleur = self.COULEUR_J if self.joueur_actuel == 1 else self.COULEUR_IA
         ajouter_pion(self.canva, ligne_jouee, col, couleur)
 
         fini, etat = victoire_ou_nul(self.grille, self.joueur_actuel)
@@ -197,8 +233,30 @@ class Jeu(tk.Frame):
         self.canva.unbind('<Button-1>')
 
         def process_ia():
-            col_bot = meilleur_coup(self.grille, profondeur=1)
-            self.canva.after(0, lambda: self.action_bot_post_calcul(col_bot))
+            col = -1
+            
+            if self.DIFF == "Hardcore":
+                col = meilleur_coup(self.grille, self.PROFONDEUR)      
+            elif self.DIFF == "Normal":
+                if self.buffer == 1:
+                    col = meilleur_coup(self.grille, self.PROFONDEUR)
+                    if self.nb_coups_ia % 3 == 0:
+                        self.buffer = 0
+                else:
+                    col = self.obtenir_colonne_aleatoire()
+                    self.buffer = 1
+                    
+            elif self.DIFF == "Facile":
+                if self.buffer == 1:
+                    col = meilleur_coup(self.grille, self.PROFONDEUR)
+                    if self.nb_coups_ia % 2 == 0:
+                        self.buffer = 0
+                else:
+                    col = self.obtenir_colonne_aleatoire()
+                    self.buffer = 1
+
+            self.nb_coups_ia += 1
+            self.canva.after(0, lambda: self.action_bot_post_calcul(col))
 
         thread = threading.Thread(target=process_ia)
         thread.daemon = True 

@@ -375,35 +375,30 @@ def ajouter_pion(canva, ligne, col, couleur):
     taille = grid['taille']
     nb_lignes = grid['rows']
 
-    # --- 1. CALCULS DE POSITION ---
     x_center = start_x + (col * taille) + (taille // 2)
 
-    # Position Y FINALE (le fond de la case cible)
     ligne_visuelle = (nb_lignes - 1) - ligne
     y_final = start_y + (ligne_visuelle * taille) + (taille // 2)
 
-    # Position Y DÉPART (Haut de la grille)
+
     y_depart = start_y 
 
-    # Rayon (un peu plus petit que la case pour que ce soit joli)
+
     rayon = (taille // 2) - 2 
 
-    # --- 2. CRÉATION DU CERCLE (create_oval) ---
     pion_id = canva.create_oval(
         x_center - rayon, y_depart - rayon,
         x_center + rayon, y_depart + rayon,
         fill=couleur, outline="black", width=1
     )
-    
-    # On le met derrière la grille (tag "grille" doit exister sur tes images)
+
     canva.tag_lower(pion_id, "grille")
 
-    # --- 3. ANIMATION STABILISÉE ---
     info_anim = {
         "y_actuel": y_depart,
         "vitesse": 0,
-        "gravite": 1.5,      # Gravité un peu plus douce pour éviter les bugs
-        "rebond": 0.5,       # Ca rebondit à 50% de la vitesse
+        "gravite": 1.5,     
+        "rebond": 0.35,       # Ca rebondit à 35% de la vitesse
     }
 
     def anim_chute():
@@ -413,29 +408,20 @@ def ajouter_pion(canva, ligne, col, couleur):
         v = info_anim["vitesse"]
         y = info_anim["y_actuel"]
 
-        # 2. Est-ce qu'on va toucher (ou dépasser) le fond ?
         if y + v >= y_final:
-            
-            # --- IMPACT ---
             dist_restante = y_final - y
-            canva.move(pion_id, 0, dist_restante) # On se colle au fond
+            canva.move(pion_id, 0, dist_restante)
             info_anim["y_actuel"] = y_final
 
-            # Calcul du rebond (inversion de la vitesse)
             v_rebond = -v * info_anim["rebond"]
             
-            # --- CORRECTION DU BUG DE FREEZE ---
-            # Si le rebond est trop faible (moins de 2 pixels/frame), on arrête TOUT.
             if abs(v_rebond) < 2.0:
-                # On s'assure d'être bien calé au fond
-                return # Fin de l'animation
+                return
             
-            # Sinon, on applique le rebond pour la frame suivante
             info_anim["vitesse"] = v_rebond
             canva.after(20, anim_chute)
 
         else:
-            # --- CHUTE LIBRE ---
             canva.move(pion_id, 0, v)
             info_anim["y_actuel"] += v
             canva.after(20, anim_chute)
