@@ -3,6 +3,7 @@ from bot2 import victoire_ou_nul, meilleur_coup
 from Plateau import Plateau
 import threading
 import random
+import time
 
 # ------- Différentes page -------- #
 
@@ -170,9 +171,9 @@ class Jeu(tk.Frame):
         add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), ((HEIGHT//10)//2 + 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Param_jeu), True, 20)
         add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
         if self.BONUS == "undo" or self.BONUS == "all" :
-            self.undo = add_canvas_bouton(self.canva, "images/undo_bonus.png", (HEIGHT//10, HEIGHT//10), (WIDTH//4, HEIGHT - HEIGHT//10), self.action_undo, True, 20)
+            self.undo = add_canvas_bouton(self.canva, "images/undo_bonus.png", (HEIGHT//10, HEIGHT//10), (WIDTH//8, HEIGHT//2), self.action_undo, True, 20)
         if self.BONUS == "bombe"  or self.BONUS == "all": 
-            self.bombe = add_canvas_bouton(self.canva, "images/bouton_bombe.png", (HEIGHT//10, HEIGHT//10), (WIDTH//4 - HEIGHT//8, HEIGHT - HEIGHT//10), self.activer_mode_bombe, True, 20)
+            self.bombe = add_canvas_bouton(self.canva, "images/bouton_bombe.png", (HEIGHT//10, HEIGHT//10), (WIDTH//8 - HEIGHT//8, HEIGHT//2), self.activer_mode_bombe, True, 20)
 
         # Avatars
         add_canvas_img(self.canva, "images/gentil_idle.png", (150, (int)(HEIGHT*0.75)), ((int)(HEIGHT*0.3), (int)(HEIGHT*0.3)))
@@ -189,7 +190,8 @@ class Jeu(tk.Frame):
         self.pions_visuels = [[] for i in range(self.NB_COLS)]
         self.historique_coups = []
         self.active_bombe = False
-        
+        self.anim_en_cours = False
+
         # Play
         self.btn_start_id = add_canvas_bouton(self.canva, "images/bouton_ready.png",(150, 150), (WIDTH//6, HEIGHT//2), self.lancer_la_game,True, 20)
 
@@ -214,10 +216,13 @@ class Jeu(tk.Frame):
         return True
 
     def action_undo(self):
+        if self.anim_en_cours: 
+            return
+
         if not self.historique_coups:
             return
 
-        if self.jeu_actif:
+        if self.jeu_actif :
             self.annuler_un_seul_coup()
             self.annuler_un_seul_coup()
             self.joueur_actuel = 1
@@ -298,6 +303,7 @@ class Jeu(tk.Frame):
                     self.jouer_coup(col)
     
     def jouer_coup(self, col):
+        if self.anim_en_cours: return
 
         if self.grille.fill_matrice[col] >= self.grille.l:
             print("Erreur")
@@ -311,28 +317,34 @@ class Jeu(tk.Frame):
         ligne_jouee = res[0]
         couleur = self.COULEUR_J if self.joueur_actuel == 1 else self.COULEUR_IA
         
-        # On ajoute le pion visuellement
-        pion_id = ajouter_pion(self.canva, ligne_jouee, col, couleur)
+        # On verrouille le jeu
+        self.anim_en_cours = True 
+        self.canva.unbind('<Button-1>')
+
+        def fin_du_mouvement():
+            self.anim_en_cours = False 
+ 
+            if self.jeu_actif:
+                 self.canva.bind('<Button-1>', self.clic_souris)
+
+            fini, etat = victoire_ou_nul(self.grille, self.joueur_actuel)
+
+            if fini:
+                self.jeu_actif = False
+                if etat == 1:
+                    pions_gagnants = self.trouver_pions_gagnants(self.joueur_actuel)
+                    self.surligner_victoire(pions_gagnants)
+                self.fin_de_partie(etat)
+                return
+
+            self.joueur_actuel = 3 - self.joueur_actuel
+            if self.joueur_actuel == 2:
+                self.canva.after(500, self.tour_bot)
+
+        pion_id = ajouter_pion(self.canva, ligne_jouee, col, couleur, finish=fin_du_mouvement)
 
         self.pions_visuels[col].append(pion_id)
         self.historique_coups.append((col, pion_id))
-
-        fini, etat = victoire_ou_nul(self.grille, self.joueur_actuel)
-
-        if fini:
-            self.jeu_actif = False
-            # Si c'est une victoire (pas un match nul), on cherche et surligne les pions
-            if etat == 1:
-                pions_gagnants = self.trouver_pions_gagnants(self.joueur_actuel)
-                self.surligner_victoire(pions_gagnants)
-            
-            self.fin_de_partie(etat)
-            return
-
-        self.joueur_actuel = 3 - self.joueur_actuel
-        if self.joueur_actuel == 2:
-            self.canva.after(500, self.tour_bot)
-    
     def trouver_pions_gagnants(self, joueur):
         """
         Scanne le plateau pour trouver les N pions alignés.

@@ -366,7 +366,7 @@ def bouger_fleche(event, canva, fleche_id):
             canva.itemconfigure(fleche_id, state='normal')
             return
 
-def ajouter_pion(canva, ligne, col, couleur):
+def ajouter_pion(canva, ligne, col, couleur, finish=None):
     grid = getattr(canva, 'grid_data', None)
     if not grid: return
 
@@ -416,7 +416,9 @@ def ajouter_pion(canva, ligne, col, couleur):
             v_rebond = -v * info_anim["rebond"]
             
             if abs(v_rebond) < 2.0:
-                return
+                if finish :
+                    finish()
+                return 
             
             info_anim["vitesse"] = v_rebond
             canva.after(20, anim_chute)
