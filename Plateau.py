@@ -77,6 +77,20 @@ class Plateau:
 
         return 1
 
+    def power_bomb(self, colone_cible):
+        self.matrice[:, colone_cible] = 0 
+        self.fill_matrice[colone_cible] = 0 # modifie la matrice
+        
+        H = self.l + 1 # modificationde la bitboard
+        shift = colone_cible * H
+        masque_colonne = ((1 << self.l) - 1) << shift
+        
+        masque_nettoyage = ~masque_colonne
+        
+        self.bitboards[0] = self.bitboards[0] & masque_nettoyage
+        self.bitboards[1] = self.bitboards[1] & masque_nettoyage
+        
+        return 1 
 
     ## @brief Verifie si il y a une victoire
     ## Comment ca marche, Magic bitboard -> explication pour détection en ligne : 

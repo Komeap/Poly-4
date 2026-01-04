@@ -59,7 +59,7 @@ class Param_jeu(tk.Frame):
             "Hauteur": [i for i in range(4,50)],
             "Difficulté": ["Facile", "Normal", "Hardcore"],
             "Permier coup": ["bot", "joueur", "random"],
-            "Bonus": ["nothing","bombe", "help", "undo"],
+            "Bonus": ["nothing","bombe", "undo", "all"],
             "couleur joueur": ["cyan", "red", "orange", "yellow"],
             "couleur bot":["cyan", "red", "orange", "yellow"]
         }
@@ -70,6 +70,7 @@ class Param_jeu(tk.Frame):
             "Win Condition": 4,    
             "Difficulté": "Normal",
             "Permier coup": "random",
+            "Bonus": "nothing",
             "couleur joueur": "red",
             "couleur bot": "yellow"
         }
@@ -87,18 +88,9 @@ class Param_jeu(tk.Frame):
 
         add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Acceuil), True, 20)
         
-        add_canvas_bouton(
-            self.canva, 
-            "images/boutonNext.png", 
-            (HEIGHT//10, HEIGHT//10), 
-            (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT) - HEIGHT//10), 
-            self.lancer_partie,
-            True, 
-            20
-        )
+        add_canvas_bouton(self.canva, "images/boutonNext.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT) - HEIGHT//10), self.lancer_partie,True, 20)
 
     def lancer_partie(self):
-        """ Cette fonction ne s'exécute que quand on CLIQUE sur le bouton Next """
         
         # Récupération des choix
         choix = self.menu.choices
@@ -111,6 +103,7 @@ class Param_jeu(tk.Frame):
         nom_coul_j = config["couleur joueur"][choix["couleur joueur"]]
         nom_coul_b = config["couleur bot"][choix["couleur bot"]]
         premier_c = config["Permier coup"][choix["Permier coup"]]
+        bonus = config["Bonus"][choix["Bonus"]]
         nom_diff = config["Difficulté"][choix["Difficulté"]]
         
 
@@ -122,7 +115,8 @@ class Param_jeu(tk.Frame):
             "diff": nom_diff,
             "couleur_j": nom_coul_j,
             "couleur_b": nom_coul_b,
-            "premier_c" : premier_c
+            "premier_c" : premier_c,
+            "bonus" : bonus
         }
 
         # Changement de page
@@ -142,6 +136,7 @@ class Jeu(tk.Frame):
         self.COULEUR_IA = settings.get("couleur_b")
         self.COULEUR_J = settings.get("couleur_j")
         self.PREMIER_COUP = settings.get("premier_c")
+        self.BONUS = settings.get("bonus")
         self.PROFONDEUR = 4
 
         self.buffer = 1
@@ -155,7 +150,7 @@ class Jeu(tk.Frame):
         else : 
             self.joueur_actuel = random.randint(1,2)
         
-        # Gestion des couleurs (éviter doublons)
+        # Gestion des couleur
         if self.COULEUR_IA == self.COULEUR_J :
             if self.COULEUR_J == "yellow" :
                 self.COULEUR_IA = "red"
@@ -174,6 +169,10 @@ class Jeu(tk.Frame):
         # Boutons de navigation
         add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), ((HEIGHT//10)//2 + 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Param_jeu), True, 20)
         add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
+        if self.BONUS == "undo" or self.BONUS == "all" :
+            self.undo = add_canvas_bouton(self.canva, "images/undo_bonus.png", (HEIGHT//10, HEIGHT//10), (WIDTH//4, HEIGHT - HEIGHT//10), self.action_undo, True, 20)
+        if self.BONUS == "bombe"  or self.BONUS == "all": 
+            self.bombe = add_canvas_bouton(self.canva, "images/bouton_bombe.png", (HEIGHT//10, HEIGHT//10), (WIDTH//4 - HEIGHT//8, HEIGHT - HEIGHT//10), self.activer_mode_bombe, True, 20)
 
         # Avatars
         add_canvas_img(self.canva, "images/gentil_idle.png", (150, (int)(HEIGHT*0.75)), ((int)(HEIGHT*0.3), (int)(HEIGHT*0.3)))
@@ -186,29 +185,98 @@ class Jeu(tk.Frame):
         self.canva.bind('<Button-1>', self.clic_souris)
 
         self.overlay_id = self.canva.create_rectangle(0, 0, WIDTH, HEIGHT, fill="black", stipple='gray50')
-
+        
+        self.pions_visuels = [[] for i in range(self.NB_COLS)]
+        self.historique_coups = []
+        self.active_bombe = False
+        
         # Play
         self.btn_start_id = add_canvas_bouton(self.canva, "images/bouton_ready.png",(150, 150), (WIDTH//6, HEIGHT//2), self.lancer_la_game,True, 20)
 
     def lancer_la_game(self):
-        """ Active le jeu et lance l'IA si besoin """
-        
-        # 1. On nettoie l'écran (on enlève le bouton et le fond gris)
         self.canva.delete(self.btn_start_id)
         if hasattr(self, 'overlay_id'):
             self.canva.delete(self.overlay_id)
         
-        # 2. On active le jeu
         self.jeu_actif = True
         self.canva.bind('<Button-1>', self.clic_souris)
 
-        # 3. Si c'est à l'IA de jouer, on lance son tour maintenant
         if self.joueur_actuel == 2:
-            # Petit délai pour que l'humain réalise que la partie commence
             self.canva.after(500, self.tour_bot)
     
+    def annuler_un_seul_coup(self):
+        if not self.historique_coups:
+            return False
+
+        col, pion_id = self.historique_coups.pop()
+        self.canva.delete(pion_id)
+        self.grille.undo(col)
+        return True
+
+    def action_undo(self):
+        if not self.historique_coups:
+            return
+
+        if self.jeu_actif:
+            self.annuler_un_seul_coup()
+            self.annuler_un_seul_coup()
+            self.joueur_actuel = 1
+
+            self.reactiver_jeu()    
+        else:
+            if self.joueur_actuel == 2 :
+                self.annuler_un_seul_coup()
+                self.annuler_un_seul_coup()
+                self.joueur_actuel = 1
+            else :
+                self.annuler_un_seul_coup()
+                self.joueur_actuel = 1
+        
+        self.reactiver_jeu()
+        self.canva.delete(self.undo)
+        # print("Retour Ok")
+
+    def reactiver_jeu(self):
+        self.jeu_actif = True
+        self.canva.bind('<Button-1>', self.clic_souris)
+        self.canva.delete("message_fin")
+
+    def activer_mode_bombe(self):
+        if not self.jeu_actif or self.joueur_actuel != 1:
+            return
+
+        self.active_bombe = not self.active_bombe 
+        
+        if self.active_bombe :
+            self.canva.config(cursor="crosshair")
+        else:
+            self.canva.config(cursor="")
+
+    def lacher_bombe(self, col):
+        if self.grille.fill_matrice[col] == 0:
+            self.mode_bombe = False
+            self.canva.config(cursor="")
+            return
+
+        self.grille.power_bomb(col)
+
+        for pion_id in self.pions_visuels[col]:
+            self.canva.delete(pion_id)
+        
+        self.pions_visuels[col] = []
+
+        self.historique_coups = [coup for coup in self.historique_coups if coup[0] != col]
+
+        # 5. Fin du tour
+        self.active_bombe = False
+        self.canva.delete(self.bombe)
+
+        self.joueur_actuel = 3 - self.joueur_actuel
+        if self.joueur_actuel == 2:
+            self.canva.after(500, self.tour_bot)
+
     def obtenir_colonne_aleatoire(self):
-        """Sélectionne une colonne non pleine au hasard"""
+        
         cols_valides = [c for c in range(self.grille.c) if self.grille.fill_matrice[c] < self.grille.l]
         if cols_valides:
             return random.choice(cols_valides)
@@ -224,19 +292,30 @@ class Jeu(tk.Frame):
         if grid_data['start_x'] <= event.x <= grid_data['start_x'] + grid_data['largeur_totale']:
             col = int((event.x - grid_data['start_x']) // grid_data['taille'])
             if 0 <= col < self.grille.c:
-                self.jouer_coup(col)
+                if self.active_bombe :
+                    self.lacher_bombe(col)
+                else :
+                    self.jouer_coup(col)
     
     def jouer_coup(self, col):
+
+        if self.grille.fill_matrice[col] >= self.grille.l:
+            print("Erreur")
+            return
+
         res = self.grille.play(col, self.joueur_actuel)
         if res == 1:
-            print("Colonne pleine ou erreur")
+            print("Colonne pleine")
             return
 
         ligne_jouee = res[0]
         couleur = self.COULEUR_J if self.joueur_actuel == 1 else self.COULEUR_IA
         
         # On ajoute le pion visuellement
-        ajouter_pion(self.canva, ligne_jouee, col, couleur)
+        pion_id = ajouter_pion(self.canva, ligne_jouee, col, couleur)
+
+        self.pions_visuels[col].append(pion_id)
+        self.historique_coups.append((col, pion_id))
 
         fini, etat = victoire_ou_nul(self.grille, self.joueur_actuel)
 
@@ -298,7 +377,6 @@ class Jeu(tk.Frame):
         return []
     
     def surligner_victoire(self, pions):
-        """ Change la couleur ou entoure les pions gagnants """
         if not pions: return
         
         grid_data = getattr(self.canva, 'grid_data', None)
@@ -313,9 +391,6 @@ class Jeu(tk.Frame):
         start_y = grid_data['start_y']
 
         for r, c in pions:
-            # Calcul des coordonnées pixels
-            # CORRECTION ICI : Pas d'inversion de 'r'. 
-            # r=0 est le haut dans ta matrice ET sur l'écran.
             
             x0 = start_x + c * taille + 5 
             y0 = start_y + r * taille + 5 
@@ -323,8 +398,7 @@ class Jeu(tk.Frame):
             x1 = x0 + taille - 10
             y1 = y0 + taille - 10
 
-            # On dessine un cercle épais par dessus le pion existant
-            self.canva.create_oval(x0, y0, x1, y1, outline=COULEUR_VICTOIRE, width=EPAISSEUR)
+            self.canva.create_oval(x0, y0, x1, y1, outline=COULEUR_VICTOIRE, width=EPAISSEUR, tags="message_fin")
     
     def tour_bot(self):
         if not self.jeu_actif: return
@@ -362,29 +436,20 @@ class Jeu(tk.Frame):
             self.canva.bind('<Button-1>', self.clic_souris)
 
     def fin_de_partie(self, etat):
-        """ Affiche le résultat sans cacher le plateau """
-        
-        # Message texte et couleur
         msg = "MATCH NUL"
         couleur_texte = "white"
         
         if etat == 1:
             if self.joueur_actuel == 1:
                 msg = "VICTOIRE !"
-                couleur_texte = "#00FF00" # Vert
+                couleur_texte = "#00FF00"
             else:
                 msg = "DÉFAITE..."
-                couleur_texte = "#FF0000" # Rouge
+                couleur_texte = "#FF0000"
 
-        # Création d'un bandeau semi-transparent ou d'un texte simple en haut
-        # On dessine un rectangle pour faire ressortir le texte (fond noir semi-transparent si possible, sinon noir)
-        self.canva.create_rectangle(WIDTH//2 - 200, 50, WIDTH//2 + 200, 150, fill="black", outline="white", width=2)
+        self.canva.create_rectangle(WIDTH//2 - 200, 50, WIDTH//2 + 200, 150, fill="black", outline="white", width=2, tags="message_fin")
         
-        self.canva.create_text(WIDTH//2, 100, text=msg, font=("Arial", 40, "bold"), fill=couleur_texte)
-
-        # On garde les boutons Back et Close accessibles
-        # (Ils sont déjà créés dans __init__, on s'assure juste qu'ils sont au dessus si besoin, 
-        # mais Tkinter empile dans l'ordre de création. Comme le texte est créé après, attention à ne pas couvrir les boutons s'ils sont en haut)
+        self.canva.create_text(WIDTH//2, 100, text=msg, font=("Arial", 40, "bold"), fill=couleur_texte, tags="message_fin")
 
 if __name__ == "__main__":
     app = App()
