@@ -1,360 +1,360 @@
 ## @file bot_MinMax.py
 ## Fonctions d'implémentations d'un bot utilisant MinMax
 
-from Plateau import Plateau
+from Plateau import Tplateau
 import numpy as np
 import multiprocessing
 from random import *
 
-def victoire_ou_nul(grille, joueur):
+def VictoireOuNul(oGrille, iJoueur):
     """
     @brief Vérifie l'état de la partie pour un joueur donné (Victoire ou nul)
-    @param grille Plateau du jeu en cours
-           joueur Humain ou bot 
+    @param oGrille Plateau du jeu en cours
+           iJoueur Humain ou bot 
     @return (True, 1) si victoire du joueur
             (True, 0) si match nul
             (False, -1) sinon
     """
-    if check_victoire_matrice(grille, joueur):
+    if CheckVictoireMatrice(oGrille, iJoueur):
         return (True, 1)
-    if est_pleine(grille):
+    if EstPleine(oGrille):
         return (True, 0)
     return (False, -1)
 
-def est_pleine(grille):
+def EstPleine(oGrille):
     """
     @brief Vérifie si la grille est pleine (match nul)
-    @param grille Plateau du jeu en cours
+    @param oGrille Plateau du jeu en cours
     @return True si la grille est pleine
             False sinon
     """
-    return all(grille.fill_matrice[col] >= grille.l for col in range(grille.c))
+    return all(oGrille.tPLAfillMatrice[iCol] >= oGrille.iPLAlignes for iCol in range(oGrille.iPLAcolonnes))
 
-def check_victoire_matrice(grille, joueur):
+def CheckVictoireMatrice(oGrille, iJoueur):
     """
     @brief Vérifie si joueur a gagné. Ici, nous n'utilisons pas les bitboards.
-    @param grille Plateau du jeu en cours
-           joueur Humain ou bot 
+    @param oGrille Plateau du jeu en cours
+           iJoueur Humain ou bot 
     @return True si le joueur a une victoire 
             False sinon
     """
-    mat = grille.matrice
-    l, c, w = grille.l, grille.c, grille.win
+
+    tMat = oGrille.tPLAmatrice
+    iL, iC, iW = oGrille.iPLAlignes, oGrille.iPLAcolonnes, oGrille.iPLAwin
 
     # Horizontale
-    for r in range(l):
-        for col in range(c - w + 1):
-            window = mat[r, col:col+w]
-            if np.all(window == joueur):
+    for iR in range(iL):
+        for iCol in range(iC - iW + 1):
+            tWindow = tMat[iR, iCol:iCol+iW]
+            if np.all(tWindow == iJoueur):
                 return True
     # Verticale
-    for col in range(c):
-        for r in range(l - w + 1):
-            window = mat[r:r+w, col]
-            if np.all(window == joueur):
+    for iCol in range(iC):
+        for iR in range(iL - iW + 1):
+            tWindow = tMat[iR:iR+iW, iCol]
+            if np.all(tWindow == iJoueur):
                 return True
     # Diagonale \
-    for r in range(l - w + 1):
-        for col in range(c - w + 1):
-            if all(mat[r+i, col+i] == joueur for i in range(w)):
+    for iR in range(iL - iW + 1):
+        for iCol in range(iC - iW + 1):
+            if all(tMat[iR+i, iCol+i] == iJoueur for i in range(iW)):
                 return True
     # Diagonale /
-    for r in range(w - 1, l):
-        for col in range(c - w + 1):
-            if all(mat[r-i, col+i] == joueur for i in range(w)):
+    for iR in range(iW - 1, iL):
+        for iCol in range(iC - iW + 1):
+            if all(tMat[iR-i, iCol+i] == iJoueur for i in range(iW)):
                 return True
     return False
 
 
-def quel_coup_matrice(grille, joueur):
+def QuelCoupMatrice(oGrille, iJoueur):
     """
     @brief Vérifie si il existe un coup gagnant immédiat pour joueur et le renvoit immédiatement si il existe. Ici, nous n'utilisons pas les bitboards.
-    @param grille Plateau du jeu en cours
-        joueur Humain ou bot 
+    @param oGrille Plateau du jeu en cours
+        iJoueur Humain ou bot 
     @return Renvoit le coup gagnant si il existe
             -1 sinon
     """
-    for col in range(grille.c):
-        if grille.fill_matrice[col] >= grille.l:
+    for iCol in range(oGrille.iPLAcolonnes):
+        if oGrille.tPLAfillMatrice[iCol] >= oGrille.iPLAlignes:
             continue
-        grille.play(col, joueur)
-        if check_victoire_matrice(grille, joueur):
-            grille.undo(col)
-            return col
-        grille.undo(col)
+        oGrille.PLAplay(iCol, iJoueur)
+        if CheckVictoireMatrice(oGrille, iJoueur):
+            oGrille.PLAundo(iCol)
+            return iCol
+        oGrille.PLAundo(iCol)
     return -1
 
-def coup_bloquant(grille, adversaire):
+def CoupBloquant(oGrille, iAdversaire):
     """
     @brief Vérifie si il existe un coup gagnant immédiat pour adversaire et le renvoit immédiatement si il existe. Ici, nous n'utilisons pas les bitboards.
-    @param grille Plateau du jeu en cours
-        joueur Humain ou bot 
+    @param oGrille Plateau du jeu en cours
+        iJoueur Humain ou bot 
     @return Renvoit le coup permettant de bloquer l'adversaire si il existe
             -1 sinon
     """
-    for col in range(grille.c):
-        if grille.fill_matrice[col] >= grille.l:
+    for iCol in range(oGrille.iPLAcolonnes):
+        if oGrille.tPLAfillMatrice[iCol] >= oGrille.iPLAlignes:
             continue
-        grille.play(col, adversaire)
-        if check_victoire_matrice(grille, adversaire):
-            grille.undo(col)
-            return col
-        grille.undo(col)
+        oGrille.PLAplay(iCol, iAdversaire)
+        if CheckVictoireMatrice(oGrille, iAdversaire):
+            oGrille.PLAundo(iCol)
+            return iCol
+        oGrille.PLAundo(iCol)
     return -1
 
 
 
-def evaluate_window(window, joueur_max, joueur_min):
+def EvaluateWindow(tWindow, iJoueurMax, iJoueurMin):
 
     """
     @brief Évalue heuristiquement une fenêtre de 4 cases pour le MinMax.
-    @param window Liste/array de 4 entiers (0 = vide, 1 = humain, 2 = IA)
-           joueur_max Entier du joueur à maximiser (ex. 2 pour l'IA)
-           joueur_min Entier du joueur à minimiser (ex. 1 pour l'humain)
+    @param tWindow Liste/array de 4 entiers (0 = vide, 1 = humain, 2 = IA)
+           iJoueur_max Entier du joueur à maximiser (ex. 2 pour l'IA)
+           iJoueur_min Entier du joueur à minimiser (ex. 1 pour l'humain)
     @return Renvoit le score de la fenêtre (positif si favorable à joueur_max, négatif si favorable à joueur_min)
     """
 
-    score = 0
-    window = list(window)
-    count_max = window.count(joueur_max)
-    count_min = window.count(joueur_min)
-    count_empty = window.count(0)
+    iScore = 0
+    tWindow = list(tWindow)
+    iCountMax = tWindow.count(iJoueurMax)
+    iCountMin = tWindow.count(iJoueurMin)
+    iCountEmpty = tWindow.count(0)
 
     # Opportunités / menaces
-    if count_max == 4:
-        score += 100000
-    elif count_max == 3 and count_empty == 1:
-        score += 120
-    elif count_max == 2 and count_empty == 2:
-        score += 15
+    if iCountMax == 4:
+        iScore += 100000
+    elif iCountMax == 3 and iCountEmpty == 1:
+        iScore += 120
+    elif iCountMax == 2 and iCountEmpty == 2:
+        iScore += 15
 
-    if count_min == 3 and count_empty == 1:
-        score -= 100
-    elif count_min == 2 and count_empty == 2:
-        score -= 8
+    if iCountMin == 3 and iCountEmpty == 1:
+        iScore -= 100
+    elif iCountMin == 2 and iCountEmpty == 2:
+        iScore -= 8
 
-    return score
+    return iScore
 
-def score_position(grille, joueur_max=2, joueur_min=1):
+def ScorePosition(oGrille, iJoueurMax=2, iJoueurMin=1):
     """
     @brief Calcule le score heuristique global d'une position pour le MinMax.
-    @param grille Plateau du jeu en cours
-           joueur_max Joueur à maximiser (ex. 2 pour l'IA)
-           joueur_min Joueur à minimiser (ex. 1 pour l'humain)
+    @param oGrille Plateau du jeu en cours
+           iJoueurMax Joueur à maximiser (ex. 2 pour l'IA)
+           iJoueurMin Joueur à minimiser (ex. 1 pour l'humain)
     @return Renvoit le score global (positif si favorable à joueur_max, négatif si favorable à joueur_min)
     """
 
-    mat = grille.matrice
-    l, c, w = grille.l, grille.c, grille.win
-    score = 0
+    tMat = oGrille.tPLAmatrice
+    iL, iC, iW = oGrille.iPLAlignes, oGrille.iPLAcolonnes, oGrille.iPLAwin
+    iScore = 0
 
     # Bonus centre (favorise colonnes centrales)
-    center = c // 2
-    center_array = mat[:, center]
-    score += 3 * np.count_nonzero(center_array == joueur_max)
+    iCenter = iC // 2
+    tCenterArray = tMat[:, iCenter]
+    iScore += 3 * np.count_nonzero(tCenterArray == iJoueurMax)
 
     # Horizontal
-    for r in range(l):
-        for col in range(c - w + 1):
-            window = mat[r, col:col+w].tolist()
-            score += evaluate_window(window, joueur_max, joueur_min)
+    for iR in range(iL):
+        for iCol in range(iC - iW + 1):
+            tWindow = tMat[iR, iCol:iCol+iW].tolist()
+            iScore += EvaluateWindow(tWindow, iJoueurMax, iJoueurMin)
 
     # Vertical
-    for col in range(c):
-        for r in range(l - w + 1):
-            window = mat[r:r+w, col].tolist()
-            score += evaluate_window(window, joueur_max, joueur_min)
+    for iCol in range(iC):
+        for iR in range(iL - iW + 1):
+            tWindow = tMat[iR:iR+iW, iCol].tolist()
+            iScore += EvaluateWindow(tWindow, iJoueurMax, iJoueurMin)
 
     # Diagonale \
-    for r in range(l - w + 1):
-        for col in range(c - w + 1):
-            window = [mat[r+i, col+i] for i in range(w)]
-            score += evaluate_window(window, joueur_max, joueur_min)
+    for iR in range(iL - iW + 1):
+        for iCol in range(iC - iW + 1):
+            tWindow = [tMat[iR+i, iCol+i] for i in range(iW)]
+            iScore += EvaluateWindow(tWindow, iJoueurMax, iJoueurMin)
 
     # Diagonale /
-    for r in range(w - 1, l):
-        for col in range(c - w + 1):
-            window = [mat[r-i, col+i] for i in range(w)]
-            score += evaluate_window(window, joueur_max, joueur_min)
+    for iR in range(iW - 1, iL):
+        for iCol in range(iC - iW + 1):
+            tWindow = [tMat[iR-i, iCol+i] for i in range(iW)]
+            iScore += EvaluateWindow(tWindow, iJoueurMax, iJoueurMin)
 
-    return score
+    return iScore
 
 # === MinMax (BASIQUE, SANS alpha-beta) ===
 
-def colonnes_ordonnees(grille):
+def ColonnesOrdonnees(oGrille):
     """
     @brief Génère la liste des colonnes jouables dans un ordre optimisé (centre → bords).
-    @param grille Plateau du jeu en cours
+    @param oGrille Plateau du jeu en cours
     @return Renvoit la liste des indices de colonnes jouables, triées par priorité (centre en premier)
     """
-    c = grille.c
-    centre = c // 2
-    ordre = []
-    for d in range(c):
-        left = centre - d
-        right = centre + d
-        if 0 <= left < c:
-            ordre.append(left)
-        if 0 <= right < c and right != left:
-            ordre.append(right)
-    return [col for col in ordre if grille.fill_matrice[col] < grille.l]
+    iC = oGrille.iPLAcolonnes
+    iCentre = iC // 2
+    tOrdre = []
+    for iD in range(iC):
+        iLeft = iCentre - iD
+        iRight = iCentre + iD
+        if 0 <= iLeft < iC:
+            tOrdre.append(iLeft)
+        if 0 <= iRight < iC and iRight != iLeft:
+            tOrdre.append(iRight)
+    return [iCol for iCol in tOrdre if oGrille.tPLAfillMatrice[iCol] < oGrille.iPLAlignes]
 
-def minmax(grille, profondeur, maximising=True):
+def Minmax(oGrille, iProfondeur, bMaximising=True):
     """
     @brief Calcule le score d'une position par MinMax sur la matrice.
-    @param grille Plateau du jeu en cours
-           profondeur Profondeur de recherche restante 
-           maximising Booléen : True si c'est le tour du joueur à maximiser (IA=2), False sinon (humain=1)
+    @param oGrille Plateau du jeu en cours
+           iProfondeur Profondeur de recherche restante 
+           bMaximising Booléen : True si c'est le tour du joueur à maximiser (IA=2), False sinon (humain=1)
     @return Renvoit le score évalué de la position (positif si favorable à l'IA, négatif si favorable à l'humain)
     """
 
     # États terminaux
-    if check_victoire_matrice(grille, 2):
+    if CheckVictoireMatrice(oGrille, 2):
         return 1000000
-    if check_victoire_matrice(grille, 1):
+    if CheckVictoireMatrice(oGrille, 1):
         return -1000000
-    if est_pleine(grille) or profondeur == 0:
-        return score_position(grille, joueur_max=2, joueur_min=1)
+    if EstPleine(oGrille) or iProfondeur == 0:
+        return ScorePosition(oGrille, iJoueurMax=2, iJoueurMin=1)
 
-    cols = colonnes_ordonnees(grille)
-    if maximising:
-        best = -10**9
-        for col in cols:
-            grille.play(col, 2)
-            val = minmax(grille, profondeur - 1, maximising=False)
-            grille.undo(col)
-            if val > best:
-                best = val
-        return best
+    tCols = ColonnesOrdonnees(oGrille)
+    if bMaximising:
+        iBest = -10**9
+        for iCol in tCols:
+            oGrille.PLAplay(iCol, 2)
+            iVal = Minmax(oGrille, iProfondeur - 1, bMaximising=False)
+            oGrille.PLAundo(iCol)
+            if iVal > iBest:
+                iBest = iVal
+        return iBest
     else:
-        best = 10**9
-        for col in cols:
-            grille.play(col, 1)
-            val = minmax(grille, profondeur - 1, maximising=True)
-            grille.undo(col)
-            if val < best:
-                best = val
-        return best
+        iBest = 10**9
+        for iCol in tCols:
+            oGrille.PLAplay(iCol, 1)
+            iVal = Minmax(oGrille, iProfondeur - 1, bMaximising=True)
+            oGrille.PLAundo(iCol)
+            if iVal < iBest:
+                iBest = iVal
+        return iBest
 
-def eval_coup(args):
+def EvalCoup(tArgs):
     """Fonction pour multiprocessing"""
-    grille, col, profondeur = args
-    grille.play(col, 2)
-    score = minmax(grille, profondeur - 1, maximising=False)
-    grille.undo(col)
-    return col, score
+    oGrille, iCol, iProfondeur = tArgs
+    oGrille.PLAplay(iCol, 2)
+    iScore = Minmax(oGrille, iProfondeur - 1, bMaximising=False)
+    oGrille.PLAundo(iCol)
+    return iCol, iScore
 
-def meilleur_coup(grille, profondeur):
+def MeilleurCoup(oGrille, iProfondeur):
     """
     @brief Sélectionne le meilleur coup pour l'IA en priorisant: coup gagnant, blocage, puis MinMax. Pour l'algorithme Minmax, on utilise le multiprocesing.
-    @param grille Plateau du jeu en cours
-           profondeur Profondeur de recherche pour MinMax
+    @param oGrille Plateau du jeu en cours
+           iProfondeur Profondeur de recherche pour MinMax
     @return Renvoit l'index de la colonne choisie pour jouer (0..grille.c-1)
     """
     # 1) Coup gagnant immédiat
-    cg = quel_coup_matrice(grille, 2)
-    if cg != -1:
-        return cg
+    iCg = QuelCoupMatrice(oGrille, 2)
+    if iCg != -1:
+        return iCg
 
     # 2) Blocage
-    cb = coup_bloquant(grille, 1)
-    if cb != -1:
-        return cb
+    iCb = CoupBloquant(oGrille, 1)
+    if iCb != -1:
+        return iCb
 
     # 3) MinMax
-    best_score = -10**9
-    best_col = None
+    iBestScore = -10**9
+    iBestCol = None
 
-    cols = colonnes_ordonnees(grille)
-    args_list = [(Plateau(grille.l, grille.c, grille.win), col, profondeur) for col in cols]
+    tCols = ColonnesOrdonnees(oGrille)
+    tArgsList = [(Tplateau(oGrille.iPLAlignes, oGrille.iPLAcolonnes, oGrille.iPLAwin), iCol, iProfondeur) for iCol in tCols]
 
-    for i, col in enumerate(cols):
-            args_list[i][0].matrice = grille.matrice.copy()
-            args_list[i][0].fill_matrice = grille.fill_matrice.copy()
-            args_list[i][0].bitboards = grille.bitboards.copy()
+    for i, iCol in enumerate(tCols):
+            tArgsList[i][0].tPLAmatrice = oGrille.tPLAmatrice.copy()
+            tArgsList[i][0].tPLAfillMatrice = oGrille.tPLAfillMatrice.copy()
+            tArgsList[i][0].tPLAbitboards = oGrille.tPLAbitboards.copy()
 
-    with multiprocessing.Pool(processes=min(len(cols), multiprocessing.cpu_count())) as pool :
-        results = pool.map(eval_coup, args_list)
+    with multiprocessing.Pool(processes=min(len(tCols), multiprocessing.cpu_count())) as oPool :
+        tResults = oPool.map(EvalCoup, tArgsList)
 
-    best_col, best_score = max(results, key=lambda x : x[1])
-    return best_col
+    iBestCol, iBestScore = max(tResults, key=lambda x : x[1])
+    return iBestCol
 
 
 ##Il me reste ça refaire et à doxygen
-def partie_vs_bot(grille, colones, mode, profondeur=4):
-    joueur = 1  # humain commence
-    buffer = 0
-    nb_coups = 0
-    print("\n=== DÉBUT DE LA PARTIE ===\n")
+def PartieVsBot(oGrille, iColones, sMode, iProfondeur=4):
+    iJoueur = 1  # humain commence
+    iBuffer = 0
+    iNbCoups = 0
+    #print("\n=== DÉBUT DE LA PARTIE ===\n")
 
     while True:
         # Affichage console
-        for ligne in grille.matrice:
-            print(" | ".join(str(x) for x in ligne))
-        print("-" * (grille.c * 4))
+        for tLigne in oGrille.tPLAmatrice:
+            print(" | ".join(str(x) for x in tLigne))
+        print("-" * (oGrille.iPLAcolonnes * 4))
 
         # Tour du joueur humain
-        if joueur == 1:
-            col = input(f"\nÀ toi de jouer ! Choisis une colonne (0-{grille.c - 1}) : ")
+        if iJoueur == 1:
+            iCol = input(f"\nÀ toi de jouer ! Choisis une colonne (0-{oGrille.iPLAcolonnes - 1}) : ")
             try:
-                col = int(col)
+                iCol = int(iCol)
             except ValueError:
                 print("Entre un nombre valide.")
                 continue
-            if col < 0 or col >= grille.c:
+            if iCol < 0 or iCol >= oGrille.iPLAcolonnes:
                 print("Colonne hors limites.")
                 continue
-            if grille.fill_matrice[col] >= grille.l:
+            if oGrille.tPLAfillMatrice[iCol] >= oGrille.iPLAlignes:
                 print("Colonne pleine.")
                 continue
 
-            grille.play(col, 1)
+            oGrille.PLAplay(iCol, 1)
 
-            term, etat = victoire_ou_nul(grille, 1)
-            if term:
-                if etat == 1:
-                    print("⚠️ Victoire du joueur 1 !")
-                elif etat == 0:
-                    print("😐 Match nul !")
+            bTerm, iEtat = VictoireOuNul(oGrille, 1)
+            if bTerm:
+                if iEtat == 1:
+                    print("Victoire du joueur 1")
+                elif iEtat == 0:
+                    print("Match nul")
                 break
 
         # Tour de l'IA
         else:
-            print("\n🤖 L'IA réfléchit...")
-            if mode=="Normal" and buffer==1 :
-                col = meilleur_coup(grille, profondeur)
-                if nb_coups%3 == 0 :
-                    buffer = 0
-            elif mode=="Normal" and buffer == 0 :
-                col = randint(0, colones)
-                buffer = 1
-            elif mode=="Facile" and buffer==1 :
-                col = meilleur_coup(grille, profondeur)
-                if nb_coups%2 == 0 :
-                    buffer = 0
-            elif mode=="Facile" and buffer == 0 :
-                col = randint(0, colones)
-                buffer = 1
+            print("\n IA réfléchit...")
+            if sMode=="Normal" and iBuffer==1 :
+                iCol = MeilleurCoup(oGrille, iProfondeur)
+                if iNbCoups%3 == 0 :
+                    iBuffer = 0
+            elif sMode=="Normal" and iBuffer == 0 :
+                iCol = randint(0, iColones)
+                iBuffer = 1
+            elif sMode=="Facile" and iBuffer==1 :
+                iCol = MeilleurCoup(oGrille, iProfondeur)
+                if iNbCoups%2 == 0 :
+                    iBuffer = 0
+            elif sMode=="Facile" and iBuffer == 0 :
+                iCol = randint(0, iColones)
+                iBuffer = 1
                 
             else :
-                col = meilleur_coup(grille, profondeur)
-            print(f"L'IA joue en colonne {col}")
-            grille.play(col, 2)
-            nb_coups += 1
-            term, etat = victoire_ou_nul(grille, 2)
-            if term:
-                if etat == 1:
-                    print("⚠️ Victoire de l'IA !")
-                elif etat == 0:
-                    print("😐 Match nul !")
+                iCol = MeilleurCoup(oGrille, iProfondeur)
+            print(f"L'IA joue en colonne {iCol}")
+            oGrille.PLAplay(iCol, 2)
+            iNbCoups += 1
+            bTerm, iEtat = VictoireOuNul(oGrille, 2)
+            if bTerm:
+                if iEtat == 1:
+                    print("Victoire de l'IA")
+                elif iEtat == 0:
+                    print("Match nul")
                 break
             
         # Alterner joueur
-        joueur = 3 - joueur  # 1 ↔ 2
+        iJoueur = 3 - iJoueur  # 1 ↔ 2
 
-    print("\n=== FIN DE PARTIE ===")
+    #print("\n=== FIN DE PARTIE ===")
 
 if __name__ == "__main__":
-    g = Plateau(lignes=6, colones=7, win_conditon=4)
-    partie_vs_bot(g, colones=6, mode="Facile", profondeur=4)
-
+    oG = Tplateau(iLignes=6, iColonnes=7, iWinCondition=4)
+    PartieVsBot(oG, iColones=6, sMode="Facile", iProfondeur=4)

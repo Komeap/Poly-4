@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['win_0',['win',['../classpoly__4_1_1Plateau.html#a54b30003436dc476b826b7c5fafae941',1,'poly_4::Plateau']]]
+  ['jeuclicsouris_0',['JEUclicSouris',['../classmain_1_1Tjeu.html#a637d33c78633dbe0e1a162f5144a5acf',1,'main::Tjeu']]],
+  ['jeutourbot_1',['JEUtourBot',['../classmain_1_1Tjeu.html#ab8f7c5285727d94fcf30a59147d5680b',1,'main::Tjeu']]]
 ];

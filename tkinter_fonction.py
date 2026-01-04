@@ -6,504 +6,538 @@ from PIL import Image, ImageTk
 import time
 
 ##screen size
-WIDTH, HEIGHT = 1350, 800
+iWIDTH, iHEIGHT = 1350, 800
 
-## @brief Ajout d'un image en bakground
-## @param master Page dans la qu'elle on veut mettre
-def add_bakground(master, image):
-    image_originale = Image.open(image)
-    image_redim = image_originale.resize((WIDTH, HEIGHT), Image.Resampling.LANCZOS)
-    photo = ImageTk.PhotoImage(image_redim)
 
-    bg_id = master.create_image(0, 0, image=photo, anchor="nw")
-    master.tag_lower(bg_id)
-    master.bg_image_cache = photo
+def AddBackground(oMaster, sImage):
+    """
+    @brief Met une image en background
+    @param sImage lien de l'image
+    """
+    oImageOriginale = Image.open(sImage)
+    oImageRedim = oImageOriginale.resize((iWIDTH, iHEIGHT), Image.Resampling.LANCZOS)
+    oPhoto = ImageTk.PhotoImage(oImageRedim)
 
-def add_canvas_img(canvas, link, pos, size):
-    img_pil = Image.open(link)
-    img_res = img_pil.resize(size, Image.LANCZOS)
-    img = ImageTk.PhotoImage(img_res)
+    iBgId = oMaster.create_image(0, 0, image=oPhoto, anchor="nw")
+    oMaster.tag_lower(iBgId)
+    oMaster.bg_image_cache = oPhoto
 
-    img_id = canvas.create_image(pos[0], pos[1], image=img ,anchor=tk.CENTER)
+def AddCanvasImg(oCanvas, sLink, tPos, tSize):
+    """
+    @brief Permet d'ajouter une image sur le canva
+    @param sLink lien de l'image
+           tPos Une position x, y 
+           tSize la taille de l'image 
+    """
+    oImgPil = Image.open(sLink)
+    oImgRes = oImgPil.resize(tSize, Image.LANCZOS)
+    oImg = ImageTk.PhotoImage(oImgRes)
 
-    if not hasattr(canvas, 'images_list'):
-        canvas.images_list = []
+    iImgId = oCanvas.create_image(tPos[0], tPos[1], image=oImg, anchor=tk.CENTER)
+
+    if not hasattr(oCanvas, 'images_list'):
+        oCanvas.images_list = []
     
-    canvas.images_list.append(img)
+    oCanvas.images_list.append(oImg)
     
-    return img_id
+    return iImgId
 
-def add_canvas_bouton(canvas, link, size, pos, cmd, hover, zoom):
-    img_pil = Image.open(link)
-    img_res = img_pil.resize(size, Image.LANCZOS)
-    img_zoom = ImageTk.PhotoImage(img_pil.resize((size[0] + zoom, size[1] + zoom), Image.LANCZOS))
-    img = ImageTk.PhotoImage(img_res)
+def AddCanvasBouton(oCanvas, sLink, tSize, tPos, fCmd, bHover, iZoom):
+    """
+    @brief Permet d'ajouter une image qui est un bouton 
+    @param sLink lien de l'image du bouton
+           tSize la taille de l'image 
+           tPos Une position x, y 
+           fCmd La fonction qui s'execute quand on clique sur le bouton
+           bHover booléen -> true changement de curseur si on passe au dessus
+           iZoom De combien ca zoom quand on passe au dessus (effet de style)
+           
+    """
+    oImgPil = Image.open(sLink)
+    oImgRes = oImgPil.resize(tSize, Image.LANCZOS)
+    oImgZoom = ImageTk.PhotoImage(oImgPil.resize((tSize[0] + iZoom, tSize[1] + iZoom), Image.LANCZOS))
+    oImg = ImageTk.PhotoImage(oImgRes)
     
-    img_id = canvas.create_image(pos[0], pos[1], image=img ,anchor=tk.CENTER)
+    iImgId = oCanvas.create_image(tPos[0], tPos[1], image=oImg, anchor=tk.CENTER)
     
+    # gestion de l'anim
+    def OnEnter(oEvent):
+        oCanvas.itemconfig(iImgId, image=oImgZoom)
 
-    def on_enter(event):
-        canvas.itemconfig(img_id, image=img_zoom)
+    def OnLeave(oEvent):
+        oCanvas.itemconfig(iImgId, image=oImg)
 
-    def on_leave(event):
-        canvas.itemconfig(img_id, image=img)
+    oCanvas.tag_bind(iImgId, "<Enter>", OnEnter)
+    oCanvas.tag_bind(iImgId, "<Leave>", OnLeave)
 
-    canvas.tag_bind(img_id, "<Enter>", on_enter)
-    canvas.tag_bind(img_id, "<Leave>", on_leave)
-
-    canvas.tag_bind(img_id, "<Button-1>", lambda event: cmd())
+    oCanvas.tag_bind(iImgId, "<Button-1>", lambda event: fCmd())
     
-    if hover :
-        canvas.tag_bind(img_id, "<Enter>", lambda event: canvas.config(cursor="hand2"), add="+")
-        canvas.tag_bind(img_id, "<Leave>", lambda event: canvas.config(cursor=""), add="+")
+    # gestion du cursor
+    if bHover :
+        oCanvas.tag_bind(iImgId, "<Enter>", lambda event: oCanvas.config(cursor="hand2"), add="+")
+        oCanvas.tag_bind(iImgId, "<Leave>", lambda event: oCanvas.config(cursor=""), add="+")
 
-    if not hasattr(canvas, 'images'):
-        canvas.images = []
+    if not hasattr(oCanvas, 'images'):
+        oCanvas.images = []
         
-    canvas.images.append(img)
-    canvas.images.append(img_zoom)
+    oCanvas.images.append(oImg)
+    oCanvas.images.append(oImgZoom)
 
-    return img_id
+    return iImgId
 
-def lancer_video(canvas, chemin_video, largeur=WIDTH, hauteur=HEIGHT +150):
-    fermer_video(canvas)
+def LancerVideo(oCanvas, sCheminVideo, iLargeur=iWIDTH, iHauteur=iHEIGHT +150):
+    """
+    @brief lancement de la vidéo
+    @param sCheminVideo Lien de la video
+           iLargeur Taille de la vidéo
+           iHauteur Taille de la vidéo
+    """
+    FermerVideo(oCanvas)
 
-    cap = cv2.VideoCapture(chemin_video)
+    oCap = cv2.VideoCapture(sCheminVideo)
 
-    canvas.cap = cap
-    canvas.video_en_cours = True
+    oCanvas.cap = oCap
+    oCanvas.video_en_cours = True
 
-    def stream():
-        if not getattr(canvas, 'video_en_cours', False):
-            cap.release()
-            canvas.delete("tag_video")
+    def Stream():
+        """
+         @brief Gére lel déroulement de la vidéo
+        """
+        if not getattr(oCanvas, 'video_en_cours', False):
+            oCap.release()
+            oCanvas.delete("tag_video")
             return
 
-        ret, frame = cap.read()
-        if ret:
-            frame = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
-            img_pil = Image.fromarray(frame)
-            img_pil = img_pil.resize((largeur, hauteur)) 
-            img_tk = ImageTk.PhotoImage(image=img_pil)
-            canvas.create_image(0, -50, anchor="nw", image=img_tk, tags="tag_video")
-            canvas.image_ref = img_tk 
-            canvas.after(33, stream)
+        bRet, oFrame = oCap.read()
+        if bRet:
+            oFrame = cv2.cvtColor(oFrame, cv2.COLOR_BGR2RGB)
+            oImgPil = Image.fromarray(oFrame)
+            oImgPil = oImgPil.resize((iLargeur, iHauteur)) 
+            oImgTk = ImageTk.PhotoImage(image=oImgPil)
+            oCanvas.create_image(0, -50, anchor="nw", image=oImgTk, tags="tag_video")
+            oCanvas.image_ref = oImgTk 
+            oCanvas.after(33, Stream)
         else:
-            fermer_video(canvas)
-    stream()
+            FermerVideo(oCanvas)
+    Stream()
 
-def fermer_video(canvas):
-    canvas.video_en_cours = False
-    if hasattr(canvas, 'cap') and canvas.cap.isOpened():
-        canvas.cap.release()
-    canvas.delete("tag_video")
+def FermerVideo(oCanvas):
+    """
+    @brief Permet de fermer la vidéo
+    """
+    oCanvas.video_en_cours = False
+    if hasattr(oCanvas, 'cap') and oCanvas.cap.isOpened():
+        oCanvas.cap.release()
+    oCanvas.delete("tag_video")
 
-class Param_case:
-    def __init__(self, canvas, x, y, nom, options=None, start_size=(HEIGHT//4, HEIGHT//3), scale=1.0, affiche=True, index=0, on_change=lambda i: None):
-        self.canvas = canvas
-        self.nom = nom
-        self.ids = []
-        self.on_change = on_change
+## @brief Class des cases de paramétre du Menu dDéroulant
+class TparamCase:
+    def __init__(self, oCanvas, iX, iY, sNom, tOptions=None, tStartSize=(iHEIGHT//4, iHEIGHT//3), fScale=1.0, bAffiche=True, iIndex=0, fOnChange=lambda i: None):
+        """
+        @brief init
+        @param iX, iY position
+            sNom Nom de la case
+            tStartSize Taille de départ
+            fScale valeur entre 0 et 1 du pourcentage de la taille afficher 0.8 affiche la case a une taille de 80%
+            bAffiche gére l'affichage ou non de la case
+        """
+        self.oPARcanvas = oCanvas
+        self.sPARnom = sNom
+        self.tPARids = []
+        self.fPARonChange = fOnChange
 
         # choix options
-        self.options = options if options else []
-        self.index = index
+        self.tPARoptions = tOptions if tOptions else []
+        self.iPARindex = iIndex
 
         # dimension pour la resizer et l'effet de déroulement du menu
-        w_redim = int(start_size[0] * scale)
-        h_redim = int(start_size[1] * scale)
-        size = (w_redim, h_redim)
+        iWRedim = int(tStartSize[0] * fScale)
+        iHRedim = int(tStartSize[1] * fScale)
+        tSize = (iWRedim, iHRedim)
 
-        # si on affiche la case, on veut pas afficher certain case pour pouvoir d&rouler jusqu'au bout sans avoir de case vide
-        if affiche:
+        if bAffiche:
             # Image de fond
-            self.img_id = add_canvas_img(canvas, "images/param_case.png", (x,y), size)
-            self.ids.append(self.img_id)
+            self.iPARimgId = AddCanvasImg(oCanvas, "images/param_case.png", (iX,iY), tSize)
+            self.tPARids.append(self.iPARimgId)
 
             # titre des paramétre
-            self.texte_nom = canvas.create_text(
-                x,
-                y - (size[1]//2) + int(35*scale),
-                text=f"{nom}",
-                font=("Retro Gaming", int(15*scale)),
-                anchor='center',
-                fill="black"
-            )
-            self.ids.append(self.texte_nom) # ajout au id pour pas le perdre
+            self.iPARtexteNom = oCanvas.create_text(iX, iY - (tSize[1]//2) + int(35*fScale), text=f"{sNom}", font=("Retro Gaming", int(15*fScale)), anchor='center', fill="black")
+            self.tPARids.append(self.iPARtexteNom) 
 
             # Valeur affichée
-            if self.options:
-                valeur = self.options[self.index]
+            if self.tPARoptions:
+                sValeur = self.tPARoptions[self.iPARindex]
             else:
-                valeur = ""
+                sValeur = ""
             
             # valeur du paramétre affichage
-            self.texte_valeur = canvas.create_text(
-                x,
-                y + 25*scale,
-                text=valeur,
-                font=("Retro Gaming", int(20*scale)),
-                anchor='center',
-                fill="black"
-            )
-            self.ids.append(self.texte_valeur)
+            self.iPARtexteValeur = oCanvas.create_text(iX,iY + 25*fScale,text=sValeur,font=("Retro Gaming", int(20*fScale)),anchor='center',fill="black")
+            self.tPARids.append(self.iPARtexteValeur)
 
             # Bouton up
-            self.btn_u_id = add_canvas_bouton(
-                canvas,
-                "images/bouton_up.png",
-                (HEIGHT//25, HEIGHT//25),
-                (x , y - size[1]//7),
-                self.next_value,
-                True,
-                10
-            )
-            self.ids.append(self.btn_u_id)
+            self.iPARbtnUId = AddCanvasBouton(oCanvas, "images/bouton_up.png", (iHEIGHT//25, iHEIGHT//25), (iX , iY - tSize[1]//7), self.PARnextValue, True, 10)
+            self.tPARids.append(self.iPARbtnUId)
 
             # Bouton down
-            self.btn_d_id = add_canvas_bouton(
-                canvas,
-                "images/bouton_down.png",
-                (HEIGHT//25, HEIGHT//25),
-                (x, y + size[1]//2.7),
-                self.prev_value,
-                True,
-                10
-            )
-            self.ids.append(self.btn_d_id)
+            self.iPARbtnDId = AddCanvasBouton(oCanvas, "images/bouton_down.png", (iHEIGHT//25, iHEIGHT//25), (iX, iY + tSize[1]//2.7), self.PARprevValue, True, 10)
+            self.tPARids.append(self.iPARbtnDId)
 
     # Changer de valeur vers HAUT
-    def next_value(self):
-        if not self.options: 
+    def PARnextValue(self):
+        if not self.tPARoptions: 
             return
-        self.index = (self.index + 1) % len(self.options) # modification de l'index ( si on fait +1 a l'index max ca remet au debut (modulo %))
-        self.canvas.itemconfig(self.texte_valeur, text=self.options[self.index]) # Changelent des valeurs
-        self.on_change(self.index)  # Fait le changement
+        self.iPARindex = (self.iPARindex + 1) % len(self.tPARoptions) 
+        self.oPARcanvas.itemconfig(self.iPARtexteValeur, text=self.tPARoptions[self.iPARindex]) 
+        self.fPARonChange(self.iPARindex)  
 
-    # Changer de valeur vers BAS (Pareil que haut mais avec - 1)
-    def prev_value(self):
-        if not self.options: return
-        self.index = (self.index - 1) % len(self.options)
-        self.canvas.itemconfig(self.texte_valeur, text=self.options[self.index])
-        self.on_change(self.index)
+    # Changer de valeur vers BAS
+    def PARprevValue(self):
+        if not self.tPARoptions: return
+        self.iPARindex = (self.iPARindex - 1) % len(self.tPARoptions)
+        self.oPARcanvas.itemconfig(self.iPARtexteValeur, text=self.tPARoptions[self.iPARindex])
+        self.fPARonChange(self.iPARindex)
 
     # détruit la case pour l'animation
-    def destroy(self):
-        for item_id in self.ids:
-            self.canvas.delete(item_id) # Détruire tous puisque tous bouge 
+    def PARdestroy(self):
+        for iItemId in self.tPARids:
+            self.oPARcanvas.delete(iItemId) 
 
-class MenuDeroulant:
-    def __init__(self, canvas, x, y_start, CONFIG_DATA):
-        self.canvas = canvas
-        self.x = x
-        self.y_start = y_start
+## @brief Class qui gérte le Menu déroulant 
+class TmenuDeroulant:
+    def __init__(self, oCanvas, iX, iYStart, dConfigData):
+        """
+        @brief init
+        @param iX Positon x du MEnue déroulant
+            iYStart Position y de la premier case
+            dConfigData Dictionnaire contenant les Nom des case de parametre du menu (TparamCase)
+        """
+        self.oMENcanvas = oCanvas
+        self.iMENx = iX
+        self.iMENyStart = iYStart
         # Gestion des valeur des paramétres
-        self.params_data = list(CONFIG_DATA.keys())
-        self.config =  CONFIG_DATA
-        self.choices = {key: 0 for key in CONFIG_DATA}
+        self.tMENparamsData = list(dConfigData.keys())
+        self.dMENconfig =  dConfigData
+        self.dMENchoices = {key: 0 for key in dConfigData}
         
         #Gestion des index
-        self.current_index = 0
-        self.max_visible = 3
-        self.ecart = HEIGHT // 3 + 20
+        self.iMENcurrentIndex = 0
+        self.iMENmaxVisible = 3
+        self.iMENecart = iHEIGHT // 3 + 20
         
         # Positions cible après mouvement
-        self.positions_y_fixes = [
-            self.y_start,                # Position haut
-            self.y_start + self.ecart,   # Position millieu
-            self.y_start + self.ecart*2  # Position bas
+        self.tMENpositionsYFixes = [
+            self.iMENyStart,                # Position haut
+            self.iMENyStart + self.iMENecart,   # Position millieu
+            self.iMENyStart + self.iMENecart*2  # Position bas
         ]
         
         # % de la taille pour l'effet de style
-        self.tailles_fixes = [0.7, 1.0, 0.7] 
+        self.tMENtaillesFixes = [0.7, 1.0, 0.7] 
 
-        self.active_cases = []
+        self.tMENactiveCases = []
         
-        # Variable pour empêcher de spammer le bouton pendant l'animation
-        self.is_animating = False
+        self.bMENisAnimating = False
         
-        self.update_display_instantane()
+        self.MENupdateDisplayInstantane()
 
-    def update_display_instantane(self):
-        for case in self.active_cases: 
-            case.destroy()
-        self.active_cases = []
+    def MENupdateDisplayInstantane(self):
+        """
+        @brief Update le menu déroulant et l'afficahge
+        """
+        for oCase in self.tMENactiveCases: 
+            oCase.PARdestroy()
+        self.tMENactiveCases = []
+        # affiche les cases visibles
+        for j in range(self.iMENmaxVisible):
+            iDataIndex = self.iMENcurrentIndex + j
 
-        for j in range(self.max_visible):
-            data_index = self.current_index + j
-
-            if data_index >= len(self.params_data): 
+            if iDataIndex >= len(self.tMENparamsData): 
                 break
 
-            nom = self.params_data[data_index]
-            options = self.config.get(nom, [])
-            y = self.positions_y_fixes[j]
-            s = self.tailles_fixes[j]
+            sNom = self.tMENparamsData[iDataIndex]
+            tOptions = self.dMENconfig.get(sNom, [])
+            iY = self.tMENpositionsYFixes[j]
+            fS = self.tMENtaillesFixes[j]
 
-            saved_index = self.choices.get(nom, 0)
-
-            if nom == "":
-                new_case = Param_case(self.canvas, self.x, y, self.params_data[data_index], scale=s, affiche=False)
-                self.active_cases.append(new_case)
+            if sNom == "":
+                oNewCase = TparamCase(self.oMENcanvas, self.iMENx, iY, self.tMENparamsData[iDataIndex], fScale=fS, bAffiche=False)
+                self.tMENactiveCases.append(oNewCase)
             else :
-                new_case = Param_case(self.canvas, self.x, y,nom, options, scale=s ,index=self.choices[nom], on_change=lambda idx, cle=nom: self.save_choice(cle, idx))
-                self.active_cases.append(new_case)
+                oNewCase = TparamCase(self.oMENcanvas, self.iMENx, iY, sNom, tOptions, fScale=fS ,iIndex=self.dMENchoices[sNom], fOnChange=lambda iIdx, sCle=sNom: self.MENsaveChoice(sCle, iIdx))
+                self.tMENactiveCases.append(oNewCase)
     
-    def save_choice(self, nom, idx):
-        self.choices[nom] = idx
+    def MENsaveChoice(self, sNom, iIdx):
+        """
+        @brief POur pas perdre la selection quand on change l'affichage
+        """
+        self.dMENchoices[sNom] = iIdx
 
-    def scroll(self, direction):
-        if self.is_animating: return
+    def MENscroll(self, iDirection):
+        """
+        @brief Permet de scroll en haut ou en bas celon iDirection
+        """
+        if self.bMENisAnimating: return
         
-        new_index = self.current_index + direction
-        if not (0 <= new_index < len(self.params_data)): return
+        iNewIndex = self.iMENcurrentIndex + iDirection
+        if not (0 <= iNewIndex < len(self.tMENparamsData)): return
 
 
-        self.animate_transition(direction)
+        self.MENanimateTransition(iDirection)
 
-    def animate_transition(self, direction):
-        self.is_animating = True
+    def MENanimateTransition(self, iDirection):
+        """
+        @brief Exécute la transition/ Déplacement
+        Calcul le décalage de postion et de proportion et affiche chaque image une par une
+        effet rétro
+        """
+        self.bMENisAnimating = True
         
         # CONFIGURATION DE L'ANIMATION
-        steps = 3
-        delay = 1
+        iSteps = 3
+        iDelay = 1
         
-        def step_process(step):
-            for case in self.active_cases:
-                case.destroy()
-            self.active_cases = []
-            
-            progress = step / steps 
-            
-            range_start = -1 if direction == -1 else 0
-            range_end = self.max_visible if direction == -1 else self.max_visible + 1
+        def StepProcess(iStep):
+            """
+            @brief Calcul la nouvel image de la case et les position et la taille
+            """
 
-            for j in range(range_start, range_end):
-                data_index = self.current_index + j
+            for oCase in self.tMENactiveCases:
+                oCase.PARdestroy()
+            self.tMENactiveCases = []
+            
+            fProgress = iStep / iSteps 
+            
+            iRangeStart = -1 if iDirection == -1 else 0
+            iRangeEnd = self.iMENmaxVisible if iDirection == -1 else self.iMENmaxVisible + 1
+
+            for j in range(iRangeStart, iRangeEnd):
+                iDataIndex = self.iMENcurrentIndex + j
                 
-                if data_index < 0 or data_index >= len(self.params_data):
+                if iDataIndex < 0 or iDataIndex >= len(self.tMENparamsData):
                     continue
 
-                nom = self.params_data[data_index]
-                options = self.config.get(nom, [])
+                sNom = self.tMENparamsData[iDataIndex]
+                tOptions = self.dMENconfig.get(sNom, [])
                 
-                start_y = self.y_start + (j * self.ecart)
-                target_y = self.y_start + ((j - direction) * self.ecart)
-                current_y = start_y + (target_y - start_y) * progress
+                iStartY = self.iMENyStart + (j * self.iMENecart)
+                iTargetY = self.iMENyStart + ((j - iDirection) * self.iMENecart)
+                fCurrentY = iStartY + (iTargetY - iStartY) * fProgress
 
-                center_y = self.y_start + self.ecart
-                dist = abs(current_y - center_y)
-                ratio = dist / self.ecart
-                if ratio > 1: ratio = 1
-                current_scale = 1.0 - (ratio * 0.2)
+                iCenterY = self.iMENyStart + self.iMENecart
+                fDist = abs(fCurrentY - iCenterY)
+                fRatio = fDist / self.iMENecart
+                if fRatio > 1: fRatio = 1
+                fCurrentScale = 1.0 - (fRatio * 0.2)
 
-                saved_index = self.choices.get(nom, 0)
+                iSavedIndex = self.dMENchoices.get(sNom, 0)
                 
-
-                if nom == "":
-                    case = Param_case(self.canvas, self.x, current_y, nom, scale=current_scale, affiche=False)
-                    self.active_cases.append(case)
+                if sNom == "":
+                    oCase = TparamCase(self.oMENcanvas, self.iMENx, fCurrentY, sNom, fScale=fCurrentScale, bAffiche=False)
+                    self.tMENactiveCases.append(oCase)
                 else :
-                    case = Param_case(self.canvas, self.x, current_y, nom, options, scale=current_scale, index=saved_index, on_change=lambda idx, cle=nom: self.save_choice(cle, idx))
-                    self.active_cases.append(case)
+                    oCase = TparamCase(self.oMENcanvas, self.iMENx, fCurrentY, sNom, tOptions, fScale=fCurrentScale, iIndex=iSavedIndex, fOnChange=lambda iIdx, sCle=sNom: self.MENsaveChoice(sCle, iIdx))
+                    self.tMENactiveCases.append(oCase)
 
-            if step < steps:
-                self.canvas.after(delay, lambda: step_process(step + 1))
+            if iStep < iSteps:
+                self.oMENcanvas.after(iDelay, lambda: StepProcess(iStep + 1))
             else:
-                self.current_index += direction
-                self.is_animating = False
-                self.update_display_instantane()
+                self.iMENcurrentIndex += iDirection
+                self.bMENisAnimating = False
+                self.MENupdateDisplayInstantane()
 
-        step_process(1)
+        StepProcess(1)
 
-    def print_all_choices(self):
+    def MENprintAllChoices(self):
+        """
+        @brief Affiche les choix de valeur utilisé pour les test
+        """
         print("\n=== PARAMÈTRES ACTUELS ===")
-        for nom in self.params_data:
-            if nom == "": 
-                continue  # lignes vides
-            index = self.choices[nom]
-            valeur = self.config[nom][index]
-            print(f"{nom}: {valeur}")
+        for sNom in self.tMENparamsData:
+            if sNom == "": 
+                continue 
+            iIndex = self.dMENchoices[sNom]
+            sValeur = self.dMENconfig[sNom][iIndex]
+            print(f"{sNom}: {sValeur}")
         print("==========================\n")
 
-def init_fleche(canva):
-
-    img_pil = Image.open("images/fleche_in_game.png")
+def InitFleche(oCanvas):
+    """
+    @brief Initialise l'image de la fléche pour le jeu
+    """
+    oImgPil = Image.open("images/fleche_in_game.png")
     
-    taille = getattr(canva, 'taille_case', 50) 
+    iTaille = getattr(oCanvas, 'taille_case', 50) 
     
-    img_res = img_pil.resize((int(taille * 0.7), int(taille * 0.7)), Image.LANCZOS)
-    img_tk = ImageTk.PhotoImage(img_res)
+    oImgRes = oImgPil.resize((int(iTaille * 0.7), int(iTaille * 0.7)), Image.LANCZOS)
+    oImgTk = ImageTk.PhotoImage(oImgRes)
 
-    canva.fleche_img = img_tk
-    fleche_id = canva.create_image(-100, -100, image=img_tk, anchor=tk.CENTER)
+    oCanvas.fleche_img = oImgTk
+    iFlecheId = oCanvas.create_image(-100, -100, image=oImgTk, anchor=tk.CENTER)
     
-    return fleche_id
+    return iFlecheId
 
-def bouger_fleche(event, canva, fleche_id):
-    grid_data = getattr(canva, 'grid_data', None)
-    if not grid_data:
+def BougerFleche(oEvent, oCanvas, iFlecheId):
+    """
+    @brief Gére le mouvemnt de la fléche de jeu
+    """
+
+    dGridData = getattr(oCanvas, 'grid_data', None)
+    if not dGridData:
         return
 
-    start_x = grid_data['start_x']
-    start_y = grid_data['start_y']
-    taille = grid_data['taille']
-    cols = grid_data['cols']
-    grille_l = grid_data['largeur_totale']
+    iStartX = dGridData['start_x']
+    iStartY = dGridData['start_y']
+    iTaille = dGridData['taille']
+    iCols = dGridData['cols']
+    iGrilleL = dGridData['largeur_totale']
 
-    mouse_x = event.x
+    iMouseX = oEvent.x
     
-    if start_x <= mouse_x <= start_x + grille_l:
-        col_index = int((mouse_x - start_x) // taille)
+    if iStartX <= iMouseX <= iStartX + iGrilleL:
+        iColIndex = int((iMouseX - iStartX) // iTaille)
         
-        if 0 <= col_index < cols:
-            center_x = start_x + (col_index * taille) + (taille // 2)
+        if 0 <= iColIndex < iCols:
+            iCenterX = iStartX + (iColIndex * iTaille) + (iTaille // 2)
 
-            pos_y = start_y - (taille // 1.5)
+            iPosY = iStartY - (iTaille // 1.5)
  
-            canva.coords(fleche_id, center_x, pos_y)
+            oCanvas.coords(iFlecheId, iCenterX, iPosY)
 
-            canva.itemconfigure(fleche_id, state='normal')
+            oCanvas.itemconfigure(iFlecheId, state='normal')
             return
 
-def ajouter_pion(canva, ligne, col, couleur, finish=None):
-    grid = getattr(canva, 'grid_data', None)
-    if not grid: return
+def AjouterPion(oCanvas, iLigne, iCol, sCouleur, fFinish=None):
+    """
+    @brief Gére l'animation d'ajout de jeton, chute physique + rebond
+    """
+    dGrid = getattr(oCanvas, 'grid_data', None)
+    if not dGrid: return
 
-    start_x = grid['start_x']
-    start_y = grid['start_y']
-    taille = grid['taille']
-    nb_lignes = grid['rows']
+    iStartX = dGrid['start_x']
+    iStartY = dGrid['start_y']
+    iTaille = dGrid['taille']
+    iNbLignes = dGrid['rows']
 
-    x_center = start_x + (col * taille) + (taille // 2)
+    iXCenter = iStartX + (iCol * iTaille) + (iTaille // 2)
 
-    ligne_visuelle = (nb_lignes - 1) - ligne
-    y_final = start_y + (ligne_visuelle * taille) + (taille // 2)
+    iLigneVisuelle = (iNbLignes - 1) - iLigne
+    iYFinal = iStartY + (iLigneVisuelle * iTaille) + (iTaille // 2)
+    iYDepart = iStartY 
+    iRayon = (iTaille // 2) - 2 
 
+    # image du pion qui va etre bougé
+    iPionId = oCanvas.create_oval(iXCenter - iRayon, iYDepart - iRayon,iXCenter + iRayon, iYDepart + iRayon,fill=sCouleur, outline="black", width=1)
 
-    y_depart = start_y 
+    oCanvas.tag_lower(iPionId, "grille")
 
+    dInfoAnim = {"y_actuel": iYDepart, "vitesse": 0, "gravite": 1.5, "rebond": 0.35}
 
-    rayon = (taille // 2) - 2 
-
-    pion_id = canva.create_oval(
-        x_center - rayon, y_depart - rayon,
-        x_center + rayon, y_depart + rayon,
-        fill=couleur, outline="black", width=1
-    )
-
-    canva.tag_lower(pion_id, "grille")
-
-    info_anim = {
-        "y_actuel": y_depart,
-        "vitesse": 0,
-        "gravite": 1.5,     
-        "rebond": 0.35,       # Ca rebondit à 35% de la vitesse
-    }
-
-    def anim_chute():
-        # 1. On accélère (Gravité)
-        info_anim["vitesse"] += info_anim["gravite"]
+    def AnimChute():
+        """
+        @brief Animation au sens de la gravité et rebond réel
+        """
+        dInfoAnim["vitesse"] += dInfoAnim["gravite"]
         
-        v = info_anim["vitesse"]
-        y = info_anim["y_actuel"]
+        fV = dInfoAnim["vitesse"]
+        fY = dInfoAnim["y_actuel"]
 
-        if y + v >= y_final:
-            dist_restante = y_final - y
-            canva.move(pion_id, 0, dist_restante)
-            info_anim["y_actuel"] = y_final
+        if fY + fV >= iYFinal:
+            fDistRestante = iYFinal - fY
+            oCanvas.move(iPionId, 0, fDistRestante)
+            dInfoAnim["y_actuel"] = iYFinal
 
-            v_rebond = -v * info_anim["rebond"]
+            fVRebond = -fV * dInfoAnim["rebond"]
             
-            if abs(v_rebond) < 2.0:
-                if finish :
-                    finish()
+            if abs(fVRebond) < 2.0:
+                if fFinish :
+                    fFinish()
                 return 
             
-            info_anim["vitesse"] = v_rebond
-            canva.after(20, anim_chute)
+            dInfoAnim["vitesse"] = fVRebond
+            oCanvas.after(20, AnimChute)
 
         else:
-            canva.move(pion_id, 0, v)
-            info_anim["y_actuel"] += v
-            canva.after(20, anim_chute)
+            oCanvas.move(iPionId, 0, fV)
+            dInfoAnim["y_actuel"] += fV
+            oCanvas.after(20, AnimChute)
+            
+    AnimChute()
+    return iPionId
 
-    anim_chute()
-    return pion_id
-
-def afficher_plateau(canva, largeur, hauteur):
+def AfficherPlateau(oCanvas, iLargeur, iHauteur):
+    """
+    @brief Affiche le plateau en fonction du nombre de colone et lignes
+    Calcul pour qu'il soit tpoujours bien centré peut uimport la taille
+    """
     
-    m_larg = WIDTH*0.2
-    m_haut = HEIGHT*0.2
+    fMLarg = iWIDTH*0.2
+    fMHaut = iHEIGHT*0.2
 
-    size_dispo_larg = abs(WIDTH - 2*(m_larg))
-    size_dispo_haut = abs(HEIGHT - 2*(m_haut))
+    fSizeDispoLarg = abs(iWIDTH - 2*(fMLarg))
+    fSizeDispoHaut = abs(iHEIGHT - 2*(fMHaut))
 
-    size_case_1 = (int)(size_dispo_larg//largeur)
-    size_case_2 = (int)(size_dispo_haut//hauteur)
+    iSizeCase1 = (int)(fSizeDispoLarg//iLargeur)
+    iSizeCase2 = (int)(fSizeDispoHaut//iHauteur)
 
-    taille_case = min(size_case_1, size_case_2)
+    iTailleCase = min(iSizeCase1, iSizeCase2)
 
-    grille_l = taille_case * largeur
-    grille_h = taille_case * hauteur
+    iGrilleL = iTailleCase * iLargeur
+    iGrilleH = iTailleCase * iHauteur
 
-    start_x = m_larg + (size_dispo_larg - grille_l)//2
-    start_y = m_haut + (size_dispo_haut - grille_h)//2
+    iStartX = fMLarg + (fSizeDispoLarg - iGrilleL)//2
+    iStartY = fMHaut + (fSizeDispoHaut - iGrilleH)//2
 
-    canva.taille_case = taille_case 
-    canva.grid_data = {
-        "start_x": start_x,
-        "start_y": start_y,
-        "taille": taille_case,
-        "cols": largeur,
-        "rows": hauteur,
-        "largeur_totale": grille_l
-    }
+    oCanvas.taille_case = iTailleCase 
+    oCanvas.grid_data = {"start_x": iStartX, "start_y": iStartY, "taille": iTailleCase, "cols": iLargeur, "rows": iHauteur, "largeur_totale": iGrilleL}
 
-    canva.image_cache = []
+    oCanvas.image_cache = []
     
-    pil_case = Image.open("images/One_case.png")
-    case_redim = pil_case.resize((taille_case, taille_case), Image.LANCZOS)
-    case_tk = ImageTk.PhotoImage(case_redim)
-    canva.image_cache.append(case_tk)
+    oPilCase = Image.open("images/One_case.png")
+    oCaseRedim = oPilCase.resize((iTailleCase, iTailleCase), Image.LANCZOS)
+    oCaseTk = ImageTk.PhotoImage(oCaseRedim)
+    oCanvas.image_cache.append(oCaseTk)
 
-    pil_border = Image.open("images/border.png")
+    oPilBorder = Image.open("images/border.png")
 
-    epaisseur_mur = taille_case // 4
-    overlap = 2
-    epaisseur_visuelle = epaisseur_mur + overlap
+    iEpaisseurMur = iTailleCase // 4
+    iOverlap = 2
+    iEpaisseurVisuelle = iEpaisseurMur + iOverlap
 
-    w_visuel_horiz = grille_l + overlap
-    h_visuel_verti = grille_h + overlap
+    iWVisuelHoriz = iGrilleL + iOverlap
+    iHVisuelVerti = iGrilleH + iOverlap
 
-    img_r = pil_border.resize((epaisseur_visuelle, h_visuel_verti), Image.LANCZOS)
-    tk_r = ImageTk.PhotoImage(img_r)
-    canva.image_cache.append(tk_r)
+    ## Afficheage des 4 bordures rotation + positon
 
-    img_l = pil_border.rotate(180).resize((epaisseur_visuelle, h_visuel_verti), Image.LANCZOS)
-    tk_l = ImageTk.PhotoImage(img_l)
-    canva.image_cache.append(tk_l)
+    oImgR = oPilBorder.resize((iEpaisseurVisuelle, iHVisuelVerti), Image.LANCZOS)
+    oTkR = ImageTk.PhotoImage(oImgR)
+    oCanvas.image_cache.append(oTkR)
 
-    img_t = pil_border.rotate(90, expand=True).resize((w_visuel_horiz, epaisseur_visuelle), Image.LANCZOS)
-    tk_t = ImageTk.PhotoImage(img_t)
-    canva.image_cache.append(tk_t)
+    oImgL = oPilBorder.rotate(180).resize((iEpaisseurVisuelle, iHVisuelVerti), Image.LANCZOS)
+    oTkL = ImageTk.PhotoImage(oImgL)
+    oCanvas.image_cache.append(oTkL)
 
-    img_b = pil_border.rotate(-90, expand=True).resize((w_visuel_horiz, epaisseur_visuelle), Image.LANCZOS)
-    tk_b = ImageTk.PhotoImage(img_b)
-    canva.image_cache.append(tk_b)
+    oImgT = oPilBorder.rotate(90, expand=True).resize((iWVisuelHoriz, iEpaisseurVisuelle), Image.LANCZOS)
+    oTkT = ImageTk.PhotoImage(oImgT)
+    oCanvas.image_cache.append(oTkT)
 
-    center_grid_x = start_x + (grille_l // 2)
-    center_grid_y = start_y + (grille_h // 2)
+    oImgB = oPilBorder.rotate(-90, expand=True).resize((iWVisuelHoriz, iEpaisseurVisuelle), Image.LANCZOS)
+    oTkB = ImageTk.PhotoImage(oImgB)
+    oCanvas.image_cache.append(oTkB)
 
-    canva.create_image(center_grid_x, start_y - (epaisseur_mur//2), image=tk_t, anchor=tk.CENTER)
-    canva.create_image(center_grid_x, start_y + grille_h + (epaisseur_mur//2), image=tk_b, anchor=tk.CENTER)
-    canva.create_image(start_x - (epaisseur_mur//2), center_grid_y, image=tk_l, anchor=tk.CENTER)
-    canva.create_image(start_x + grille_l + (epaisseur_mur//2), center_grid_y, image=tk_r, anchor=tk.CENTER)
+    # Fin affichage bordure
+
+    iCenterGridX = iStartX + (iGrilleL // 2)
+    iCenterGridY = iStartY + (iGrilleH // 2)
+
+    oCanvas.create_image(iCenterGridX, iStartY - (iEpaisseurMur//2), image=oTkT, anchor=tk.CENTER)
+    oCanvas.create_image(iCenterGridX, iStartY + iGrilleH + (iEpaisseurMur//2), image=oTkB, anchor=tk.CENTER)
+    oCanvas.create_image(iStartX - (iEpaisseurMur//2), iCenterGridY, image=oTkL, anchor=tk.CENTER)
+    oCanvas.create_image(iStartX + iGrilleL + (iEpaisseurMur//2), iCenterGridY, image=oTkR, anchor=tk.CENTER)
     
+    ## Afdfichage de chaque case de la grille
+    for iCol in range(iLargeur):
+        for iLig in range(iHauteur):
+            iPosX = iStartX + (iCol * iTailleCase) + (iTailleCase // 2)
+            iPosY = iStartY + (iLig * iTailleCase) + (iTailleCase // 2)
 
-    for col in range(largeur):
-        for lig in range(hauteur):
-            pos_x = start_x + (col * taille_case) + (taille_case // 2)
-            pos_y = start_y + (lig * taille_case) + (taille_case // 2)
-
-            canva.create_image(pos_x, pos_y, image=case_tk, anchor=tk.CENTER, tags="grille")
+            oCanvas.create_image(iPosX, iPosY, image=oCaseTk, anchor=tk.CENTER, tags="grille")

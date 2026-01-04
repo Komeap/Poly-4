@@ -1,18 +1,17 @@
-import tkinter as tk
 import numpy as np
 
-class Plateau:
+class Tplateau:
     ## @brief Initialisation du plateau de puissance 4
-    ## @param lignes Nombre de lignes du plateau
-    ## @param colones Nombre de colones du plateau
-    ## @param win conditon du tableau, nbr de jeton qu'il faut alligner
-    def __init__(self, lignes, colones, win_conditon):
-        self.l = lignes ## nombre de lignes <=> hauteur d'uen colone
-        self.c = colones
-        self.win = win_conditon
-        self.matrice = np.zeros((lignes, colones), dtype = int)
-        self.fill_matrice = np.zeros((colones), dtype = int)
-        self.bitboards = [0, 0] ## @brief bitboards[0] -> celle de l'ordi, bitboards[1]-> celle du joueur
+    ## @param iLignes Nombre de lignes du plateau
+    ## @param iColonnes Nombre de colones du plateau
+    ## @param iWinCondition du tableau, nbr de jeton qu'il faut alligner
+    def __init__(self, iLignes, iColonnes, iWinCondition):
+        self.iPLAlignes = iLignes ## nombre de lignes <=> hauteur d'uen colone
+        self.iPLAcolonnes = iColonnes
+        self.iPLAwin = iWinCondition
+        self.tPLAmatrice = np.zeros((iLignes, iColonnes), dtype=int)
+        self.tPLAfillMatrice = np.zeros((iColonnes), dtype=int)
+        self.tPLAbitboards = [0, 0]## @brief bitboards[0] -> celle de l'ordi, bitboards[1]-> celle du joueur
         ## Une bitboard est un nombre binaire, qui représente le plateau de jeu "applatie", avec 1 un jeton et 0 jetons enemmie, ou rien
         ## "0000" --> les 0 "mur" dans la bitboard (5 0)
         ## [0000]
@@ -21,76 +20,80 @@ class Plateau:
         ## [1001]
 
         ## hauteur H, +1 pour le décalage de la bitboard
-        self.H = self.l + 1
+        self.iPLAh = self.iPLAlignes + 1
 
         ## un masque couvrant les bit utilise du plateau
-        total_bits = self.c * self.H
-        self.mask = (1 << total_bits) - 1
+        iTotalBits = self.iPLAcolonnes * self.iPLAh
+        self.iPLAmask = (1 << iTotalBits) - 1
         
     
     ## @brief permet d'ajouter le coup a la bitbord du joueur
-    ## @param pos = (colone , ligne, numéro du joueur)
-    def add_coup_bitboard(self, pos):
-        
-        self.bitboards[pos[2]] = self.bitboards[pos[2]] | (1 << (pos[0] + (self.H * pos[1])) )
+    ## @param tPos = (colone , ligne, numéro du joueur)
+    def PLAaddCoupBitboard(self, tPos):
+        self.tPLAbitboards[tPos[2]] = self.tPLAbitboards[tPos[2]] | (1 << (tPos[0] + (self.iPLAh * tPos[1])))
         ## ajoute a la bitbord du joueur le coup qui vient d'être ajouter
         ## l'operation | 'le ou binaire', ajoute un chiffre bianaire (met les 1 du deuxieme dans le permier si y'a un zero a la place)
         ## 1 << (pos[1] + hauteur*pos[0])  creer le chiffre binaire associé au coup qui vient d'etre jouer '<<' -> met un 1 en position x
         ## pos[1] -> décalage sur ligne , hauteur*pos[0] -> saute pos[0] colone
 
     ## @brief Joue sur la colone play_colone
-    ## @param joueur 1 ou 2 celon le joueur (Peut etre d'autre chiffre celon les bonus, ...)
+    ## @param iJoueur 1 ou 2 celon le joueur (Peut etre d'autre chiffre celon les bonus, ...)
     ## @return !!!!!! Return 1 si ca peut pas jouer, et return (ligne, colone, num du joueur) si c'est ok et ca joue !!!!!!!
-    def play(self, play_colone, joueur):
-        ## @breif joue en [(hauteur de la matrice)-(le nombre de jeton sur cette colone)][colone ou c'est jouer]
-        if joueur == 2 : j = 0 
-        else : j = joueur
-        if (play_colone < self.c and play_colone >= 0): ## si le coup est possible
-            if (self.fill_matrice[play_colone] < self.l) : ## si la colone est pas pleine
-                self.matrice[(self.l - 1) - self.fill_matrice[play_colone]][play_colone] = joueur
-                ## @brief modifie la matrice et la matrice de remplicage eavec le coup jouer
-                self.fill_matrice[play_colone] += 1
+    def PLAplay(self, iPlayColone, iJoueur):
+        ## joue en [(hauteur de la matrice)-(le nombre de jeton sur cette colone)][colone ou c'est jouer]
+        if iJoueur == 2: iJ = 0 
+        else: iJ = iJoueur
+        
+        if (iPlayColone < self.iPLAcolonnes and iPlayColone >= 0): ## si le coup est possible
+            if (self.tPLAfillMatrice[iPlayColone] < self.iPLAlignes): ## si la colone est pas pleine
+                self.tPLAmatrice[(self.iPLAlignes - 1) - self.tPLAfillMatrice[iPlayColone]][iPlayColone] = iJoueur
+                ## modifie la matrice et la matrice de remplicage eavec le coup jouer
+
+                self.tPLAfillMatrice[iPlayColone] += 1
                 #print("Le coup est en (", self.fill_matrice[play_colone] - 1,",", play_colone,") du joueur :", joueur)
                 ## @brief modifi la bitboard avec une fonction précédente
-                self.add_coup_bitboard((self.fill_matrice[play_colone] - 1 , play_colone, j)) ## modifi la bitbord du joeuur en même temps
-                return (self.fill_matrice[play_colone] - 1 , play_colone, joueur)
+
+                self.PLAaddCoupBitboard((self.tPLAfillMatrice[iPlayColone] - 1 , iPlayColone, iJ))  ## modifi la bitbord du joeuur en même temps
+                return (self.tPLAfillMatrice[iPlayColone] - 1 , iPlayColone, iJoueur)
         return 1
 
-    def undo(self, play_colone):
-        if (play_colone < self.c and play_colone >= 0): ## si le undo est possible
-            if (self.fill_matrice[play_colone] > 0) : ## si la colone est pas vide
-                self.matrice[(self.l - 1) - self.fill_matrice[play_colone] + 1][play_colone] = 0
+    def PLAundo(self, iPlayColone):
+        if (iPlayColone < self.iPLAcolonnes and iPlayColone >= 0): ## si le undo est possible
+            if (self.tPLAfillMatrice[iPlayColone] > 0): ## si la colone est pas vide 
+                self.tPLAmatrice[(self.iPLAlignes - 1) - self.tPLAfillMatrice[iPlayColone] + 1][iPlayColone] = 0
                 ## @brief modifie la matrice et la matrice de remplicage avec le coup enlever
-                self.fill_matrice[play_colone] -= 1
+                self.tPLAfillMatrice[iPlayColone] -= 1
                 """
                 ## @brief Exactement la meme chose que add bitboard mais l'opération est ^, ce qui retire le 1 de la bitboard au lieu de l'ajouter
                 self.bitboards[1] = self.bitboards[1] ^ (1 << (play_colone + (self.l + 1)*(self.fill_matrice[play_colone])))
                 self.bitboards[0] = self.bitboards[0] ^ (1 << (play_colone + (self.l + 1)*(self.fill_matrice[play_colone])))"""
-                hauteur = self.l + 1
-                ligne_actuelle = self.fill_matrice[play_colone]
-                index = ligne_actuelle + (self.H * play_colone)
+                
+                iHauteur = self.iPLAlignes + 1
+                iLigneActuelle = self.tPLAfillMatrice[iPlayColone]
+                iIndex = iLigneActuelle + (self.iPLAh * iPlayColone)
                 
                 # On retire le bit avec XOR (^)
-                mask = 1 << index
-                self.bitboards[1] ^= mask
-                self.bitboards[0] ^= mask
+                iMask = 1 << iIndex
+                self.tPLAbitboards[1] ^= iMask
+                self.tPLAbitboards[0] ^= iMask
 
         return 1
 
-    def power_bomb(self, colone_cible):
-        self.matrice[:, colone_cible] = 0 
-        self.fill_matrice[colone_cible] = 0 # modifie la matrice
+    def PLApowerBomb(self, iColoneCible):
+        self.tPLAmatrice[:, iColoneCible] = 0 
+        self.tPLAfillMatrice[iColoneCible] = 0 ## modifie la matrice
         
-        H = self.l + 1 # modificationde la bitboard
-        shift = colone_cible * H
-        masque_colonne = ((1 << self.l) - 1) << shift
+        iH = self.iPLAlignes + 1 # modificationde la bitboard
+        iShift = iColoneCible * iH
+        iMasqueColonne = ((1 << self.iPLAlignes) - 1) << iShift
         
-        masque_nettoyage = ~masque_colonne
+        iMasqueNettoyage = ~iMasqueColonne
         
-        self.bitboards[0] = self.bitboards[0] & masque_nettoyage
-        self.bitboards[1] = self.bitboards[1] & masque_nettoyage
+        self.tPLAbitboards[0] = self.tPLAbitboards[0] & iMasqueNettoyage
+        self.tPLAbitboards[1] = self.tPLAbitboards[1] & iMasqueNettoyage
         
         return 1 
+
 
     ## @brief Verifie si il y a une victoire
     ## Comment ca marche, Magic bitboard -> explication pour détection en ligne : 
@@ -102,20 +105,19 @@ class Plateau:
     ## si on decale de H + 1 -> au dessus décaler a droite -> diag /
     ## H - 1 -> diag \
     ## @param joueur le joueur pour le qu'elle on verifie si ca gagne
-    def check_win_bitboard(self, joueur, win_cond):
-        ## modification de la valeur joueur, car ici ceulement on a besoin de 1 ou 0 et pas 1ou 2
-        if joueur == 2 : j = 0 
-        else : j = joueur
+    ## @brief Verifie si il y a une victoire
+    def PLAcheckWinBitboard(self, iJoueur, iWinCond):
+        ## modification de la valeur joueur, car ici ceulement on a besoin de 1 ou 0 et pas 1ou 2   
+        if iJoueur == 2: iJ = 0 
+        else: iJ = iJoueur
         ## H taille d'une colone pour la bitboard taille + 1 ajout de la séparation entre colone
-        H = self.l +1
+        iH = self.iPLAlignes + 1
         # différentes direction possible, pour verifie en ligne 
-        directions = [1, H, H+1, H-1 ]
-        for d in directions:
-            bb = self.bitboards[j]
-            for i in range(win_cond - 1):
-                bb = bb & (bb >> d) ## 'et bianire' etape de "comparaison" des deuc bitboard décaler (bb >> d -> on décale de d) 
-
-            if bb != 0:
+        tDirections = [1, iH, iH+1, iH-1]
+        for iD in tDirections:
+            iBb = self.tPLAbitboards[iJ]
+            for i in range(iWinCond - 1):
+                iBb = iBb & (iBb >> iD) ## 'et bianire' etape de "comparaison" des deuc bitboard décaler (bb >> d -> on décale de d) 
+            if iBb != 0:
                 return True
         return False
-

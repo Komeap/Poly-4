@@ -1,4 +1,5 @@
 var searchData=
 [
-  ['fill_5fmatrice_0',['fill_matrice',['../classpoly__4_1_1Plateau.html#a12b62197c41ae257d3bd1337b9d5e72d',1,'poly_4::Plateau']]]
+  ['dmenchoices_0',['dMENchoices',['../classtkinter__fonction_1_1TmenuDeroulant.html#a9471a2e9d3b9a35f460cd313d931b238',1,'tkinter_fonction::TmenuDeroulant']]],
+  ['dmenconfig_1',['dMENconfig',['../classtkinter__fonction_1_1TmenuDeroulant.html#af4680e3512f15a828139421f9fcf62a7',1,'tkinter_fonction::TmenuDeroulant']]]
 ];

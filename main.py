@@ -1,6 +1,6 @@
 from tkinter_fonction import *
-from bot2 import victoire_ou_nul, meilleur_coup
-from Plateau import Plateau
+from bot2 import VictoireOuNul, MeilleurCoup
+from Plateau import Tplateau
 import threading
 import random
 import time
@@ -8,52 +8,51 @@ import time
 # ------- Différentes page -------- #
 
 ## @brief class maitre qui gére les différentes pages
-class App(tk.Tk):
+class Tapp(tk.Tk):
     def __init__(self):
         super().__init__()
         self.title("POLIC")
-        screen_width = self.winfo_screenwidth()
-        screen_height = self.winfo_screenheight()
-        x_cordinate = int((screen_width/2) - (WIDTH/2))
-        y_cordinate = int((screen_height/2) - (HEIGHT/2))
-        
-        self.geometry("{}x{}+{}+{}".format(WIDTH, HEIGHT, x_cordinate, y_cordinate))
-        self.page_en_cours = None
+        ## Génération des taille de page
+        iScreenWidth = self.winfo_screenwidth()
+        iScreenHeight = self.winfo_screenheight()
+        iXCordinate = int((iScreenWidth/2) - (iWIDTH/2))
+        iYCordinate = int((iScreenHeight/2) - (iHEIGHT/2))
+        ## iWIDTH et iHEIGHT valeur global
+        self.geometry("{}x{}+{}+{}".format(iWIDTH, iHEIGHT, iXCordinate, iYCordinate))
+        self.oAPPpageEnCours = None
         self.resizable(width=False, height=False)
 
-        
-
-    ## @brief CHangement de page, supprime celle en cours
+    ## @brief Changement de page, supprime celle en cours
     ## et en met une autre sans oublier de redéfinir le self
-    def changer_de_page(self, page, **data):
-        if self.page_en_cours:
-            self.page_en_cours.destroy()
+    def APPchangerDePage(self, oPage, **dData):
+        if self.oAPPpageEnCours:
+            self.oAPPpageEnCours.destroy()
 
-        self.page_en_cours = page(parent=self, **data)
-        self.page_en_cours.pack(fill="both", expand=True)
+        self.oAPPpageEnCours = oPage(oParent=self, **dData)
+        self.oAPPpageEnCours.pack(fill="both", expand=True)
     
 ## @brief Page d'accueil
-class Acceuil(tk.Frame):
-    def __init__(self, parent):
-        super().__init__(parent, bg="")
+class Tacceuil(tk.Frame):
+    def __init__(self, oParent):
+        super().__init__(oParent, bg="")
 
-        self.canva = tk.Canvas(self, width=WIDTH, height=HEIGHT, highlightthickness=0, bg="grey")
-        self.canva.pack(fill="both", expand=True)
+        self.oACCcanva = tk.Canvas(self, width=iWIDTH, height=iHEIGHT, highlightthickness=0, bg="grey")
+        self.oACCcanva.pack(fill="both", expand=True)
         
-        add_bakground(self.canva, "images/Acceuil.jpg")
-        add_canvas_bouton(self.canva, "images/bouton_play.png", ((WIDTH//4),HEIGHT//6), (WIDTH//2,(HEIGHT//12)*11), lambda: app.changer_de_page(Param_jeu), True, 35)
-        add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
+        AddBackground(self.oACCcanva, "images/Acceuil.jpg")
+        AddCanvasBouton(self.oACCcanva, "images/bouton_play.png", ((iWIDTH//4),iHEIGHT//6), (iWIDTH//2,(iHEIGHT//12)*11), lambda: oApp.APPchangerDePage(TparamJeu), True, 35)
+        AddCanvasBouton(self.oACCcanva, "images/bouton_close.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT//10)//2 + 5), oApp.destroy, True, 20)
 
-class Param_jeu(tk.Frame):
-    def __init__(self, parent, **kwargs):
-        super().__init__(parent, bg="")
+class TparamJeu(tk.Frame):
+    def __init__(self, oParent, **dKwargs):
+        super().__init__(oParent, bg="")
 
         # 1. Création du canva et background
-        self.canva = tk.Canvas(self, width=parent.winfo_screenwidth(), height=parent.winfo_screenheight(), highlightthickness=0, bg="grey")
-        self.canva.pack(fill="both", expand=True)
-        add_bakground(self.canva, "images/parametre_bg.png")
+        self.oPAJcanva = tk.Canvas(self, width=oParent.winfo_screenwidth(), height=oParent.winfo_screenheight(), highlightthickness=0, bg="grey")
+        self.oPAJcanva.pack(fill="both", expand=True)
+        AddBackground(self.oPAJcanva, "images/parametre_bg.png")
 
-        CONFIG_DATA = {
+        dCONFIG_DATA = {
             "": [],
             "Win Condition": [i for i in range(3,50)],
             "Largeur": [i for i in range(4,50)], 
@@ -65,7 +64,7 @@ class Param_jeu(tk.Frame):
             "couleur bot":["cyan", "red", "orange", "yellow"]
         }
 
-        DEFAUTS = {
+        dDEFAUTS = {
             "Largeur": 7,          
             "Hauteur": 6,          
             "Win Condition": 4,    
@@ -76,394 +75,443 @@ class Param_jeu(tk.Frame):
             "couleur bot": "yellow"
         }
 
-        self.menu = MenuDeroulant(self.canva, WIDTH//2, HEIGHT//7, CONFIG_DATA)
-        self.menu.scroll(1)
+        self.oPAJmenu = TmenuDeroulant(self.oPAJcanva, iWIDTH//2, iHEIGHT//7, dCONFIG_DATA)
+        self.oPAJmenu.MENscroll(1)
 
-        for cle, valeur in DEFAUTS.items():
-            index_par_defaut = CONFIG_DATA[cle].index(valeur)
-            self.menu.choices[cle] = index_par_defaut
+        for sCle, sValeur in dDEFAUTS.items():
+            iIndexParDefaut = dCONFIG_DATA[sCle].index(sValeur)
+            self.oPAJmenu.dMENchoices[sCle] = iIndexParDefaut
 
 
-        add_canvas_bouton(self.canva, "images/bouton_up.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 - 50), lambda: self.menu.scroll(-1), True, 5)
-        add_canvas_bouton(self.canva, "images/bouton_down.png", (50, 50), (WIDTH//2 + 250, HEIGHT//2 + 50), lambda: self.menu.scroll(1), True, 5)
+        AddCanvasBouton(self.oPAJcanva, "images/bouton_up.png", (50, 50), (iWIDTH//2 + 250, iHEIGHT//2 - 50), lambda: self.oPAJmenu.MENscroll(-1), True, 5)
+        AddCanvasBouton(self.oPAJcanva, "images/bouton_down.png", (50, 50), (iWIDTH//2 + 250, iHEIGHT//2 + 50), lambda: self.oPAJmenu.MENscroll(1), True, 5)
 
-        add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Acceuil), True, 20)
+        AddCanvasBouton(self.oPAJcanva, "images/bouton_back.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT//10)//2 + 5), lambda: oApp.APPchangerDePage(Tacceuil), True, 20)
         
-        add_canvas_bouton(self.canva, "images/boutonNext.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT) - HEIGHT//10), self.lancer_partie,True, 20)
+        AddCanvasBouton(self.oPAJcanva, "images/boutonNext.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT) - iHEIGHT//10), self.PAJlancerPartie,True, 20)
 
-    def lancer_partie(self):
+    def PAJlancerPartie(self):
         
         # Récupération des choix
-        choix = self.menu.choices
-        config = self.menu.config
+        dChoix = self.oPAJmenu.dMENchoices
+        dConfig = self.oPAJmenu.dMENconfig
         
         # Conversion des choix
-        largeur = config["Largeur"][choix["Largeur"]]
-        hauteur = config["Hauteur"][choix["Hauteur"]]
-        win_cond = config["Win Condition"][choix["Win Condition"]]
-        nom_coul_j = config["couleur joueur"][choix["couleur joueur"]]
-        nom_coul_b = config["couleur bot"][choix["couleur bot"]]
-        premier_c = config["Permier coup"][choix["Permier coup"]]
-        bonus = config["Bonus"][choix["Bonus"]]
-        nom_diff = config["Difficulté"][choix["Difficulté"]]
+        iLargeur = dConfig["Largeur"][dChoix["Largeur"]]
+        iHauteur = dConfig["Hauteur"][dChoix["Hauteur"]]
+        iWinCond = dConfig["Win Condition"][dChoix["Win Condition"]]
+        sNomCoulJ = dConfig["couleur joueur"][dChoix["couleur joueur"]]
+        sNomCoulB = dConfig["couleur bot"][dChoix["couleur bot"]]
+        sPremierC = dConfig["Permier coup"][dChoix["Permier coup"]]
+        sBonus = dConfig["Bonus"][dChoix["Bonus"]]
+        sNomDiff = dConfig["Difficulté"][dChoix["Difficulté"]]
         
 
         # Création du colis de données
-        parametres = {
-            "largeur": largeur,
-            "hauteur": hauteur,
-            "win": win_cond,
-            "diff": nom_diff,
-            "couleur_j": nom_coul_j,
-            "couleur_b": nom_coul_b,
-            "premier_c" : premier_c,
-            "bonus" : bonus
+        dParametres = {
+            "largeur": iLargeur,
+            "hauteur": iHauteur,
+            "win": iWinCond,
+            "diff": sNomDiff,
+            "couleur_j": sNomCoulJ,
+            "couleur_b": sNomCoulB,
+            "premier_c" : sPremierC,
+            "bonus" : sBonus
         }
 
         # Changement de page
-        app.changer_de_page(Jeu, **parametres)
+        oApp.APPchangerDePage(Tjeu, **dParametres)
 
-class Jeu(tk.Frame):
+class Tjeu(tk.Frame):
     """
     @brief Réprésente la page de jeu 
     """
-    def __init__(self, parent, **settings):
-        super().__init__(parent, bg="")
+    def __init__(self, oParent, **dSettings):
+        super().__init__(oParent, bg="")
 
-        self.NB_COLS = settings.get("largeur")
-        self.NB_LIGNES = settings.get("hauteur")
-        self.WIN_COND = settings.get("win")
-        self.DIFF = settings.get("diff")
-        self.COULEUR_IA = settings.get("couleur_b")
-        self.COULEUR_J = settings.get("couleur_j")
-        self.PREMIER_COUP = settings.get("premier_c")
-        self.BONUS = settings.get("bonus")
-        self.PROFONDEUR = 4
+        self.iJEUnbCols = dSettings.get("largeur")
+        self.iJEUnbLignes = dSettings.get("hauteur")
+        self.iJEUwinCond = dSettings.get("win")
+        self.sJEUdiff = dSettings.get("diff")
+        self.sJEUcouleurIa = dSettings.get("couleur_b")
+        self.sJEUcouleurJ = dSettings.get("couleur_j")
+        self.sJEUpremierCoup = dSettings.get("premier_c")
+        self.sJEUbonus = dSettings.get("bonus")
+        self.iJEUprofondeur = 4
 
-        self.buffer = 1
-        self.nb_coups_ia = 0
+        self.iJEUbuffer = 1
+        self.iJEUnbCoupsIa = 0
 
         # Gestion du premier tour
-        if self.PREMIER_COUP == "bot" : 
-            self.joueur_actuel = 2
-        elif self.PREMIER_COUP == "joueur": 
-            self.joueur_actuel = 1
+        if self.sJEUpremierCoup == "bot" : 
+            self.iJEUjoueurActuel = 2
+        elif self.sJEUpremierCoup == "joueur": 
+            self.iJEUjoueurActuel = 1
         else : 
-            self.joueur_actuel = random.randint(1,2)
+            self.iJEUjoueurActuel = random.randint(1,2)
         
-        # Gestion des couleur
-        if self.COULEUR_IA == self.COULEUR_J :
-            if self.COULEUR_J == "yellow" :
-                self.COULEUR_IA = "red"
+        # Gestion des couleur, eviter deux fois la même
+        if self.sJEUcouleurIa == self.sJEUcouleurJ :
+            if self.sJEUcouleurJ == "yellow" :
+                self.sJEUcouleurIa = "red"
             else :
-                self.COULEUR_IA = "yellow"
+                self.sJEUcouleurIa = "yellow"
 
-        self.grille = Plateau(lignes=self.NB_LIGNES, colones=self.NB_COLS, win_conditon=self.WIN_COND)
-        self.jeu_actif = False # attendre l'affichage complet avant de lancer sinon ca bug 
+        self.oJEUgrille = Tplateau(iLignes=self.iJEUnbLignes, iColonnes=self.iJEUnbCols, iWinCondition=self.iJEUwinCond)
+        self.bJEUjeuActif = False # attendre l'affichage complet avant de lancer sinon ca bug 
 
         # Configuration UI
-        self.canva = tk.Canvas(self, width=parent.winfo_screenwidth(), height=parent.winfo_screenheight(), highlightthickness=0, bg="grey")
-        self.canva.pack(fill="both", expand=True)
+        self.oJEUcanvas = tk.Canvas(self, width=oParent.winfo_screenwidth(), height=oParent.winfo_screenheight(), highlightthickness=0, bg="grey")
+        self.oJEUcanvas.pack(fill="both", expand=True)
 
-        add_bakground(self.canva, "images/bg.jpg")
+        AddBackground(self.oJEUcanvas, "images/bg.jpg")
         
         # Boutons de navigation
-        add_canvas_bouton(self.canva, "images/bouton_back.png", (HEIGHT//10, HEIGHT//10), ((HEIGHT//10)//2 + 5, (HEIGHT//10)//2 + 5), lambda: app.changer_de_page(Param_jeu), True, 20)
-        add_canvas_bouton(self.canva, "images/bouton_close.png", (HEIGHT//10, HEIGHT//10), (WIDTH - (HEIGHT//10)//2 - 5, (HEIGHT//10)//2 + 5), app.destroy, True, 20)
-        if self.BONUS == "undo" or self.BONUS == "all" :
-            self.undo = add_canvas_bouton(self.canva, "images/undo_bonus.png", (HEIGHT//10, HEIGHT//10), (WIDTH//8, HEIGHT//2), self.action_undo, True, 20)
-        if self.BONUS == "bombe"  or self.BONUS == "all": 
-            self.bombe = add_canvas_bouton(self.canva, "images/bouton_bombe.png", (HEIGHT//10, HEIGHT//10), (WIDTH//8 - HEIGHT//8, HEIGHT//2), self.activer_mode_bombe, True, 20)
+        AddCanvasBouton(self.oJEUcanvas, "images/bouton_back.png", (iHEIGHT//10, iHEIGHT//10), ((iHEIGHT//10)//2 + 5, (iHEIGHT//10)//2 + 5), lambda: oApp.APPchangerDePage(TparamJeu), True, 20)
+        AddCanvasBouton(self.oJEUcanvas, "images/bouton_close.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT//10)//2 + 5), oApp.destroy, True, 20)
+        if self.sJEUbonus == "undo" or self.sJEUbonus == "all" :
+            self.iJEUundo = AddCanvasBouton(self.oJEUcanvas, "images/undo_bonus.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8, iHEIGHT//2), self.JEUactionUndo, True, 20)
+        if self.sJEUbonus == "bombe"  or self.sJEUbonus == "all": 
+            self.iJEUbombe = AddCanvasBouton(self.oJEUcanvas, "images/bouton_bombe.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8 - iHEIGHT//8, iHEIGHT//2), self.JEUactiverModeBombe, True, 20)
 
         # Avatars
-        add_canvas_img(self.canva, "images/gentil_idle.png", (150, (int)(HEIGHT*0.75)), ((int)(HEIGHT*0.3), (int)(HEIGHT*0.3)))
-        add_canvas_img(self.canva, "images/mechant_idle.png", ((int)(WIDTH*0.85), (int)(HEIGHT*0.75)), ((int)(HEIGHT*0.35), (int)(HEIGHT*0.35)))
+        AddCanvasImg(self.oJEUcanvas, "images/gentil_idle.png", (150, (int)(iHEIGHT*0.75)), ((int)(iHEIGHT*0.3), (int)(iHEIGHT*0.3)))
+        AddCanvasImg(self.oJEUcanvas, "images/mechant_idle.png", ((int)(iWIDTH*0.85), (int)(iHEIGHT*0.75)), ((int)(iHEIGHT*0.35), (int)(iHEIGHT*0.35)))
 
-        afficher_plateau(self.canva, self.NB_COLS, self.NB_LIGNES)
+        AfficherPlateau(self.oJEUcanvas, self.iJEUnbCols, self.iJEUnbLignes)
 
-        self.fleche_id = init_fleche(self.canva)
-        self.canva.bind('<Motion>', lambda event: bouger_fleche(event, self.canva, self.fleche_id))
-        self.canva.bind('<Button-1>', self.clic_souris)
+        self.iJEUflecheId = InitFleche(self.oJEUcanvas)
+        self.oJEUcanvas.bind('<Motion>', lambda event: BougerFleche(event, self.oJEUcanvas, self.iJEUflecheId))
+        self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
 
-        self.overlay_id = self.canva.create_rectangle(0, 0, WIDTH, HEIGHT, fill="black", stipple='gray50')
+        self.iJEUoverlayId = self.oJEUcanvas.create_rectangle(0, 0, iWIDTH, iHEIGHT, fill="black", stipple='gray50')
         
-        self.pions_visuels = [[] for i in range(self.NB_COLS)]
-        self.historique_coups = []
-        self.active_bombe = False
-        self.anim_en_cours = False
+        self.tJEUpionsVisuels = [[] for i in range(self.iJEUnbCols)]
+        self.tJEUhistoriqueCoups = []
+        self.bJEUactiveBombe = False
+        self.bJEUanimEnCours = False
 
         # Play
-        self.btn_start_id = add_canvas_bouton(self.canva, "images/bouton_ready.png",(150, 150), (WIDTH//6, HEIGHT//2), self.lancer_la_game,True, 20)
+        self.iJEUbtnStartId = AddCanvasBouton(self.oJEUcanvas, "images/bouton_ready.png",(150, 150), (iWIDTH//6, iHEIGHT//2), self.JEUlancerLaGame,True, 20)
 
-    def lancer_la_game(self):
-        self.canva.delete(self.btn_start_id)
-        if hasattr(self, 'overlay_id'):
-            self.canva.delete(self.overlay_id)
+    def JEUlancerLaGame(self):
+        """
+        @brief Pour lancer la partie de puissance 4
+        """
+        self.oJEUcanvas.delete(self.iJEUbtnStartId)
+        if hasattr(self, 'iJEUoverlayId'):
+            self.oJEUcanvas.delete(self.iJEUoverlayId)
         
-        self.jeu_actif = True
-        self.canva.bind('<Button-1>', self.clic_souris)
+        self.bJEUjeuActif = True
+        self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
 
-        if self.joueur_actuel == 2:
-            self.canva.after(500, self.tour_bot)
+        if self.iJEUjoueurActuel == 2: # lancer le tours du bot, avec un delay pour pas qu'il joue avant l'affichage
+            self.oJEUcanvas.after(500, self.JEUtourBot)
     
-    def annuler_un_seul_coup(self):
-        if not self.historique_coups:
+    def JEUannulerUnSeulCoup(self):
+        """
+        @brief Annule un seul coup, use in JEUactionUndo
+        """
+        if not self.tJEUhistoriqueCoups:
             return False
 
-        col, pion_id = self.historique_coups.pop()
-        self.canva.delete(pion_id)
-        self.grille.undo(col)
+        iCol, iPionId = self.tJEUhistoriqueCoups.pop() # Récup l'id du pio a suppr
+        self.oJEUcanvas.delete(iPionId)
+        self.oJEUgrille.PLAundo(iCol)
         return True
 
-    def action_undo(self):
-        if self.anim_en_cours: 
+    def JEUactionUndo(self):
+        """
+        @brief suppr le bon nombre de jeton celon le cas
+            Cas 1 partie encore en cours -> suppr deux jetons tours du joueur
+            Cas 2 Fin, vicoire joueur -> suppr uniquement ke coup du joueur et relance le jeu
+            Cas3 FIn, victoire du bot -> suppr deux jetons et relance le jeu  
+        """
+        if self.bJEUanimEnCours: 
             return
 
-        if not self.historique_coups:
+        if not self.tJEUhistoriqueCoups:
             return
 
-        if self.jeu_actif :
-            self.annuler_un_seul_coup()
-            self.annuler_un_seul_coup()
-            self.joueur_actuel = 1
+        if self.bJEUjeuActif :
+            self.JEUannulerUnSeulCoup()
+            self.JEUannulerUnSeulCoup()
+            self.iJEUjoueurActuel = 1
 
-            self.reactiver_jeu()    
+            self.JEUreactiverJeu()    
         else:
-            if self.joueur_actuel == 2 :
-                self.annuler_un_seul_coup()
-                self.annuler_un_seul_coup()
-                self.joueur_actuel = 1
+            if self.iJEUjoueurActuel == 2 :
+                self.JEUannulerUnSeulCoup()
+                self.JEUannulerUnSeulCoup()
+                self.iJEUjoueurActuel = 1
             else :
-                self.annuler_un_seul_coup()
-                self.joueur_actuel = 1
+                self.JEUannulerUnSeulCoup()
+                self.iJEUjoueurActuel = 1
         
-        self.reactiver_jeu()
-        self.canva.delete(self.undo)
+        self.JEUreactiverJeu()
+        self.oJEUcanvas.delete(self.iJEUundo)
         # print("Retour Ok")
 
-    def reactiver_jeu(self):
-        self.jeu_actif = True
-        self.canva.bind('<Button-1>', self.clic_souris)
-        self.canva.delete("message_fin")
+    def JEUreactiverJeu(self):
+        """
+        @brief réactivation du jeu -> suppr les affichage de fin, et réactive le clic souris
+        """
+        self.bJEUjeuActif = True
+        self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
+        self.oJEUcanvas.delete("message_fin")
 
-    def activer_mode_bombe(self):
-        if not self.jeu_actif or self.joueur_actuel != 1:
+    def JEUactiverModeBombe(self):
+        """
+        @brief active le bonus bombe
+        """
+        if not self.bJEUjeuActif or self.iJEUjoueurActuel != 1:
             return
 
-        self.active_bombe = not self.active_bombe 
+        self.bJEUactiveBombe = not self.bJEUactiveBombe 
         
-        if self.active_bombe :
-            self.canva.config(cursor="crosshair")
-        else:
-            self.canva.config(cursor="")
-
-    def lacher_bombe(self, col):
-        if self.grille.fill_matrice[col] == 0:
-            self.mode_bombe = False
-            self.canva.config(cursor="")
+    def JEUlacherBombe(self, iCol):
+        """
+        @brief Joue la bombe
+        """
+        if self.oJEUgrille.tPLAfillMatrice[iCol] == 0:
+            self.bJEUmodeBombe = False
             return
 
-        self.grille.power_bomb(col)
+        self.oJEUgrille.PLApowerBomb(iCol)
 
-        for pion_id in self.pions_visuels[col]:
-            self.canva.delete(pion_id)
+        for iPionId in self.tJEUpionsVisuels[iCol]:
+            self.oJEUcanvas.delete(iPionId)
         
-        self.pions_visuels[col] = []
+        self.tJEUpionsVisuels[iCol] = []
 
-        self.historique_coups = [coup for coup in self.historique_coups if coup[0] != col]
+        self.tJEUhistoriqueCoups = [tCoup for tCoup in self.tJEUhistoriqueCoups if tCoup[0] != iCol]
 
-        # 5. Fin du tour
-        self.active_bombe = False
-        self.canva.delete(self.bombe)
+        # Fin du tour
+        self.bJEUactiveBombe = False
+        self.oJEUcanvas.delete(self.iJEUbombe) ## suppr le bouton
 
-        self.joueur_actuel = 3 - self.joueur_actuel
-        if self.joueur_actuel == 2:
-            self.canva.after(500, self.tour_bot)
+        self.iJEUjoueurActuel = 3 - self.iJEUjoueurActuel ## Fait jouer le bot 
+        if self.iJEUjoueurActuel == 2:
+            self.oJEUcanvas.after(500, self.JEUtourBot)
 
-    def obtenir_colonne_aleatoire(self):
-        
-        cols_valides = [c for c in range(self.grille.c) if self.grille.fill_matrice[c] < self.grille.l]
-        if cols_valides:
-            return random.choice(cols_valides)
+    def JEUobtenirColonneAleatoire(self):
+        """
+        @brief Prend une colone aléatoire, pour la gestion du niveau de bot
+        """
+        tColsValides = [c for c in range(self.oJEUgrille.iPLAcolonnes) if self.oJEUgrille.tPLAfillMatrice[c] < self.oJEUgrille.iPLAlignes]
+        if tColsValides:
+            return random.choice(tColsValides)
         return 0
 
-    def clic_souris(self, event):
-        if not self.jeu_actif or self.joueur_actuel != 1:
+    def JEUclicSouris(self, oEvent):
+        """
+        @brief gére le clic souris, pour jouer un coup
+        """
+        if not self.bJEUjeuActif or self.iJEUjoueurActuel != 1:
             return
 
-        grid_data = getattr(self.canva, 'grid_data', None)
-        if not grid_data: return
+        dGridData = getattr(self.oJEUcanvas, 'grid_data', None)
+        if not dGridData: return
 
-        if grid_data['start_x'] <= event.x <= grid_data['start_x'] + grid_data['largeur_totale']:
-            col = int((event.x - grid_data['start_x']) // grid_data['taille'])
-            if 0 <= col < self.grille.c:
-                if self.active_bombe :
-                    self.lacher_bombe(col)
+        if dGridData['start_x'] <= oEvent.x <= dGridData['start_x'] + dGridData['largeur_totale']:
+            iCol = int((oEvent.x - dGridData['start_x']) // dGridData['taille'])
+            # trouve la colone jouer par rapport a la position de la souris
+            if 0 <= iCol < self.oJEUgrille.iPLAcolonnes:
+                if self.bJEUactiveBombe :
+                    self.JEUlacherBombe(iCol) # joue la bombe
                 else :
-                    self.jouer_coup(col)
+                    self.JEUjouerCoup(iCol) # joue normalement
     
-    def jouer_coup(self, col):
-        if self.anim_en_cours: return
+    def JEUjouerCoup(self, iCol):
+        """
+        @brief Joue un coup sur le plateau
+        """
+        if self.bJEUanimEnCours: return
 
-        if self.grille.fill_matrice[col] >= self.grille.l:
+        if self.oJEUgrille.tPLAfillMatrice[iCol] >= self.oJEUgrille.iPLAlignes: # Verifie si le coup est possible
             print("Erreur")
             return
 
-        res = self.grille.play(col, self.joueur_actuel)
-        if res == 1:
+        tRes = self.oJEUgrille.PLAplay(iCol, self.iJEUjoueurActuel) # Verif si colone pleine
+        if tRes == 1:
             print("Colonne pleine")
             return
 
-        ligne_jouee = res[0]
-        couleur = self.COULEUR_J if self.joueur_actuel == 1 else self.COULEUR_IA
+        iLigneJouee = tRes[0]
+        sCouleur = self.sJEUcouleurJ if self.iJEUjoueurActuel == 1 else self.sJEUcouleurIa
         
-        # On verrouille le jeu
-        self.anim_en_cours = True 
-        self.canva.unbind('<Button-1>')
+        # On verrouille le jeu pendant l'animation
+        self.bJEUanimEnCours = True 
+        self.oJEUcanvas.unbind('<Button-1>')
 
-        def fin_du_mouvement():
-            self.anim_en_cours = False 
+        def JEUfinDuMouvement():
+            """
+            @brief Gére la fin de l'animation, relance le jeu 
+            """
+            self.bJEUanimEnCours = False 
  
-            if self.jeu_actif:
-                 self.canva.bind('<Button-1>', self.clic_souris)
+            if self.bJEUjeuActif:
+                 self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris) # réactive la souris
 
-            fini, etat = victoire_ou_nul(self.grille, self.joueur_actuel)
+            bFini, iEtat = VictoireOuNul(self.oJEUgrille, self.iJEUjoueurActuel)
 
-            if fini:
-                self.jeu_actif = False
-                if etat == 1:
-                    pions_gagnants = self.trouver_pions_gagnants(self.joueur_actuel)
-                    self.surligner_victoire(pions_gagnants)
-                self.fin_de_partie(etat)
+            if bFini: # check victoire
+                self.bJEUjeuActif = False
+                if iEtat == 1:
+                    tPionsGagnants = self.JEUtrouverPionsGagnants(self.iJEUjoueurActuel)
+                    self.JEUsurlignerVictoire(tPionsGagnants)
+                self.JEUfinDePartie(iEtat)
                 return
 
-            self.joueur_actuel = 3 - self.joueur_actuel
-            if self.joueur_actuel == 2:
-                self.canva.after(500, self.tour_bot)
+            self.iJEUjoueurActuel = 3 - self.iJEUjoueurActuel # channgement de joueur
+            if self.iJEUjoueurActuel == 2:
+                self.oJEUcanvas.after(500, self.JEUtourBot)
 
-        pion_id = ajouter_pion(self.canva, ligne_jouee, col, couleur, finish=fin_du_mouvement)
+        iPionId = AjouterPion(self.oJEUcanvas, iLigneJouee, iCol, sCouleur, fFinish=JEUfinDuMouvement) # ajout du piont jouer
 
-        self.pions_visuels[col].append(pion_id)
-        self.historique_coups.append((col, pion_id))
-    def trouver_pions_gagnants(self, joueur):
+        self.tJEUpionsVisuels[iCol].append(iPionId)
+        self.tJEUhistoriqueCoups.append((iCol, iPionId))
+    
+    def JEUtrouverPionsGagnants(self, iJoueur):
         """
-        Scanne le plateau pour trouver les N pions alignés.
-        Retourne une liste de tuples (ligne, colonne).
+         @brief scanne le plateau pour trouver les pions gagnant
+        @ return une liste de tuples (ligne, colonne).
         """
-        # On récupère la matrice (attribut 'matrice' dans ton Plateau.py)
-        matrice = getattr(self.grille, 'matrice', [])
+        # On récupère la matrice 
+        tMatrice = getattr(self.oJEUgrille, 'tPLAmatrice', [])
         
-        rows = self.NB_LIGNES
-        cols = self.NB_COLS
-        N = self.WIN_COND
+        iRows = self.iJEUnbLignes
+        iCols = self.iJEUnbCols
+        iN = self.iJEUwinCond
 
         # Directions: Horizontal, Vertical, Diagonale Descendante (\), Diagonale Montante (/)
-        directions = [(0, 1), (1, 0), (1, 1), (1, -1)]
+        tDirections = [(0, 1), (1, 0), (1, 1), (1, -1)]
 
-        for r in range(rows):
-            for c in range(cols):
-                # CORRECTION ICI : On accède à matrice[r][c] et non [c][r]
+        for iR in range(iRows):
+            for iC in range(iCols):
+                
                 try:
-                    if matrice[r][c] != joueur: continue 
+                    if tMatrice[iR][iC] != iJoueur: continue 
                 except IndexError:
                     continue 
 
-                for dr, dc in directions:
-                    ligne_test = [(r, c)]
-                    for k in range(1, N):
-                        nr, nc = r + dr * k, c + dc * k
+                for iDr, iDc in tDirections:
+                    tLigneTest = [(iR, iC)]
+                    for k in range(1, iN):
+                        iNr, iNc = iR + iDr * k, iC + iDc * k
                         
                         # Vérification des limites du plateau
-                        if 0 <= nr < rows and 0 <= nc < cols:
+                        if 0 <= iNr < iRows and 0 <= iNc < iCols:
                             try:
-                                if matrice[nr][nc] == joueur:
-                                    ligne_test.append((nr, nc))
+                                if tMatrice[iNr][iNc] == iJoueur:
+                                    tLigneTest.append((iNr, iNc))
                                 else:
                                     break
                             except IndexError: break
                         else:
                             break
                     
-                    if len(ligne_test) == N:
-                        return ligne_test
+                    if len(tLigneTest) == iN:
+                        return tLigneTest
         return []
     
-    def surligner_victoire(self, pions):
-        if not pions: return
+    def JEUsurlignerVictoire(self, tPions):
+        """
+        @brief entour les piosn gagnant du jeu
+        """
+        if not tPions: return
         
-        grid_data = getattr(self.canva, 'grid_data', None)
-        if not grid_data: return
+        dGridData = getattr(self.oJEUcanvas, 'grid_data', None)
+        if not dGridData: return
 
-        # Couleur de la victoire (Vert fluo)
-        COULEUR_VICTOIRE = "#00FF00" 
-        EPAISSEUR = 5
+        # Couleur (Vert fluo)
+        sCOULEUR_VICTOIRE = "#00FF00" 
+        iEPAISSEUR = 5
 
-        taille = grid_data['taille']
-        start_x = grid_data['start_x']
-        start_y = grid_data['start_y']
+        iTaille = dGridData['taille']
+        iStartX = dGridData['start_x']
+        iStartY = dGridData['start_y']
 
-        for r, c in pions:
+        # Dessine les cercle celon la positin des joueurs gagnants
+        for r, c in tPions:
             
-            x0 = start_x + c * taille + 5 
-            y0 = start_y + r * taille + 5 
+            iX0 = iStartX + c * iTaille + 5 
+            iY0 = iStartY + r * iTaille + 5 
             
-            x1 = x0 + taille - 10
-            y1 = y0 + taille - 10
+            iX1 = iX0 + iTaille - 10
+            iY1 = iY0 + iTaille - 10
 
-            self.canva.create_oval(x0, y0, x1, y1, outline=COULEUR_VICTOIRE, width=EPAISSEUR, tags="message_fin")
+            self.oJEUcanvas.create_oval(iX0, iY0, iX1, iY1, outline=sCOULEUR_VICTOIRE, width=iEPAISSEUR, tags="message_fin")
     
-    def tour_bot(self):
-        if not self.jeu_actif: return
-        self.canva.unbind('<Button-1>')
+    def JEUtourBot(self):
+        """
+        @brief Gestion du jeu bot
+        """
+        if not self.bJEUjeuActif: return
+        self.oJEUcanvas.unbind('<Button-1>')
 
-        def process_ia():
-            col = -1
-            if self.DIFF == "Hardcore":
-                col = meilleur_coup(self.grille, self.PROFONDEUR)      
-            elif self.DIFF == "Normal":
-                if self.buffer == 1:
-                    col = meilleur_coup(self.grille, self.PROFONDEUR)
-                    if self.nb_coups_ia % 3 == 0: self.buffer = 0
+        def JEUprocessIa():
+            """
+            @brief Gére la dificulté de l'IA celon les paramétre et joue le coup
+            Hardcore utilise meilleur coup a chaque fois
+            Normal meilleur coup 2 fois sur 3
+            Facile meilleur coup 1 fois sur 2 
+            """
+            iCol = -1
+            if self.sJEUdiff == "Hardcore":
+                iCol = MeilleurCoup(self.oJEUgrille, self.iJEUprofondeur)      
+            elif self.sJEUdiff == "Normal":
+                if self.iJEUbuffer == 1:
+                    iCol = MeilleurCoup(self.oJEUgrille, self.iJEUprofondeur)
+                    if self.iJEUnbCoupsIa % 3 == 0:
+                        self.iJEUbuffer = 0
                 else:
-                    col = self.obtenir_colonne_aleatoire()
-                    self.buffer = 1     
-            elif self.DIFF == "Facile":
-                if self.buffer == 1:
-                    col = meilleur_coup(self.grille, self.PROFONDEUR)
-                    if self.nb_coups_ia % 2 == 0: self.buffer = 0
+                    iCol = self.JEUobtenirColonneAleatoire()
+                    self.iJEUbuffer = 1     
+            elif self.sJEUdiff == "Facile":
+                if self.iJEUbuffer == 1:
+                    iCol = MeilleurCoup(self.oJEUgrille, self.iJEUprofondeur)
+                    if self.iJEUnbCoupsIa % 2 == 0:
+                        self.iJEUbuffer = 0
                 else:
-                    col = self.obtenir_colonne_aleatoire()
-                    self.buffer = 1
+                    iCol = self.JEUobtenirColonneAleatoire()
+                    self.iJEUbuffer = 1
 
-            self.nb_coups_ia += 1
-            self.canva.after(0, lambda: self.action_bot_post_calcul(col))
+            self.iJEUnbCoupsIa += 1
+            self.oJEUcanvas.after(0, lambda: self.JEUactionBotPostCalcul(iCol))
 
-        thread = threading.Thread(target=process_ia)
-        thread.daemon = True 
-        thread.start()
+        oThread = threading.Thread(target=JEUprocessIa) # Utilise le thread pour eviter que ca bloque tous 
+        oThread.daemon = True 
+        oThread.start()
 
-    def action_bot_post_calcul(self, col):
-        self.jouer_coup(col)
-        if self.jeu_actif:
-            self.canva.bind('<Button-1>', self.clic_souris)
+    def JEUactionBotPostCalcul(self, iCol):
+        """
+        @brief joue le coup de l'ia et réactivele clic souris
+        """
+        self.JEUjouerCoup(iCol)
+        if self.bJEUjeuActif:
+            self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
 
-    def fin_de_partie(self, etat):
-        msg = "MATCH NUL"
-        couleur_texte = "white"
+    def JEUfinDePartie(self, iEtat):
+        """
+        @brief GEstion de fin de partie
+        """
+        sMsg = "MATCH NUL"
+        sCouleurTexte = "white"
         
-        if etat == 1:
-            if self.joueur_actuel == 1:
-                msg = "VICTOIRE !"
-                couleur_texte = "#00FF00"
+        if iEtat == 1:
+            if self.iJEUjoueurActuel == 1:
+                sMsg = "VICTOIRE !"
+                sCouleurTexte = "#00FF00"
             else:
-                msg = "DÉFAITE..."
-                couleur_texte = "#FF0000"
+                sMsg = "DÉFAITE..."
+                sCouleurTexte = "#FF0000"
 
-        self.canva.create_rectangle(WIDTH//2 - 200, 50, WIDTH//2 + 200, 150, fill="black", outline="white", width=2, tags="message_fin")
+        self.oJEUcanvas.create_rectangle(iWIDTH//2 - 200, 50, iWIDTH//2 + 200, 150, fill="black", outline="white", width=2, tags="message_fin")
         
-        self.canva.create_text(WIDTH//2, 100, text=msg, font=("Arial", 40, "bold"), fill=couleur_texte, tags="message_fin")
+        self.oJEUcanvas.create_text(iWIDTH//2, 100, text=sMsg, font=("Arial", 40, "bold"), fill=sCouleurTexte, tags="message_fin")
 
 if __name__ == "__main__":
-    app = App()
-    app.changer_de_page(Acceuil)
-    app.mainloop()
+    oApp = Tapp()
+    oApp.APPchangerDePage(Tacceuil)
+    oApp.mainloop()
