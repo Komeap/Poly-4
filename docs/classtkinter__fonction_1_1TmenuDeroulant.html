@@ -80,6 +80,9 @@ $(function() {
   <div class="headertitle"><div class="title">tkinter_fonction.TmenuDeroulant Class Reference</div></div>
 </div><!--header-->
 <div class="contents">
+
+<p>Class qui gérte le Menu déroulant.  
+ <a href="classtkinter__fonction_1_1TmenuDeroulant.html#details">More...</a></p>
 <table class="memberdecls">
 <tr class="heading"><td colspan="2"><h2 class="groupheader"><a id="pub-methods" name="pub-methods"></a>
 Public Member Functions</h2></td></tr>
@@ -125,7 +128,9 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a8bdb10f0b23a73e34dcfa7eaf9b90739" id="r_a8bdb10f0b23a73e34dcfa7eaf9b90739"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classtkinter__fonction_1_1TmenuDeroulant.html#a8bdb10f0b23a73e34dcfa7eaf9b90739">bMENisAnimating</a></td></tr>
 <tr class="separator:a8bdb10f0b23a73e34dcfa7eaf9b90739"><td class="memSeparator" colspan="2">&#160;</td></tr>
 </table>
-<h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
+<a name="details" id="details"></a><h2 class="groupheader">Detailed Description</h2>
+<div class="textblock"><p>Class qui gérte le Menu déroulant. </p>
+</div><h2 class="groupheader">Constructor &amp; Destructor Documentation</h2>
 <a id="a75bd6e84e51830a00aca779d1253cedf" name="a75bd6e84e51830a00aca779d1253cedf"></a>
 <h2 class="memtitle"><span class="permalink"><a href="#a75bd6e84e51830a00aca779d1253cedf">&#9670;&#160;</a></span>__init__()</h2>
 
@@ -169,7 +174,11 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief init
+@param iX Positon x du MEnue déroulant
+    iYStart Position y de la premier case
+    dConfigData Dictionnaire contenant les Nom des case de parametre du menu (TparamCase)
+</pre> 
 </div>
 </div>
 <h2 class="groupheader">Member Function Documentation</h2>
@@ -198,7 +207,10 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Exécute la transition/ Déplacement
+Calcul le décalage de postion et de proportion et affiche chaque image une par une
+effet rétro
+</pre> 
 </div>
 </div>
 <a id="ab2676c5a491bbc2d3c7c0ac14458bbc8" name="ab2676c5a491bbc2d3c7c0ac14458bbc8"></a>
@@ -216,7 +228,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Affiche les choix de valeur utilisé pour les test
+</pre> 
 </div>
 </div>
 <a id="a0caec0cef45a6b5c808d1712158a13b4" name="a0caec0cef45a6b5c808d1712158a13b4"></a>
@@ -250,7 +263,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief POur pas perdre la selection quand on change l'affichage
+</pre> 
 </div>
 </div>
 <a id="a97fca5f4667c39d51f030902da3e101c" name="a97fca5f4667c39d51f030902da3e101c"></a>
@@ -278,7 +292,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Permet de scroll en haut ou en bas celon iDirection
+</pre> 
 </div>
 </div>
 <a id="a2daa69a9e913dddb5da1cbd792f2221e" name="a2daa69a9e913dddb5da1cbd792f2221e"></a>
@@ -296,7 +311,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Update le menu déroulant et l'afficahge
+</pre> 
 </div>
 </div>
 <h2 class="groupheader">Member Data Documentation</h2>

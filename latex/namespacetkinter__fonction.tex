@@ -4,14 +4,14 @@
 \begin{DoxyCompactItemize}
 \item 
 class \mbox{\hyperlink{classtkinter__fonction_1_1TmenuDeroulant}{Tmenu\+Deroulant}}
-\item 
+\begin{DoxyCompactList}\small\item\em Class qui gérte le Menu déroulant. \end{DoxyCompactList}\item 
 class \mbox{\hyperlink{classtkinter__fonction_1_1TparamCase}{Tparam\+Case}}
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Class des cases de paramétre du Menu d\+Déroulant. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Functions}
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{namespacetkinter__fonction_aa9eac97a661a14c3c7803ec66d6fc954}{Add\+Background}} (o\+Master, s\+Image)
-\begin{DoxyCompactList}\small\item\em Ajout d\textquotesingle{}un image en background. \end{DoxyCompactList}\item 
+\item 
 \mbox{\hyperlink{namespacetkinter__fonction_a5ef2dd15653238bb0efae94f4fc9bd25}{Add\+Canvas\+Img}} (o\+Canvas, s\+Link, t\+Pos, t\+Size)
 \item 
 \mbox{\hyperlink{namespacetkinter__fonction_a3a0b7910a0a647b7feb9acd05cf72896}{Add\+Canvas\+Bouton}} (o\+Canvas, s\+Link, t\+Size, t\+Pos, f\+Cmd, b\+Hover, i\+Zoom)
@@ -44,59 +44,86 @@ class \mbox{\hyperlink{classtkinter__fonction_1_1TparamCase}{Tparam\+Case}}
 \doxysubsubsection{\texorpdfstring{AddBackground()}{AddBackground()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Add\+Background (\begin{DoxyParamCaption}\item[{}]{o\+Master,  }\item[{}]{s\+Image }\end{DoxyParamCaption})}
 
-
-
-Ajout d\textquotesingle{}un image en background. 
-
-\Hypertarget{namespacetkinter__fonction_a3a0b7910a0a647b7feb9acd05cf72896}\label{namespacetkinter__fonction_a3a0b7910a0a647b7feb9acd05cf72896} 
+\begin{DoxyVerb}@brief Met une image en background
+@param sImage lien de l'image
+\end{DoxyVerb}
+ \Hypertarget{namespacetkinter__fonction_a3a0b7910a0a647b7feb9acd05cf72896}\label{namespacetkinter__fonction_a3a0b7910a0a647b7feb9acd05cf72896} 
 \index{tkinter\_fonction@{tkinter\_fonction}!AddCanvasBouton@{AddCanvasBouton}}
 \index{AddCanvasBouton@{AddCanvasBouton}!tkinter\_fonction@{tkinter\_fonction}}
 \doxysubsubsection{\texorpdfstring{AddCanvasBouton()}{AddCanvasBouton()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Add\+Canvas\+Bouton (\begin{DoxyParamCaption}\item[{}]{o\+Canvas,  }\item[{}]{s\+Link,  }\item[{}]{t\+Size,  }\item[{}]{t\+Pos,  }\item[{}]{f\+Cmd,  }\item[{}]{b\+Hover,  }\item[{}]{i\+Zoom }\end{DoxyParamCaption})}
 
-\Hypertarget{namespacetkinter__fonction_a5ef2dd15653238bb0efae94f4fc9bd25}\label{namespacetkinter__fonction_a5ef2dd15653238bb0efae94f4fc9bd25} 
+\begin{DoxyVerb}@brief Permet d'ajouter une image qui est un bouton 
+@param sLink lien de l'image du bouton
+       tSize la taille de l'image 
+       tPos Une position x, y 
+       fCmd La fonction qui s'execute quand on clique sur le bouton
+       bHover booléen -> true changement de curseur si on passe au dessus
+       iZoom De combien ca zoom quand on passe au dessus (effet de style)\end{DoxyVerb}
+ \Hypertarget{namespacetkinter__fonction_a5ef2dd15653238bb0efae94f4fc9bd25}\label{namespacetkinter__fonction_a5ef2dd15653238bb0efae94f4fc9bd25} 
 \index{tkinter\_fonction@{tkinter\_fonction}!AddCanvasImg@{AddCanvasImg}}
 \index{AddCanvasImg@{AddCanvasImg}!tkinter\_fonction@{tkinter\_fonction}}
 \doxysubsubsection{\texorpdfstring{AddCanvasImg()}{AddCanvasImg()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Add\+Canvas\+Img (\begin{DoxyParamCaption}\item[{}]{o\+Canvas,  }\item[{}]{s\+Link,  }\item[{}]{t\+Pos,  }\item[{}]{t\+Size }\end{DoxyParamCaption})}
 
-\Hypertarget{namespacetkinter__fonction_afa58a188c22d9ee28cba3648219631c9}\label{namespacetkinter__fonction_afa58a188c22d9ee28cba3648219631c9} 
+\begin{DoxyVerb}@brief Permet d'ajouter une image sur le canva
+@param sLink lien de l'image
+       tPos Une position x, y 
+       tSize la taille de l'image 
+\end{DoxyVerb}
+ \Hypertarget{namespacetkinter__fonction_afa58a188c22d9ee28cba3648219631c9}\label{namespacetkinter__fonction_afa58a188c22d9ee28cba3648219631c9} 
 \index{tkinter\_fonction@{tkinter\_fonction}!AfficherPlateau@{AfficherPlateau}}
 \index{AfficherPlateau@{AfficherPlateau}!tkinter\_fonction@{tkinter\_fonction}}
 \doxysubsubsection{\texorpdfstring{AfficherPlateau()}{AfficherPlateau()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Afficher\+Plateau (\begin{DoxyParamCaption}\item[{}]{o\+Canvas,  }\item[{}]{i\+Largeur,  }\item[{}]{i\+Hauteur }\end{DoxyParamCaption})}
 
-\Hypertarget{namespacetkinter__fonction_a6fd645092e44ccbffa18b9c5145ae4fb}\label{namespacetkinter__fonction_a6fd645092e44ccbffa18b9c5145ae4fb} 
+\begin{DoxyVerb}@brief Affiche le plateau en fonction du nombre de colone et lignes
+Calcul pour qu'il soit tpoujours bien centré peut uimport la taille
+\end{DoxyVerb}
+ \Hypertarget{namespacetkinter__fonction_a6fd645092e44ccbffa18b9c5145ae4fb}\label{namespacetkinter__fonction_a6fd645092e44ccbffa18b9c5145ae4fb} 
 \index{tkinter\_fonction@{tkinter\_fonction}!AjouterPion@{AjouterPion}}
 \index{AjouterPion@{AjouterPion}!tkinter\_fonction@{tkinter\_fonction}}
 \doxysubsubsection{\texorpdfstring{AjouterPion()}{AjouterPion()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Ajouter\+Pion (\begin{DoxyParamCaption}\item[{}]{o\+Canvas,  }\item[{}]{i\+Ligne,  }\item[{}]{i\+Col,  }\item[{}]{s\+Couleur,  }\item[{}]{f\+Finish = {\ttfamily None} }\end{DoxyParamCaption})}
 
-\Hypertarget{namespacetkinter__fonction_ae1a12c11cae105d79ff191dc5608608d}\label{namespacetkinter__fonction_ae1a12c11cae105d79ff191dc5608608d} 
+\begin{DoxyVerb}@brief Gére l'animation d'ajout de jeton, chute physique + rebond
+\end{DoxyVerb}
+ \Hypertarget{namespacetkinter__fonction_ae1a12c11cae105d79ff191dc5608608d}\label{namespacetkinter__fonction_ae1a12c11cae105d79ff191dc5608608d} 
 \index{tkinter\_fonction@{tkinter\_fonction}!BougerFleche@{BougerFleche}}
 \index{BougerFleche@{BougerFleche}!tkinter\_fonction@{tkinter\_fonction}}
 \doxysubsubsection{\texorpdfstring{BougerFleche()}{BougerFleche()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Bouger\+Fleche (\begin{DoxyParamCaption}\item[{}]{o\+Event,  }\item[{}]{o\+Canvas,  }\item[{}]{i\+Fleche\+Id }\end{DoxyParamCaption})}
 
-\Hypertarget{namespacetkinter__fonction_a0091fa54bac86ede091416d5d47e4cb9}\label{namespacetkinter__fonction_a0091fa54bac86ede091416d5d47e4cb9} 
+\begin{DoxyVerb}@brief Gére le mouvemnt de la fléche de jeu
+\end{DoxyVerb}
+ \Hypertarget{namespacetkinter__fonction_a0091fa54bac86ede091416d5d47e4cb9}\label{namespacetkinter__fonction_a0091fa54bac86ede091416d5d47e4cb9} 
 \index{tkinter\_fonction@{tkinter\_fonction}!FermerVideo@{FermerVideo}}
 \index{FermerVideo@{FermerVideo}!tkinter\_fonction@{tkinter\_fonction}}
 \doxysubsubsection{\texorpdfstring{FermerVideo()}{FermerVideo()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Fermer\+Video (\begin{DoxyParamCaption}\item[{}]{o\+Canvas }\end{DoxyParamCaption})}
 
-\Hypertarget{namespacetkinter__fonction_a905b56ceac2d1015634496566b79851f}\label{namespacetkinter__fonction_a905b56ceac2d1015634496566b79851f} 
+\begin{DoxyVerb}@brief Permet de fermer la vidéo
+\end{DoxyVerb}
+ \Hypertarget{namespacetkinter__fonction_a905b56ceac2d1015634496566b79851f}\label{namespacetkinter__fonction_a905b56ceac2d1015634496566b79851f} 
 \index{tkinter\_fonction@{tkinter\_fonction}!InitFleche@{InitFleche}}
 \index{InitFleche@{InitFleche}!tkinter\_fonction@{tkinter\_fonction}}
 \doxysubsubsection{\texorpdfstring{InitFleche()}{InitFleche()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Init\+Fleche (\begin{DoxyParamCaption}\item[{}]{o\+Canvas }\end{DoxyParamCaption})}
 
-\Hypertarget{namespacetkinter__fonction_a60176b6a7e90459030d9d27577966cfa}\label{namespacetkinter__fonction_a60176b6a7e90459030d9d27577966cfa} 
+\begin{DoxyVerb}@brief Initialise l'image de la fléche pour le jeu
+\end{DoxyVerb}
+ \Hypertarget{namespacetkinter__fonction_a60176b6a7e90459030d9d27577966cfa}\label{namespacetkinter__fonction_a60176b6a7e90459030d9d27577966cfa} 
 \index{tkinter\_fonction@{tkinter\_fonction}!LancerVideo@{LancerVideo}}
 \index{LancerVideo@{LancerVideo}!tkinter\_fonction@{tkinter\_fonction}}
 \doxysubsubsection{\texorpdfstring{LancerVideo()}{LancerVideo()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Lancer\+Video (\begin{DoxyParamCaption}\item[{}]{o\+Canvas,  }\item[{}]{s\+Chemin\+Video,  }\item[{}]{i\+Largeur = {\ttfamily \mbox{\hyperlink{namespacetkinter__fonction_a3ae33c88287076d6317419938d9fd7d1}{i\+WIDTH}}},  }\item[{}]{i\+Hauteur = {\ttfamily \mbox{\hyperlink{namespacetkinter__fonction_a70045f7655654f1bba1351fd98e2259a}{i\+HEIGHT}}~+150} }\end{DoxyParamCaption})}
 
-
+\begin{DoxyVerb}@brief lancement de la vidéo
+@param sCheminVideo Lien de la video
+       iLargeur Taille de la vidéo
+       iHauteur Taille de la vidéo
+\end{DoxyVerb}
+ 
 
 \doxysubsection{Variable Documentation}
 \Hypertarget{namespacetkinter__fonction_a70045f7655654f1bba1351fd98e2259a}\label{namespacetkinter__fonction_a70045f7655654f1bba1351fd98e2259a} 

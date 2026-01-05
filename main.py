@@ -4,6 +4,7 @@ from Plateau import Tplateau
 import threading
 import random
 import time
+import os
 
 # ------- Différentes page -------- #
 
@@ -30,7 +31,7 @@ class Tapp(tk.Tk):
 
         self.oAPPpageEnCours = oPage(oParent=self, **dData)
         self.oAPPpageEnCours.pack(fill="both", expand=True)
-    
+
 ## @brief Page d'accueil
 class Tacceuil(tk.Frame):
     def __init__(self, oParent):

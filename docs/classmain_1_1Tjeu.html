@@ -159,6 +159,7 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:ab0b72c93acd3638ca837562ee0041ba4" id="r_ab0b72c93acd3638ca837562ee0041ba4"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1Tjeu.html#ab0b72c93acd3638ca837562ee0041ba4">iJEUnbCoupsIa</a></td></tr>
 <tr class="separator:ab0b72c93acd3638ca837562ee0041ba4"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:aa95a29fa19e589ee6de353d91b20b319" id="r_aa95a29fa19e589ee6de353d91b20b319"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1Tjeu.html#aa95a29fa19e589ee6de353d91b20b319">iJEUjoueurActuel</a></td></tr>
+<tr class="memdesc:aa95a29fa19e589ee6de353d91b20b319"><td class="mdescLeft">&#160;</td><td class="mdescRight">suppr le bouton  <br /></td></tr>
 <tr class="separator:aa95a29fa19e589ee6de353d91b20b319"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:af6230ffa60227e20b2039283411c9160" id="r_af6230ffa60227e20b2039283411c9160"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1Tjeu.html#af6230ffa60227e20b2039283411c9160">oJEUgrille</a></td></tr>
 <tr class="separator:af6230ffa60227e20b2039283411c9160"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -187,6 +188,7 @@ Public Attributes</h2></td></tr>
 <tr class="memitem:a5a33ff5af26306ad95f1244e7b35d080" id="r_a5a33ff5af26306ad95f1244e7b35d080"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1Tjeu.html#a5a33ff5af26306ad95f1244e7b35d080">iJEUbtnStartId</a></td></tr>
 <tr class="separator:a5a33ff5af26306ad95f1244e7b35d080"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ab8f7c5285727d94fcf30a59147d5680b" id="r_ab8f7c5285727d94fcf30a59147d5680b"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1Tjeu.html#ab8f7c5285727d94fcf30a59147d5680b">JEUtourBot</a></td></tr>
+<tr class="memdesc:ab8f7c5285727d94fcf30a59147d5680b"><td class="mdescLeft">&#160;</td><td class="mdescRight">Fait jouer le bot.  <br /></td></tr>
 <tr class="separator:ab8f7c5285727d94fcf30a59147d5680b"><td class="memSeparator" colspan="2">&#160;</td></tr>
 <tr class="memitem:ad95b321821bb71cb3dcdf917e5c2643c" id="r_ad95b321821bb71cb3dcdf917e5c2643c"><td class="memItemLeft" align="right" valign="top">&#160;</td><td class="memItemRight" valign="bottom"><a class="el" href="classmain_1_1Tjeu.html#ad95b321821bb71cb3dcdf917e5c2643c">bJEUmodeBombe</a></td></tr>
 <tr class="separator:ad95b321821bb71cb3dcdf917e5c2643c"><td class="memSeparator" colspan="2">&#160;</td></tr>
@@ -254,7 +256,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief joue le coup de l'ia et réactivele clic souris
+</pre> 
 </div>
 </div>
 <a id="aa5531354ed6e301b9a2379382190f87e" name="aa5531354ed6e301b9a2379382190f87e"></a>
@@ -272,7 +275,11 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief suppr le bon nombre de jeton celon le cas
+    Cas 1 partie encore en cours -&gt; suppr deux jetons tours du joueur
+    Cas 2 Fin, vicoire joueur -&gt; suppr uniquement ke coup du joueur et relance le jeu
+    Cas3 FIn, victoire du bot -&gt; suppr deux jetons et relance le jeu  
+</pre> 
 </div>
 </div>
 <a id="ae0f3f8952636c3c20d4d75b2fb1c0de0" name="ae0f3f8952636c3c20d4d75b2fb1c0de0"></a>
@@ -290,7 +297,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief active le bonus bombe
+</pre> 
 </div>
 </div>
 <a id="a58fdabfed1181a4b80ba3588209ec5d2" name="a58fdabfed1181a4b80ba3588209ec5d2"></a>
@@ -308,7 +316,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Annule un seul coup, use in JEUactionUndo
+</pre> 
 </div>
 </div>
 <a id="af4fa8335e476b44df47a42c557867c5c" name="af4fa8335e476b44df47a42c557867c5c"></a>
@@ -336,7 +345,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief gére le clic souris, pour jouer un coup
+</pre> 
 </div>
 </div>
 <a id="acaf3474faf5e6dc4656d6a294343fe40" name="acaf3474faf5e6dc4656d6a294343fe40"></a>
@@ -364,7 +374,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief GEstion de fin de partie
+</pre> 
 </div>
 </div>
 <a id="acee9ced79c95ad66c76800f7858b93ad" name="acee9ced79c95ad66c76800f7858b93ad"></a>
@@ -392,7 +403,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Joue un coup sur le plateau
+</pre> 
 </div>
 </div>
 <a id="a29a442ada5a55e8c4ac00350a2f9a8c2" name="a29a442ada5a55e8c4ac00350a2f9a8c2"></a>
@@ -420,7 +432,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Joue la bombe
+</pre> 
 </div>
 </div>
 <a id="a32bfb831b7f57ca801974531c35949c2" name="a32bfb831b7f57ca801974531c35949c2"></a>
@@ -438,7 +451,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Pour lancer la partie de puissance 4
+</pre> 
 </div>
 </div>
 <a id="a6e368b5bd0b7720c581e2c6ae03214c7" name="a6e368b5bd0b7720c581e2c6ae03214c7"></a>
@@ -456,7 +470,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Prend une colone aléatoire, pour la gestion du niveau de bot
+</pre> 
 </div>
 </div>
 <a id="a45efb1178962ee3f6cb6c4db9182f70b" name="a45efb1178962ee3f6cb6c4db9182f70b"></a>
@@ -474,7 +489,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief réactivation du jeu -&gt; suppr les affichage de fin, et réactive le clic souris
+</pre> 
 </div>
 </div>
 <a id="af4bad8a2852f8df06cb3dd7b45d27695" name="af4bad8a2852f8df06cb3dd7b45d27695"></a>
@@ -502,7 +518,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief entour les piosn gagnant du jeu
+</pre> 
 </div>
 </div>
 <a id="a18b0ceb15d4a13d8702118574934f9c4" name="a18b0ceb15d4a13d8702118574934f9c4"></a>
@@ -520,7 +537,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-
+<pre class="fragment">@brief Gestion du jeu bot
+</pre> 
 </div>
 </div>
 <a id="a016d59db5d0d98b923d0a6997f94b7bb" name="a016d59db5d0d98b923d0a6997f94b7bb"></a>
@@ -548,8 +566,8 @@ Public Attributes</h2></td></tr>
         </tr>
       </table>
 </div><div class="memdoc">
-<pre class="fragment">Scanne le plateau pour trouver les N pions alignés.
-Retourne une liste de tuples (ligne, colonne).
+<pre class="fragment"> @brief scanne le plateau pour trouver les pions gagnant
+@ return une liste de tuples (ligne, colonne).
 </pre> 
 </div>
 </div>
@@ -678,6 +696,8 @@ Retourne une liste de tuples (ligne, colonne).
       </table>
 </div><div class="memdoc">
 
+<p>suppr le bouton </p>
+
 </div>
 </div>
 <a id="a5c73d4929b22155adc7f35a3b6346b53" name="a5c73d4929b22155adc7f35a3b6346b53"></a>
@@ -803,6 +823,8 @@ Retourne une liste de tuples (ligne, colonne).
         </tr>
       </table>
 </div><div class="memdoc">
+
+<p>Fait jouer le bot. </p>
 
 </div>
 </div>
