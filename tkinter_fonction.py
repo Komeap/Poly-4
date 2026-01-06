@@ -10,7 +10,7 @@ iWIDTH, iHEIGHT = 1350, 800
 
 
 def AddBackground(oMaster, sImage):
-    """
+    """!
     @brief Met une image en background
     @param sImage lien de l'image
     """
@@ -23,7 +23,7 @@ def AddBackground(oMaster, sImage):
     oMaster.bg_image_cache = oPhoto
 
 def AddCanvasImg(oCanvas, sLink, tPos, tSize):
-    """
+    """!
     @brief Permet d'ajouter une image sur le canva
     @param sLink lien de l'image
            tPos Une position x, y 
@@ -43,7 +43,7 @@ def AddCanvasImg(oCanvas, sLink, tPos, tSize):
     return iImgId
 
 def AddCanvasBouton(oCanvas, sLink, tSize, tPos, fCmd, bHover, iZoom):
-    """
+    """!
     @brief Permet d'ajouter une image qui est un bouton 
     @param sLink lien de l'image du bouton
            tSize la taille de l'image 
@@ -86,7 +86,7 @@ def AddCanvasBouton(oCanvas, sLink, tSize, tPos, fCmd, bHover, iZoom):
     return iImgId
 
 def LancerVideo(oCanvas, sCheminVideo, iLargeur=iWIDTH, iHauteur=iHEIGHT +150):
-    """
+    """!
     @brief lancement de la vidéo
     @param sCheminVideo Lien de la video
            iLargeur Taille de la vidéo
@@ -100,7 +100,7 @@ def LancerVideo(oCanvas, sCheminVideo, iLargeur=iWIDTH, iHauteur=iHEIGHT +150):
     oCanvas.video_en_cours = True
 
     def Stream():
-        """
+        """!
          @brief Gére lel déroulement de la vidéo
         """
         if not getattr(oCanvas, 'video_en_cours', False):
@@ -122,7 +122,7 @@ def LancerVideo(oCanvas, sCheminVideo, iLargeur=iWIDTH, iHauteur=iHEIGHT +150):
     Stream()
 
 def FermerVideo(oCanvas):
-    """
+    """!
     @brief Permet de fermer la vidéo
     """
     oCanvas.video_en_cours = False
@@ -132,8 +132,8 @@ def FermerVideo(oCanvas):
 
 ## @brief Class des cases de paramétre du Menu dDéroulant
 class TparamCase:
-    def __init__(self, oCanvas, iX, iY, sNom, tOptions=None, tStartSize=(iHEIGHT//4, iHEIGHT//3), fScale=1.0, bAffiche=True, iIndex=0, fOnChange=lambda i: None):
-        """
+    def __init__(self, oCanvas, iX:int, iY:int, sNom, tOptions=None, tStartSize=(iHEIGHT//4, iHEIGHT//3), fScale=1.0, bAffiche=True, iIndex=0, fOnChange=lambda i: None):
+        """!
         @brief init
         @param iX, iY position
             sNom Nom de la case
@@ -205,7 +205,7 @@ class TparamCase:
 ## @brief Class qui gérte le Menu déroulant 
 class TmenuDeroulant:
     def __init__(self, oCanvas, iX, iYStart, dConfigData):
-        """
+        """!
         @brief init
         @param iX Positon x du MEnue déroulant
             iYStart Position y de la premier case
@@ -241,7 +241,7 @@ class TmenuDeroulant:
         self.MENupdateDisplayInstantane()
 
     def MENupdateDisplayInstantane(self):
-        """
+        """!
         @brief Update le menu déroulant et l'afficahge
         """
         for oCase in self.tMENactiveCases: 
@@ -267,13 +267,13 @@ class TmenuDeroulant:
                 self.tMENactiveCases.append(oNewCase)
     
     def MENsaveChoice(self, sNom, iIdx):
-        """
+        """!
         @brief POur pas perdre la selection quand on change l'affichage
         """
         self.dMENchoices[sNom] = iIdx
 
     def MENscroll(self, iDirection):
-        """
+        """!
         @brief Permet de scroll en haut ou en bas celon iDirection
         """
         if self.bMENisAnimating: return
@@ -285,7 +285,7 @@ class TmenuDeroulant:
         self.MENanimateTransition(iDirection)
 
     def MENanimateTransition(self, iDirection):
-        """
+        """!
         @brief Exécute la transition/ Déplacement
         Calcul le décalage de postion et de proportion et affiche chaque image une par une
         effet rétro
@@ -297,7 +297,7 @@ class TmenuDeroulant:
         iDelay = 1
         
         def StepProcess(iStep):
-            """
+            """!
             @brief Calcul la nouvel image de la case et les position et la taille
             """
 
@@ -348,7 +348,7 @@ class TmenuDeroulant:
         StepProcess(1)
 
     def MENprintAllChoices(self):
-        """
+        """!
         @brief Affiche les choix de valeur utilisé pour les test
         """
         print("\n=== PARAMÈTRES ACTUELS ===")
@@ -361,7 +361,7 @@ class TmenuDeroulant:
         print("==========================\n")
 
 def InitFleche(oCanvas):
-    """
+    """!
     @brief Initialise l'image de la fléche pour le jeu
     """
     oImgPil = Image.open("images/fleche_in_game.png")
@@ -377,7 +377,7 @@ def InitFleche(oCanvas):
     return iFlecheId
 
 def BougerFleche(oEvent, oCanvas, iFlecheId):
-    """
+    """!
     @brief Gére le mouvemnt de la fléche de jeu
     """
 
@@ -407,7 +407,7 @@ def BougerFleche(oEvent, oCanvas, iFlecheId):
             return
 
 def AjouterPion(oCanvas, iLigne, iCol, sCouleur, fFinish=None):
-    """
+    """!
     @brief Gére l'animation d'ajout de jeton, chute physique + rebond
     """
     dGrid = getattr(oCanvas, 'grid_data', None)
@@ -433,7 +433,7 @@ def AjouterPion(oCanvas, iLigne, iCol, sCouleur, fFinish=None):
     dInfoAnim = {"y_actuel": iYDepart, "vitesse": 0, "gravite": 1.5, "rebond": 0.35}
 
     def AnimChute():
-        """
+        """!
         @brief Animation au sens de la gravité et rebond réel
         """
         dInfoAnim["vitesse"] += dInfoAnim["gravite"]
@@ -465,7 +465,7 @@ def AjouterPion(oCanvas, iLigne, iCol, sCouleur, fFinish=None):
     return iPionId
 
 def AfficherPlateau(oCanvas, iLargeur, iHauteur):
-    """
+    """!
     @brief Affiche le plateau en fonction du nombre de colone et lignes
     Calcul pour qu'il soit tpoujours bien centré peut uimport la taille
     """

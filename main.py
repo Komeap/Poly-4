@@ -124,7 +124,7 @@ class TparamJeu(tk.Frame):
         oApp.APPchangerDePage(Tjeu, **dParametres)
 
 class Tjeu(tk.Frame):
-    """
+    """!
     @brief Réprésente la page de jeu 
     """
     def __init__(self, oParent, **dSettings):
@@ -174,6 +174,8 @@ class Tjeu(tk.Frame):
             self.iJEUundo = AddCanvasBouton(self.oJEUcanvas, "images/undo_bonus.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8, iHEIGHT//2), self.JEUactionUndo, True, 20)
         if self.sJEUbonus == "bombe"  or self.sJEUbonus == "all": 
             self.iJEUbombe = AddCanvasBouton(self.oJEUcanvas, "images/bouton_bombe.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8 - iHEIGHT//8, iHEIGHT//2), self.JEUactiverModeBombe, True, 20)
+            self.iJEUbombe_on = AddCanvasBouton(self.oJEUcanvas, "images/bouton_bombe_press.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8 - iHEIGHT//8, iHEIGHT//2), self.JEUactiverModeBombe, True, 20)
+            self.oJEUcanvas.itemconfig(self.iJEUbombe_on, state='hidden')
 
         # Avatars
         AddCanvasImg(self.oJEUcanvas, "images/gentil_idle.png", (150, (int)(iHEIGHT*0.75)), ((int)(iHEIGHT*0.3), (int)(iHEIGHT*0.3)))
@@ -196,7 +198,7 @@ class Tjeu(tk.Frame):
         self.iJEUbtnStartId = AddCanvasBouton(self.oJEUcanvas, "images/bouton_ready.png",(150, 150), (iWIDTH//6, iHEIGHT//2), self.JEUlancerLaGame,True, 20)
 
     def JEUlancerLaGame(self):
-        """
+        """!
         @brief Pour lancer la partie de puissance 4
         """
         self.oJEUcanvas.delete(self.iJEUbtnStartId)
@@ -210,7 +212,7 @@ class Tjeu(tk.Frame):
             self.oJEUcanvas.after(500, self.JEUtourBot)
     
     def JEUannulerUnSeulCoup(self):
-        """
+        """!
         @brief Annule un seul coup, use in JEUactionUndo
         """
         if not self.tJEUhistoriqueCoups:
@@ -222,7 +224,7 @@ class Tjeu(tk.Frame):
         return True
 
     def JEUactionUndo(self):
-        """
+        """!
         @brief suppr le bon nombre de jeton celon le cas
             Cas 1 partie encore en cours -> suppr deux jetons tours du joueur
             Cas 2 Fin, vicoire joueur -> suppr uniquement ke coup du joueur et relance le jeu
@@ -254,7 +256,7 @@ class Tjeu(tk.Frame):
         # print("Retour Ok")
 
     def JEUreactiverJeu(self):
-        """
+        """!
         @brief réactivation du jeu -> suppr les affichage de fin, et réactive le clic souris
         """
         self.bJEUjeuActif = True
@@ -262,16 +264,22 @@ class Tjeu(tk.Frame):
         self.oJEUcanvas.delete("message_fin")
 
     def JEUactiverModeBombe(self):
-        """
+        """!
         @brief active le bonus bombe
         """
         if not self.bJEUjeuActif or self.iJEUjoueurActuel != 1:
             return
 
         self.bJEUactiveBombe = not self.bJEUactiveBombe 
+        if self.bJEUactiveBombe :
+            self.oJEUcanvas.itemconfig(self.iJEUbombe, state='hidden')
+            self.oJEUcanvas.itemconfig(self.iJEUbombe_on, state='normal')
+        else : 
+            self.oJEUcanvas.itemconfig(self.iJEUbombe_on, state='hidden')
+            self.oJEUcanvas.itemconfig(self.iJEUbombe, state='normal')
         
     def JEUlacherBombe(self, iCol):
-        """
+        """!
         @brief Joue la bombe
         """
         if self.oJEUgrille.tPLAfillMatrice[iCol] == 0:
@@ -290,13 +298,14 @@ class Tjeu(tk.Frame):
         # Fin du tour
         self.bJEUactiveBombe = False
         self.oJEUcanvas.delete(self.iJEUbombe) ## suppr le bouton
+        self.oJEUcanvas.delete(self.iJEUbombe_on)
 
         self.iJEUjoueurActuel = 3 - self.iJEUjoueurActuel ## Fait jouer le bot 
         if self.iJEUjoueurActuel == 2:
             self.oJEUcanvas.after(500, self.JEUtourBot)
 
     def JEUobtenirColonneAleatoire(self):
-        """
+        """!
         @brief Prend une colone aléatoire, pour la gestion du niveau de bot
         """
         tColsValides = [c for c in range(self.oJEUgrille.iPLAcolonnes) if self.oJEUgrille.tPLAfillMatrice[c] < self.oJEUgrille.iPLAlignes]
@@ -305,7 +314,7 @@ class Tjeu(tk.Frame):
         return 0
 
     def JEUclicSouris(self, oEvent):
-        """
+        """!
         @brief gére le clic souris, pour jouer un coup
         """
         if not self.bJEUjeuActif or self.iJEUjoueurActuel != 1:
@@ -324,7 +333,7 @@ class Tjeu(tk.Frame):
                     self.JEUjouerCoup(iCol) # joue normalement
     
     def JEUjouerCoup(self, iCol):
-        """
+        """!
         @brief Joue un coup sur le plateau
         """
         if self.bJEUanimEnCours: return
@@ -374,9 +383,9 @@ class Tjeu(tk.Frame):
         self.tJEUhistoriqueCoups.append((iCol, iPionId))
     
     def JEUtrouverPionsGagnants(self, iJoueur):
-        """
-         @brief scanne le plateau pour trouver les pions gagnant
-        @ return une liste de tuples (ligne, colonne).
+        """!
+        @brief scanne le plateau pour trouver les pions gagnant
+        @return une liste de tuples (ligne, colonne).
         """
         # On récupère la matrice 
         tMatrice = getattr(self.oJEUgrille, 'tPLAmatrice', [])
@@ -417,7 +426,7 @@ class Tjeu(tk.Frame):
         return []
     
     def JEUsurlignerVictoire(self, tPions):
-        """
+        """!
         @brief entour les piosn gagnant du jeu
         """
         if not tPions: return
@@ -445,14 +454,19 @@ class Tjeu(tk.Frame):
             self.oJEUcanvas.create_oval(iX0, iY0, iX1, iY1, outline=sCOULEUR_VICTOIRE, width=iEPAISSEUR, tags="message_fin")
     
     def JEUtourBot(self):
-        """
+        """!
         @brief Gestion du jeu bot
         """
         if not self.bJEUjeuActif: return
         self.oJEUcanvas.unbind('<Button-1>')
 
+        iXPoint = int(iWIDTH * 0.85)
+        iYPoint = int(iHEIGHT * 0.45) 
+        
+        self.iJEUpointInterrogationId = AddCanvasImg(self.oJEUcanvas, "images/pts_interro.png", (iXPoint, iYPoint), (100, 100))
+
         def JEUprocessIa():
-            """
+            """!
             @brief Gére la dificulté de l'IA celon les paramétre et joue le coup
             Hardcore utilise meilleur coup a chaque fois
             Normal meilleur coup 2 fois sur 3
@@ -486,15 +500,20 @@ class Tjeu(tk.Frame):
         oThread.start()
 
     def JEUactionBotPostCalcul(self, iCol):
-        """
+        """!
         @brief joue le coup de l'ia et réactivele clic souris
         """
+
+        if hasattr(self, 'iJEUpointInterrogationId'):
+            self.oJEUcanvas.delete(self.iJEUpointInterrogationId)
+            del self.iJEUpointInterrogationId
+
         self.JEUjouerCoup(iCol)
         if self.bJEUjeuActif:
             self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
 
     def JEUfinDePartie(self, iEtat):
-        """
+        """!
         @brief GEstion de fin de partie
         """
         sMsg = "MATCH NUL"

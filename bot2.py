@@ -7,7 +7,7 @@ import multiprocessing
 from random import *
 
 def VictoireOuNul(oGrille, iJoueur):
-    """
+    """!
     @brief Vérifie l'état de la partie pour un joueur donné (Victoire ou nul)
     @param oGrille Plateau du jeu en cours
            iJoueur Humain ou bot 
@@ -22,7 +22,7 @@ def VictoireOuNul(oGrille, iJoueur):
     return (False, -1)
 
 def EstPleine(oGrille):
-    """
+    """!
     @brief Vérifie si la grille est pleine (match nul)
     @param oGrille Plateau du jeu en cours
     @return True si la grille est pleine
@@ -31,7 +31,7 @@ def EstPleine(oGrille):
     return all(oGrille.tPLAfillMatrice[iCol] >= oGrille.iPLAlignes for iCol in range(oGrille.iPLAcolonnes))
 
 def CheckVictoireMatrice(oGrille, iJoueur):
-    """
+    """!
     @brief Vérifie si joueur a gagné. Ici, nous n'utilisons pas les bitboards.
     @param oGrille Plateau du jeu en cours
            iJoueur Humain ou bot 
@@ -68,7 +68,7 @@ def CheckVictoireMatrice(oGrille, iJoueur):
 
 
 def QuelCoupMatrice(oGrille, iJoueur):
-    """
+    """!
     @brief Vérifie si il existe un coup gagnant immédiat pour joueur et le renvoit immédiatement si il existe. Ici, nous n'utilisons pas les bitboards.
     @param oGrille Plateau du jeu en cours
         iJoueur Humain ou bot 
@@ -86,12 +86,11 @@ def QuelCoupMatrice(oGrille, iJoueur):
     return -1
 
 def CoupBloquant(oGrille, iAdversaire):
-    """
+    """!
     @brief Vérifie si il existe un coup gagnant immédiat pour adversaire et le renvoit immédiatement si il existe. Ici, nous n'utilisons pas les bitboards.
     @param oGrille Plateau du jeu en cours
-        iJoueur Humain ou bot 
-    @return Renvoit le coup permettant de bloquer l'adversaire si il existe
-            -1 sinon
+    @param iAdversaire Humain ou bot 
+    @return Renvoit le coup permettant de bloquer l'adversaire si il existe -1 sinon
     """
     for iCol in range(oGrille.iPLAcolonnes):
         if oGrille.tPLAfillMatrice[iCol] >= oGrille.iPLAlignes:
@@ -107,7 +106,7 @@ def CoupBloquant(oGrille, iAdversaire):
 
 def EvaluateWindow(tWindow, iJoueurMax, iJoueurMin):
 
-    """
+    """!
     @brief Évalue heuristiquement une fenêtre de 4 cases pour le MinMax.
     @param tWindow Liste/array de 4 entiers (0 = vide, 1 = humain, 2 = IA)
            iJoueur_max Entier du joueur à maximiser (ex. 2 pour l'IA)
@@ -137,7 +136,7 @@ def EvaluateWindow(tWindow, iJoueurMax, iJoueurMin):
     return iScore
 
 def ScorePosition(oGrille, iJoueurMax=2, iJoueurMin=1):
-    """
+    """!
     @brief Calcule le score heuristique global d'une position pour le MinMax.
     @param oGrille Plateau du jeu en cours
            iJoueurMax Joueur à maximiser (ex. 2 pour l'IA)
@@ -183,7 +182,7 @@ def ScorePosition(oGrille, iJoueurMax=2, iJoueurMin=1):
 # === MinMax (BASIQUE, SANS alpha-beta) ===
 
 def ColonnesOrdonnees(oGrille):
-    """
+    """!
     @brief Génère la liste des colonnes jouables dans un ordre optimisé (centre → bords).
     @param oGrille Plateau du jeu en cours
     @return Renvoit la liste des indices de colonnes jouables, triées par priorité (centre en premier)
@@ -201,7 +200,7 @@ def ColonnesOrdonnees(oGrille):
     return [iCol for iCol in tOrdre if oGrille.tPLAfillMatrice[iCol] < oGrille.iPLAlignes]
 
 def Minmax(oGrille, iProfondeur, bMaximising=True):
-    """
+    """!
     @brief Calcule le score d'une position par MinMax sur la matrice.
     @param oGrille Plateau du jeu en cours
            iProfondeur Profondeur de recherche restante 
@@ -246,7 +245,7 @@ def EvalCoup(tArgs):
     return iCol, iScore
 
 def MeilleurCoup(oGrille, iProfondeur):
-    """
+    """!
     @brief Sélectionne le meilleur coup pour l'IA en priorisant: coup gagnant, blocage, puis MinMax. Pour l'algorithme Minmax, on utilise le multiprocesing.
     @param oGrille Plateau du jeu en cours
            iProfondeur Profondeur de recherche pour MinMax

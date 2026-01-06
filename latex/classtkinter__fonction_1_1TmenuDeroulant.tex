@@ -9,17 +9,17 @@ Class qui gérte le Menu déroulant.
 \begin{DoxyCompactItemize}
 \item 
 \mbox{\hyperlink{classtkinter__fonction_1_1TmenuDeroulant_a75bd6e84e51830a00aca779d1253cedf}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, o\+Canvas, iX, i\+YStart, d\+Config\+Data)
-\item 
+\begin{DoxyCompactList}\small\item\em init \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classtkinter__fonction_1_1TmenuDeroulant_a2daa69a9e913dddb5da1cbd792f2221e}{MENupdate\+Display\+Instantane}} (self)
-\item 
+\begin{DoxyCompactList}\small\item\em Update le menu déroulant et l\textquotesingle{}afficahge. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classtkinter__fonction_1_1TmenuDeroulant_a0caec0cef45a6b5c808d1712158a13b4}{MENsave\+Choice}} (self, s\+Nom, i\+Idx)
-\item 
+\begin{DoxyCompactList}\small\item\em POur pas perdre la selection quand on change l\textquotesingle{}affichage. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classtkinter__fonction_1_1TmenuDeroulant_a97fca5f4667c39d51f030902da3e101c}{MENscroll}} (self, i\+Direction)
-\item 
+\begin{DoxyCompactList}\small\item\em Permet de scroll en haut ou en bas celon i\+Direction. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classtkinter__fonction_1_1TmenuDeroulant_a13fb387d906d824cc9ec5b0888e08d80}{MENanimate\+Transition}} (self, i\+Direction)
-\item 
+\begin{DoxyCompactList}\small\item\em Exécute la transition/ Déplacement Calcul le décalage de postion et de proportion et affiche chaque image une par une effet rétro. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classtkinter__fonction_1_1TmenuDeroulant_ab2676c5a491bbc2d3c7c0ac14458bbc8}{MENprint\+All\+Choices}} (self)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em Affiche les choix de valeur utilisé pour les test. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -61,12 +61,16 @@ Class qui gérte le Menu déroulant.
 \doxysubsubsection{\texorpdfstring{\_\_init\_\_()}{\_\_init\_\_()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Tmenu\+Deroulant.\+\_\+\+\_\+init\+\_\+\+\_\+ (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{o\+Canvas,  }\item[{}]{iX,  }\item[{}]{i\+YStart,  }\item[{}]{d\+Config\+Data }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief init
-@param iX Positon x du MEnue déroulant
-    iYStart Position y de la premier case
-    dConfigData Dictionnaire contenant les Nom des case de parametre du menu (TparamCase)
-\end{DoxyVerb}
- 
+
+
+init 
+
+
+\begin{DoxyParams}{Parameters}
+{\em iX} & Positon x du MEnue déroulant i\+YStart Position y de la premier case d\+Config\+Data Dictionnaire contenant les Nom des case de parametre du menu (Tparam\+Case) \\
+\hline
+\end{DoxyParams}
+
 
 \doxysubsection{Member Function Documentation}
 \Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_a13fb387d906d824cc9ec5b0888e08d80}\label{classtkinter__fonction_1_1TmenuDeroulant_a13fb387d906d824cc9ec5b0888e08d80} 
@@ -75,43 +79,51 @@ Class qui gérte le Menu déroulant.
 \doxysubsubsection{\texorpdfstring{MENanimateTransition()}{MENanimateTransition()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Tmenu\+Deroulant.\+MENanimate\+Transition (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Direction }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Exécute la transition/ Déplacement
-Calcul le décalage de postion et de proportion et affiche chaque image une par une
-effet rétro
-\end{DoxyVerb}
- \Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_ab2676c5a491bbc2d3c7c0ac14458bbc8}\label{classtkinter__fonction_1_1TmenuDeroulant_ab2676c5a491bbc2d3c7c0ac14458bbc8} 
+
+
+Exécute la transition/ Déplacement Calcul le décalage de postion et de proportion et affiche chaque image une par une effet rétro. 
+
+\Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_ab2676c5a491bbc2d3c7c0ac14458bbc8}\label{classtkinter__fonction_1_1TmenuDeroulant_ab2676c5a491bbc2d3c7c0ac14458bbc8} 
 \index{tkinter\_fonction.TmenuDeroulant@{tkinter\_fonction.TmenuDeroulant}!MENprintAllChoices@{MENprintAllChoices}}
 \index{MENprintAllChoices@{MENprintAllChoices}!tkinter\_fonction.TmenuDeroulant@{tkinter\_fonction.TmenuDeroulant}}
 \doxysubsubsection{\texorpdfstring{MENprintAllChoices()}{MENprintAllChoices()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Tmenu\+Deroulant.\+MENprint\+All\+Choices (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Affiche les choix de valeur utilisé pour les test
-\end{DoxyVerb}
- \Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_a0caec0cef45a6b5c808d1712158a13b4}\label{classtkinter__fonction_1_1TmenuDeroulant_a0caec0cef45a6b5c808d1712158a13b4} 
+
+
+Affiche les choix de valeur utilisé pour les test. 
+
+\Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_a0caec0cef45a6b5c808d1712158a13b4}\label{classtkinter__fonction_1_1TmenuDeroulant_a0caec0cef45a6b5c808d1712158a13b4} 
 \index{tkinter\_fonction.TmenuDeroulant@{tkinter\_fonction.TmenuDeroulant}!MENsaveChoice@{MENsaveChoice}}
 \index{MENsaveChoice@{MENsaveChoice}!tkinter\_fonction.TmenuDeroulant@{tkinter\_fonction.TmenuDeroulant}}
 \doxysubsubsection{\texorpdfstring{MENsaveChoice()}{MENsaveChoice()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Tmenu\+Deroulant.\+MENsave\+Choice (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{s\+Nom,  }\item[{}]{i\+Idx }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief POur pas perdre la selection quand on change l'affichage
-\end{DoxyVerb}
- \Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_a97fca5f4667c39d51f030902da3e101c}\label{classtkinter__fonction_1_1TmenuDeroulant_a97fca5f4667c39d51f030902da3e101c} 
+
+
+POur pas perdre la selection quand on change l\textquotesingle{}affichage. 
+
+\Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_a97fca5f4667c39d51f030902da3e101c}\label{classtkinter__fonction_1_1TmenuDeroulant_a97fca5f4667c39d51f030902da3e101c} 
 \index{tkinter\_fonction.TmenuDeroulant@{tkinter\_fonction.TmenuDeroulant}!MENscroll@{MENscroll}}
 \index{MENscroll@{MENscroll}!tkinter\_fonction.TmenuDeroulant@{tkinter\_fonction.TmenuDeroulant}}
 \doxysubsubsection{\texorpdfstring{MENscroll()}{MENscroll()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Tmenu\+Deroulant.\+MENscroll (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Direction }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Permet de scroll en haut ou en bas celon iDirection
-\end{DoxyVerb}
- \Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_a2daa69a9e913dddb5da1cbd792f2221e}\label{classtkinter__fonction_1_1TmenuDeroulant_a2daa69a9e913dddb5da1cbd792f2221e} 
+
+
+Permet de scroll en haut ou en bas celon i\+Direction. 
+
+\Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_a2daa69a9e913dddb5da1cbd792f2221e}\label{classtkinter__fonction_1_1TmenuDeroulant_a2daa69a9e913dddb5da1cbd792f2221e} 
 \index{tkinter\_fonction.TmenuDeroulant@{tkinter\_fonction.TmenuDeroulant}!MENupdateDisplayInstantane@{MENupdateDisplayInstantane}}
 \index{MENupdateDisplayInstantane@{MENupdateDisplayInstantane}!tkinter\_fonction.TmenuDeroulant@{tkinter\_fonction.TmenuDeroulant}}
 \doxysubsubsection{\texorpdfstring{MENupdateDisplayInstantane()}{MENupdateDisplayInstantane()}}
 {\footnotesize\ttfamily tkinter\+\_\+fonction.\+Tmenu\+Deroulant.\+MENupdate\+Display\+Instantane (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Update le menu déroulant et l'afficahge
-\end{DoxyVerb}
- 
+
+
+Update le menu déroulant et l\textquotesingle{}afficahge. 
+
+
 
 \doxysubsection{Member Data Documentation}
 \Hypertarget{classtkinter__fonction_1_1TmenuDeroulant_a8bdb10f0b23a73e34dcfa7eaf9b90739}\label{classtkinter__fonction_1_1TmenuDeroulant_a8bdb10f0b23a73e34dcfa7eaf9b90739} 

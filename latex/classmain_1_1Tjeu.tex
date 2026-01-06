@@ -2,7 +2,13 @@
 \hypertarget{classmain_1_1Tjeu}{}\label{classmain_1_1Tjeu}\index{main.Tjeu@{main.Tjeu}}
 
 
-Inheritance diagram for main.\+Tjeu\+:\nopagebreak
+Réprésente la page de jeu.  
+
+
+
+
+Inheritance diagram for main.\+Tjeu\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -11,7 +17,8 @@ Inheritance diagram for main.\+Tjeu\+:\nopagebreak
 \end{figure}
 
 
-Collaboration diagram for main.\+Tjeu\+:\nopagebreak
+Collaboration diagram for main.\+Tjeu\+:
+\nopagebreak
 \begin{figure}[H]
 \begin{center}
 \leavevmode
@@ -24,33 +31,34 @@ Collaboration diagram for main.\+Tjeu\+:\nopagebreak
 \mbox{\hyperlink{classmain_1_1Tjeu_a2a47d25cf7168890fa6be832b887224e}{\+\_\+\+\_\+init\+\_\+\+\_\+}} (self, o\+Parent, \texorpdfstring{$\ast$}{*}\texorpdfstring{$\ast$}{*}d\+Settings)
 \item 
 \mbox{\hyperlink{classmain_1_1Tjeu_a32bfb831b7f57ca801974531c35949c2}{JEUlancer\+La\+Game}} (self)
-\item 
+\begin{DoxyCompactList}\small\item\em Pour lancer la partie de puissance 4. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_a58fdabfed1181a4b80ba3588209ec5d2}{JEUannuler\+Un\+Seul\+Coup}} (self)
-\item 
+\begin{DoxyCompactList}\small\item\em Annule un seul coup, use in JEUaction\+Undo. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_aa5531354ed6e301b9a2379382190f87e}{JEUaction\+Undo}} (self)
-\item 
+\begin{DoxyCompactList}\small\item\em suppr le bon nombre de jeton celon le cas Cas 1 partie encore en cours -\/\texorpdfstring{$>$}{>} suppr deux jetons tours du joueur Cas 2 Fin, vicoire joueur -\/\texorpdfstring{$>$}{>} suppr uniquement ke coup du joueur et relance le jeu Cas3 FIn, victoire du bot -\/\texorpdfstring{$>$}{>} suppr deux jetons et relance le jeu ~\newline
+ \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_a45efb1178962ee3f6cb6c4db9182f70b}{JEUreactiver\+Jeu}} (self)
-\item 
+\begin{DoxyCompactList}\small\item\em réactivation du jeu -\/\texorpdfstring{$>$}{>} suppr les affichage de fin, et réactive le clic souris \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_ae0f3f8952636c3c20d4d75b2fb1c0de0}{JEUactiver\+Mode\+Bombe}} (self)
-\item 
+\begin{DoxyCompactList}\small\item\em active le bonus bombe \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_a29a442ada5a55e8c4ac00350a2f9a8c2}{JEUlacher\+Bombe}} (self, i\+Col)
-\item 
+\begin{DoxyCompactList}\small\item\em Joue la bombe. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_a6e368b5bd0b7720c581e2c6ae03214c7}{JEUobtenir\+Colonne\+Aleatoire}} (self)
-\item 
+\begin{DoxyCompactList}\small\item\em Prend une colone aléatoire, pour la gestion du niveau de bot. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_af4fa8335e476b44df47a42c557867c5c}{JEUclic\+Souris}} (self, o\+Event)
-\item 
+\begin{DoxyCompactList}\small\item\em gére le clic souris, pour jouer un coup \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_acee9ced79c95ad66c76800f7858b93ad}{JEUjouer\+Coup}} (self, i\+Col)
-\item 
+\begin{DoxyCompactList}\small\item\em Joue un coup sur le plateau. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_a016d59db5d0d98b923d0a6997f94b7bb}{JEUtrouver\+Pions\+Gagnants}} (self, i\+Joueur)
-\item 
+\begin{DoxyCompactList}\small\item\em scanne le plateau pour trouver les pions gagnant \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_af4bad8a2852f8df06cb3dd7b45d27695}{JEUsurligner\+Victoire}} (self, t\+Pions)
-\item 
+\begin{DoxyCompactList}\small\item\em entour les piosn gagnant du jeu \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_a18b0ceb15d4a13d8702118574934f9c4}{JEUtour\+Bot}} (self)
-\item 
+\begin{DoxyCompactList}\small\item\em Gestion du jeu bot. \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_aaa9d1dda1d1c94854f2323b6a9ca5276}{JEUaction\+Bot\+Post\+Calcul}} (self, i\+Col)
-\item 
+\begin{DoxyCompactList}\small\item\em joue le coup de l\textquotesingle{}ia et réactivele clic souris \end{DoxyCompactList}\item 
 \mbox{\hyperlink{classmain_1_1Tjeu_acaf3474faf5e6dc4656d6a294343fe40}{JEUfin\+De\+Partie}} (self, i\+Etat)
-\end{DoxyCompactItemize}
+\begin{DoxyCompactList}\small\item\em GEstion de fin de partie. \end{DoxyCompactList}\end{DoxyCompactItemize}
 \doxysubsubsection*{Public Attributes}
 \begin{DoxyCompactItemize}
 \item 
@@ -111,9 +119,7 @@ Collaboration diagram for main.\+Tjeu\+:\nopagebreak
 
 
 \doxysubsection{Detailed Description}
-\begin{DoxyVerb}@brief Réprésente la page de jeu 
-\end{DoxyVerb}
- 
+Réprésente la page de jeu. 
 
 \doxysubsection{Constructor \& Destructor Documentation}
 \Hypertarget{classmain_1_1Tjeu_a2a47d25cf7168890fa6be832b887224e}\label{classmain_1_1Tjeu_a2a47d25cf7168890fa6be832b887224e} 
@@ -131,117 +137,145 @@ Collaboration diagram for main.\+Tjeu\+:\nopagebreak
 \doxysubsubsection{\texorpdfstring{JEUactionBotPostCalcul()}{JEUactionBotPostCalcul()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUaction\+Bot\+Post\+Calcul (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Col }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief joue le coup de l'ia et réactivele clic souris
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_aa5531354ed6e301b9a2379382190f87e}\label{classmain_1_1Tjeu_aa5531354ed6e301b9a2379382190f87e} 
+
+
+joue le coup de l\textquotesingle{}ia et réactivele clic souris 
+
+\Hypertarget{classmain_1_1Tjeu_aa5531354ed6e301b9a2379382190f87e}\label{classmain_1_1Tjeu_aa5531354ed6e301b9a2379382190f87e} 
 \index{main.Tjeu@{main.Tjeu}!JEUactionUndo@{JEUactionUndo}}
 \index{JEUactionUndo@{JEUactionUndo}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUactionUndo()}{JEUactionUndo()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUaction\+Undo (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief suppr le bon nombre de jeton celon le cas
-    Cas 1 partie encore en cours -> suppr deux jetons tours du joueur
-    Cas 2 Fin, vicoire joueur -> suppr uniquement ke coup du joueur et relance le jeu
-    Cas3 FIn, victoire du bot -> suppr deux jetons et relance le jeu  
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_ae0f3f8952636c3c20d4d75b2fb1c0de0}\label{classmain_1_1Tjeu_ae0f3f8952636c3c20d4d75b2fb1c0de0} 
+
+
+suppr le bon nombre de jeton celon le cas Cas 1 partie encore en cours -\/\texorpdfstring{$>$}{>} suppr deux jetons tours du joueur Cas 2 Fin, vicoire joueur -\/\texorpdfstring{$>$}{>} suppr uniquement ke coup du joueur et relance le jeu Cas3 FIn, victoire du bot -\/\texorpdfstring{$>$}{>} suppr deux jetons et relance le jeu ~\newline
+ 
+
+\Hypertarget{classmain_1_1Tjeu_ae0f3f8952636c3c20d4d75b2fb1c0de0}\label{classmain_1_1Tjeu_ae0f3f8952636c3c20d4d75b2fb1c0de0} 
 \index{main.Tjeu@{main.Tjeu}!JEUactiverModeBombe@{JEUactiverModeBombe}}
 \index{JEUactiverModeBombe@{JEUactiverModeBombe}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUactiverModeBombe()}{JEUactiverModeBombe()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUactiver\+Mode\+Bombe (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief active le bonus bombe
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_a58fdabfed1181a4b80ba3588209ec5d2}\label{classmain_1_1Tjeu_a58fdabfed1181a4b80ba3588209ec5d2} 
+
+
+active le bonus bombe 
+
+\Hypertarget{classmain_1_1Tjeu_a58fdabfed1181a4b80ba3588209ec5d2}\label{classmain_1_1Tjeu_a58fdabfed1181a4b80ba3588209ec5d2} 
 \index{main.Tjeu@{main.Tjeu}!JEUannulerUnSeulCoup@{JEUannulerUnSeulCoup}}
 \index{JEUannulerUnSeulCoup@{JEUannulerUnSeulCoup}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUannulerUnSeulCoup()}{JEUannulerUnSeulCoup()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUannuler\+Un\+Seul\+Coup (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Annule un seul coup, use in JEUactionUndo
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_af4fa8335e476b44df47a42c557867c5c}\label{classmain_1_1Tjeu_af4fa8335e476b44df47a42c557867c5c} 
+
+
+Annule un seul coup, use in JEUaction\+Undo. 
+
+\Hypertarget{classmain_1_1Tjeu_af4fa8335e476b44df47a42c557867c5c}\label{classmain_1_1Tjeu_af4fa8335e476b44df47a42c557867c5c} 
 \index{main.Tjeu@{main.Tjeu}!JEUclicSouris@{JEUclicSouris}}
 \index{JEUclicSouris@{JEUclicSouris}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUclicSouris()}{JEUclicSouris()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUclic\+Souris (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{o\+Event }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief gére le clic souris, pour jouer un coup
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_acaf3474faf5e6dc4656d6a294343fe40}\label{classmain_1_1Tjeu_acaf3474faf5e6dc4656d6a294343fe40} 
+
+
+gére le clic souris, pour jouer un coup 
+
+\Hypertarget{classmain_1_1Tjeu_acaf3474faf5e6dc4656d6a294343fe40}\label{classmain_1_1Tjeu_acaf3474faf5e6dc4656d6a294343fe40} 
 \index{main.Tjeu@{main.Tjeu}!JEUfinDePartie@{JEUfinDePartie}}
 \index{JEUfinDePartie@{JEUfinDePartie}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUfinDePartie()}{JEUfinDePartie()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUfin\+De\+Partie (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Etat }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief GEstion de fin de partie
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_acee9ced79c95ad66c76800f7858b93ad}\label{classmain_1_1Tjeu_acee9ced79c95ad66c76800f7858b93ad} 
+
+
+GEstion de fin de partie. 
+
+\Hypertarget{classmain_1_1Tjeu_acee9ced79c95ad66c76800f7858b93ad}\label{classmain_1_1Tjeu_acee9ced79c95ad66c76800f7858b93ad} 
 \index{main.Tjeu@{main.Tjeu}!JEUjouerCoup@{JEUjouerCoup}}
 \index{JEUjouerCoup@{JEUjouerCoup}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUjouerCoup()}{JEUjouerCoup()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUjouer\+Coup (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Col }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Joue un coup sur le plateau
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_a29a442ada5a55e8c4ac00350a2f9a8c2}\label{classmain_1_1Tjeu_a29a442ada5a55e8c4ac00350a2f9a8c2} 
+
+
+Joue un coup sur le plateau. 
+
+\Hypertarget{classmain_1_1Tjeu_a29a442ada5a55e8c4ac00350a2f9a8c2}\label{classmain_1_1Tjeu_a29a442ada5a55e8c4ac00350a2f9a8c2} 
 \index{main.Tjeu@{main.Tjeu}!JEUlacherBombe@{JEUlacherBombe}}
 \index{JEUlacherBombe@{JEUlacherBombe}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUlacherBombe()}{JEUlacherBombe()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUlacher\+Bombe (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Col }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Joue la bombe
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_a32bfb831b7f57ca801974531c35949c2}\label{classmain_1_1Tjeu_a32bfb831b7f57ca801974531c35949c2} 
+
+
+Joue la bombe. 
+
+\Hypertarget{classmain_1_1Tjeu_a32bfb831b7f57ca801974531c35949c2}\label{classmain_1_1Tjeu_a32bfb831b7f57ca801974531c35949c2} 
 \index{main.Tjeu@{main.Tjeu}!JEUlancerLaGame@{JEUlancerLaGame}}
 \index{JEUlancerLaGame@{JEUlancerLaGame}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUlancerLaGame()}{JEUlancerLaGame()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUlancer\+La\+Game (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Pour lancer la partie de puissance 4
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_a6e368b5bd0b7720c581e2c6ae03214c7}\label{classmain_1_1Tjeu_a6e368b5bd0b7720c581e2c6ae03214c7} 
+
+
+Pour lancer la partie de puissance 4. 
+
+\Hypertarget{classmain_1_1Tjeu_a6e368b5bd0b7720c581e2c6ae03214c7}\label{classmain_1_1Tjeu_a6e368b5bd0b7720c581e2c6ae03214c7} 
 \index{main.Tjeu@{main.Tjeu}!JEUobtenirColonneAleatoire@{JEUobtenirColonneAleatoire}}
 \index{JEUobtenirColonneAleatoire@{JEUobtenirColonneAleatoire}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUobtenirColonneAleatoire()}{JEUobtenirColonneAleatoire()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUobtenir\+Colonne\+Aleatoire (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Prend une colone aléatoire, pour la gestion du niveau de bot
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_a45efb1178962ee3f6cb6c4db9182f70b}\label{classmain_1_1Tjeu_a45efb1178962ee3f6cb6c4db9182f70b} 
+
+
+Prend une colone aléatoire, pour la gestion du niveau de bot. 
+
+\Hypertarget{classmain_1_1Tjeu_a45efb1178962ee3f6cb6c4db9182f70b}\label{classmain_1_1Tjeu_a45efb1178962ee3f6cb6c4db9182f70b} 
 \index{main.Tjeu@{main.Tjeu}!JEUreactiverJeu@{JEUreactiverJeu}}
 \index{JEUreactiverJeu@{JEUreactiverJeu}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUreactiverJeu()}{JEUreactiverJeu()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUreactiver\+Jeu (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief réactivation du jeu -> suppr les affichage de fin, et réactive le clic souris
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_af4bad8a2852f8df06cb3dd7b45d27695}\label{classmain_1_1Tjeu_af4bad8a2852f8df06cb3dd7b45d27695} 
+
+
+réactivation du jeu -\/\texorpdfstring{$>$}{>} suppr les affichage de fin, et réactive le clic souris 
+
+\Hypertarget{classmain_1_1Tjeu_af4bad8a2852f8df06cb3dd7b45d27695}\label{classmain_1_1Tjeu_af4bad8a2852f8df06cb3dd7b45d27695} 
 \index{main.Tjeu@{main.Tjeu}!JEUsurlignerVictoire@{JEUsurlignerVictoire}}
 \index{JEUsurlignerVictoire@{JEUsurlignerVictoire}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUsurlignerVictoire()}{JEUsurlignerVictoire()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUsurligner\+Victoire (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{t\+Pions }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief entour les piosn gagnant du jeu
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_a18b0ceb15d4a13d8702118574934f9c4}\label{classmain_1_1Tjeu_a18b0ceb15d4a13d8702118574934f9c4} 
+
+
+entour les piosn gagnant du jeu 
+
+\Hypertarget{classmain_1_1Tjeu_a18b0ceb15d4a13d8702118574934f9c4}\label{classmain_1_1Tjeu_a18b0ceb15d4a13d8702118574934f9c4} 
 \index{main.Tjeu@{main.Tjeu}!JEUtourBot@{JEUtourBot}}
 \index{JEUtourBot@{JEUtourBot}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUtourBot()}{JEUtourBot()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUtour\+Bot (\begin{DoxyParamCaption}\item[{}]{self }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb}@brief Gestion du jeu bot
-\end{DoxyVerb}
- \Hypertarget{classmain_1_1Tjeu_a016d59db5d0d98b923d0a6997f94b7bb}\label{classmain_1_1Tjeu_a016d59db5d0d98b923d0a6997f94b7bb} 
+
+
+Gestion du jeu bot. 
+
+\Hypertarget{classmain_1_1Tjeu_a016d59db5d0d98b923d0a6997f94b7bb}\label{classmain_1_1Tjeu_a016d59db5d0d98b923d0a6997f94b7bb} 
 \index{main.Tjeu@{main.Tjeu}!JEUtrouverPionsGagnants@{JEUtrouverPionsGagnants}}
 \index{JEUtrouverPionsGagnants@{JEUtrouverPionsGagnants}!main.Tjeu@{main.Tjeu}}
 \doxysubsubsection{\texorpdfstring{JEUtrouverPionsGagnants()}{JEUtrouverPionsGagnants()}}
 {\footnotesize\ttfamily main.\+Tjeu.\+JEUtrouver\+Pions\+Gagnants (\begin{DoxyParamCaption}\item[{}]{self,  }\item[{}]{i\+Joueur }\end{DoxyParamCaption})}
 
-\begin{DoxyVerb} @brief scanne le plateau pour trouver les pions gagnant
-@ return une liste de tuples (ligne, colonne).
-\end{DoxyVerb}
- 
+
+
+scanne le plateau pour trouver les pions gagnant 
+
+\begin{DoxyReturn}{Returns}
+une liste de tuples (ligne, colonne). 
+\end{DoxyReturn}
+
 
 \doxysubsection{Member Data Documentation}
 \Hypertarget{classmain_1_1Tjeu_a88c9f78db5de389a7083521685896fd9}\label{classmain_1_1Tjeu_a88c9f78db5de389a7083521685896fd9} 
