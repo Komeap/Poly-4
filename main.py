@@ -1,5 +1,5 @@
 from tkinter_fonction import *
-from bot2 import VictoireOuNul, MeilleurCoup
+from bot2 import VictoireOuNul, MeilleurCoup, QuelCoupMatrice, CoupBloquant
 from Plateau import Tplateau
 import threading
 import random
@@ -21,6 +21,8 @@ class Tapp(tk.Tk):
         ## iWIDTH et iHEIGHT valeur global
         self.geometry("{}x{}+{}+{}".format(iWIDTH, iHEIGHT, iXCordinate, iYCordinate))
         self.oAPPpageEnCours = None
+
+        self.dSauvegardeParametres = None
         self.resizable(width=False, height=False)
 
     ## @brief Changement de page, supprime celle en cours
@@ -76,6 +78,9 @@ class TparamJeu(tk.Frame):
             "couleur bot": "yellow"
         }
 
+        if self.master.dSauvegardeParametres is not None:
+            dDEFAUTS = self.master.dSauvegardeParametres
+
         self.oPAJmenu = TmenuDeroulant(self.oPAJcanva, iWIDTH//2, iHEIGHT//7, dCONFIG_DATA)
         self.oPAJmenu.MENscroll(1)
 
@@ -107,8 +112,19 @@ class TparamJeu(tk.Frame):
         sBonus = dConfig["Bonus"][dChoix["Bonus"]]
         sNomDiff = dConfig["Difficulté"][dChoix["Difficulté"]]
         
+        dSauvegarde = {
+            "Largeur": iLargeur,          
+            "Hauteur": iHauteur,          
+            "Win Condition": iWinCond,    
+            "Difficulté": sNomDiff,
+            "Permier coup": sPremierC,
+            "Bonus": sBonus,
+            "couleur joueur": sNomCoulJ,
+            "couleur bot": sNomCoulB
+        }
+        self.master.dSauvegardeParametres = dSauvegarde
 
-        # Création du colis de données
+        # Création du dic de données
         dParametres = {
             "largeur": iLargeur,
             "hauteur": iHauteur,
@@ -142,6 +158,9 @@ class Tjeu(tk.Frame):
 
         self.iJEUbuffer = 1
         self.iJEUnbCoupsIa = 0
+        
+        self.bJEUbotHasBomb = False
+        self.bJEUbotHasUndo = False
 
         # Gestion du premier tour
         if self.sJEUpremierCoup == "bot" : 
@@ -171,8 +190,10 @@ class Tjeu(tk.Frame):
         AddCanvasBouton(self.oJEUcanvas, "images/bouton_back.png", (iHEIGHT//10, iHEIGHT//10), ((iHEIGHT//10)//2 + 5, (iHEIGHT//10)//2 + 5), lambda: oApp.APPchangerDePage(TparamJeu), True, 20)
         AddCanvasBouton(self.oJEUcanvas, "images/bouton_close.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT//10)//2 + 5), oApp.destroy, True, 20)
         if self.sJEUbonus == "undo" or self.sJEUbonus == "all" :
+            self.bJEUbotHasUndo = True
             self.iJEUundo = AddCanvasBouton(self.oJEUcanvas, "images/undo_bonus.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8, iHEIGHT//2), self.JEUactionUndo, True, 20)
         if self.sJEUbonus == "bombe"  or self.sJEUbonus == "all": 
+            self.bJEUbotHasBomb = True
             self.iJEUbombe = AddCanvasBouton(self.oJEUcanvas, "images/bouton_bombe.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8 - iHEIGHT//8, iHEIGHT//2), self.JEUactiverModeBombe, True, 20)
             self.iJEUbombe_on = AddCanvasBouton(self.oJEUcanvas, "images/bouton_bombe_press.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8 - iHEIGHT//8, iHEIGHT//2), self.JEUactiverModeBombe, True, 20)
             self.oJEUcanvas.itemconfig(self.iJEUbombe_on, state='hidden')
@@ -280,29 +301,38 @@ class Tjeu(tk.Frame):
         
     def JEUlacherBombe(self, iCol):
         """!
-        @brief Joue la bombe
+        @brief Joue la bombe (Compatible IA et Joueur)
         """
         if self.oJEUgrille.tPLAfillMatrice[iCol] == 0:
-            self.bJEUmodeBombe = False
+            if self.iJEUjoueurActuel == 1: 
+                self.bJEUactiveBombe = False
+                # Reset boutons visuels joueur
+                self.oJEUcanvas.itemconfig(self.iJEUbombe_on, state='hidden')
+                self.oJEUcanvas.itemconfig(self.iJEUbombe, state='normal')
             return
 
         self.oJEUgrille.PLApowerBomb(iCol)
 
         for iPionId in self.tJEUpionsVisuels[iCol]:
             self.oJEUcanvas.delete(iPionId)
-        
         self.tJEUpionsVisuels[iCol] = []
-
+        
         self.tJEUhistoriqueCoups = [tCoup for tCoup in self.tJEUhistoriqueCoups if tCoup[0] != iCol]
 
-        # Fin du tour
-        self.bJEUactiveBombe = False
-        self.oJEUcanvas.delete(self.iJEUbombe) ## suppr le bouton
-        self.oJEUcanvas.delete(self.iJEUbombe_on)
-
-        self.iJEUjoueurActuel = 3 - self.iJEUjoueurActuel ## Fait jouer le bot 
+        if self.iJEUjoueurActuel == 1:
+            self.bJEUactiveBombe = False
+            if hasattr(self, 'iJEUbombe'): self.oJEUcanvas.delete(self.iJEUbombe)
+            if hasattr(self, 'iJEUbombe_on'): self.oJEUcanvas.delete(self.iJEUbombe_on)
+        
+        # Changement de tour
+        self.iJEUjoueurActuel = 3 - self.iJEUjoueurActuel 
+        
         if self.iJEUjoueurActuel == 2:
             self.oJEUcanvas.after(500, self.JEUtourBot)
+        else:
+            # Si c'est au joueur, on réactive la souris
+            if self.bJEUjeuActif:
+                self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
 
     def JEUobtenirColonneAleatoire(self):
         """!
@@ -455,7 +485,7 @@ class Tjeu(tk.Frame):
     
     def JEUtourBot(self):
         """!
-        @brief Gestion du jeu bot
+        @brief Gestion du jeu bot avec intelligence adaptative
         """
         if not self.bJEUjeuActif: return
         self.oJEUcanvas.unbind('<Button-1>')
@@ -467,50 +497,107 @@ class Tjeu(tk.Frame):
 
         def JEUprocessIa():
             """!
-            @brief Gére la dificulté de l'IA celon les paramétre et joue le coup
-            Hardcore utilise meilleur coup a chaque fois
-            Normal meilleur coup 2 fois sur 3
-            Facile meilleur coup 1 fois sur 2 
+            @brief Thread IA
             """
-            iCol = -1
+            tAction = (0, 0) # (Type, Col)
+            
+            iCoupGagnant = -1
+            iCoupBloquant = -1
+            
+            if self.sJEUdiff != "Facile":
+                iCoupGagnant = QuelCoupMatrice(self.oJEUgrille, 2)
+                iCoupBloquant = CoupBloquant(self.oJEUgrille, 1)
+
+
+            # MODE HARDCORE toujours meilleur coup
             if self.sJEUdiff == "Hardcore":
-                iCol = MeilleurCoup(self.oJEUgrille, self.iJEUprofondeur)      
+                tAction = MeilleurCoup(self.oJEUgrille, self.iJEUprofondeur, self.bJEUbotHasBomb, self.bJEUbotHasUndo)      
+            
+            # MODE NORMAL : Intelligent mais pas trop
             elif self.sJEUdiff == "Normal":
-                if self.iJEUbuffer == 1:
-                    iCol = MeilleurCoup(self.oJEUgrille, self.iJEUprofondeur)
-                    if self.iJEUnbCoupsIa % 3 == 0:
-                        self.iJEUbuffer = 0
+                # Priorité 1 : Gagner si possible
+                if iCoupGagnant != -1:
+                    tAction = (0, iCoupGagnant)
+                # Priorité 2 : Bloquer si nécessaire
+                elif iCoupBloquant != -1:
+                    tAction = (0, iCoupBloquant)
                 else:
-                    iCol = self.JEUobtenirColonneAleatoire()
-                    self.iJEUbuffer = 1     
+                    # Pas de coup spécial
+                    # 70% de chance de jouer le MeilleurCoup
+                    # 30% de chance de jouer un coup moyen
+                    if random.random() < 0.7:
+                         tAction = MeilleurCoup(self.oJEUgrille, self.iJEUprofondeur, self.bJEUbotHasBomb, self.bJEUbotHasUndo)
+                    else:
+                         tAction = (0, self.JEUobtenirCoupAleatoireSemiIntelligent())
+
+            # MODE FACILE : Joue de temps en temps bien 
             elif self.sJEUdiff == "Facile":
-                if self.iJEUbuffer == 1:
-                    iCol = MeilleurCoup(self.oJEUgrille, self.iJEUprofondeur)
-                    if self.iJEUnbCoupsIa % 2 == 0:
-                        self.iJEUbuffer = 0
+                # 30% de chance de jouer le meilleur coup
+                if random.random() < 0.3:
+                    tAction = MeilleurCoup(self.oJEUgrille, self.iJEUprofondeur, self.bJEUbotHasBomb, self.bJEUbotHasUndo)
                 else:
-                    iCol = self.JEUobtenirColonneAleatoire()
-                    self.iJEUbuffer = 1
+                    # 70% random
+                    tAction = (0, self.JEUobtenirColonneAleatoire())
 
             self.iJEUnbCoupsIa += 1
-            self.oJEUcanvas.after(0, lambda: self.JEUactionBotPostCalcul(iCol))
+            self.oJEUcanvas.after(0, lambda: self.JEUactionBotPostCalcul(tAction))
 
-        oThread = threading.Thread(target=JEUprocessIa) # Utilise le thread pour eviter que ca bloque tous 
+        oThread = threading.Thread(target=JEUprocessIa)
         oThread.daemon = True 
         oThread.start()
 
-    def JEUactionBotPostCalcul(self, iCol):
+    def JEUactionBotPostCalcul(self, tAction):
         """!
-        @brief joue le coup de l'ia et réactivele clic souris
+        @brief Joue l'action choisie par l'IA
+        @param tAction Tuple (TypeAction, Colonne)
         """
+        iType, iCol = tAction
 
         if hasattr(self, 'iJEUpointInterrogationId'):
             self.oJEUcanvas.delete(self.iJEUpointInterrogationId)
             del self.iJEUpointInterrogationId
 
-        self.JEUjouerCoup(iCol)
-        if self.bJEUjeuActif:
-            self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
+        if iType == 2: # UNDO
+            # print("Bot joue Undo")
+            self.bJEUbotHasUndo = False
+            self.JEUactionUndo()
+            return
+
+        elif iType == 1: # BOMBE
+            print(f"Bot joue Bombe en {iCol}")
+            self.bJEUbotHasBomb = False # Consomme le bonus
+            self.JEUlacherBombe(iCol)
+            return
+
+        else: # COUP NORMAL
+            self.JEUjouerCoup(iCol)
+            if self.bJEUjeuActif:
+                self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
+
+    def JEUobtenirCoupAleatoireSemiIntelligent(self):
+        """!
+        @brief Trouve une colonne aléatoire, mais évite de donner une victoire immédiate à l'adversaire.
+        """
+        tColsValides = [c for c in range(self.oJEUgrille.iPLAcolonnes) if self.oJEUgrille.tPLAfillMatrice[c] < self.oJEUgrille.iPLAlignes]
+        
+        if not tColsValides: return 0
+        
+        random.shuffle(tColsValides)
+        
+        # On cherche une colonne qui n'est pas "suicidaire"
+        for iCol in tColsValides:
+            self.oJEUgrille.PLAplay(iCol, 2)
+            bSuicide = False
+
+            if QuelCoupMatrice(self.oJEUgrille, 1) != -1:
+                bSuicide = True
+            
+            self.oJEUgrille.PLAundo(iCol)
+            
+            if not bSuicide:
+                return iCol
+
+        return tColsValides[0]
 
     def JEUfinDePartie(self, iEtat):
         """!

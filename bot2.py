@@ -5,6 +5,7 @@ from Plateau import Tplateau
 import numpy as np
 import multiprocessing
 from random import *
+import copy
 
 def VictoireOuNul(oGrille, iJoueur):
     """!
@@ -244,41 +245,72 @@ def EvalCoup(tArgs):
     oGrille.PLAundo(iCol)
     return iCol, iScore
 
-def MeilleurCoup(oGrille, iProfondeur):
+def MeilleurCoup(oGrille, iProfondeur, bHasBomb=False, bHasUndo=False):
     """!
     @brief Sélectionne le meilleur coup pour l'IA en priorisant: coup gagnant, blocage, puis MinMax. Pour l'algorithme Minmax, on utilise le multiprocesing.
     @param oGrille Plateau du jeu en cours
            iProfondeur Profondeur de recherche pour MinMax
+           bHasBomb si le bot peut utiliser la bombe
+           bHasUndo si le bot peut utiliser le undo
     @return Renvoit l'index de la colonne choisie pour jouer (0..grille.c-1)
     """
-    # 1) Coup gagnant immédiat
+
+    # 1) Coup gagnant 
     iCg = QuelCoupMatrice(oGrille, 2)
-    if iCg != -1:
-        return iCg
+    if iCg != -1: return (0, iCg)
 
-    # 2) Blocage
+    # 2) Coup bloquant
     iCb = CoupBloquant(oGrille, 1)
-    if iCb != -1:
-        return iCb
+    if iCb != -1: return (0, iCb)
 
-    # 3) MinMax
-    iBestScore = -10**9
-    iBestCol = None
-
+    # 3) MinMax pour coup de base
     tCols = ColonnesOrdonnees(oGrille)
-    tArgsList = [(Tplateau(oGrille.iPLAlignes, oGrille.iPLAcolonnes, oGrille.iPLAwin), iCol, iProfondeur) for iCol in tCols]
+    tArgsList = []
+    
+    # deepcopy pour multiprocessing
+    for iCol in tCols:
+        oClone = Tplateau(oGrille.iPLAlignes, oGrille.iPLAcolonnes, oGrille.iPLAwin)
+        oClone.tPLAmatrice = oGrille.tPLAmatrice.copy()
+        oClone.tPLAfillMatrice = oGrille.tPLAfillMatrice.copy()
+        oClone.tPLAbitboards = oGrille.tPLAbitboards.copy()
+        tArgsList.append((oClone, iCol, iProfondeur))
 
-    for i, iCol in enumerate(tCols):
-            tArgsList[i][0].tPLAmatrice = oGrille.tPLAmatrice.copy()
-            tArgsList[i][0].tPLAfillMatrice = oGrille.tPLAfillMatrice.copy()
-            tArgsList[i][0].tPLAbitboards = oGrille.tPLAbitboards.copy()
+    if not tArgsList: return (0, 0) # Cas grille pleine
 
-    with multiprocessing.Pool(processes=min(len(tCols), multiprocessing.cpu_count())) as oPool :
+    with multiprocessing.Pool(processes=min(len(tCols), multiprocessing.cpu_count())) as oPool:
         tResults = oPool.map(EvalCoup, tArgsList)
 
-    iBestCol, iBestScore = max(tResults, key=lambda x : x[1])
-    return iBestCol
+    iBestCol, iBestScore = max(tResults, key=lambda x: x[1])
 
+    # --- LOGIQUE BONUS ---
+    
+    # 4) Test de la BOMBE si dispo
+    if bHasBomb:
+        iBestBombScore = -10**9
+        iBestBombCol = -1
+
+        for iCol in range(oGrille.iPLAcolonnes):
+            if oGrille.tPLAfillMatrice[iCol] == 0: continue
+
+            oClone = copy.deepcopy(oGrille)
+            oClone.PLApowerBomb(iCol)
+            
+            iScore = Minmax(oClone, iProfondeur=1, bMaximising=False)
+            
+            if iScore > iBestBombScore:
+                iBestBombScore = iScore
+                iBestBombCol = iCol
+        
+        if iBestBombScore > iBestScore + 50: # Bonus d'inertie, on préfère jouer sauf si bombe bien meilleure
+             # print(f"IA décide de bomber la colonne {iBestBombCol} (Score {iBestBombScore} vs {iBestScore})")
+             return (1, iBestBombCol)
+
+    # 5) Test du UNDO 
+    if bHasUndo and iBestScore < -90000:
+        # print("IA utilise UNDO pour éviter la défaite !")
+        return (2, 0)
+
+    return (0, iBestCol)
 
 ##Il me reste ça refaire et à doxygen
 def PartieVsBot(oGrille, iColones, sMode, iProfondeur=4):
