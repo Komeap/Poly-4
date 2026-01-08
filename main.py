@@ -62,7 +62,7 @@ class TparamJeu(tk.Frame):
             "Hauteur": [i for i in range(4,50)],
             "Difficulté": ["Facile", "Normal", "Hardcore"],
             "Permier coup": ["bot", "joueur", "random"],
-            "Bonus": ["nothing","bombe", "undo", "all"],
+            "Bonus": ["nothing","bombe", "undo", "aide", "all"],
             "couleur joueur": ["cyan", "red", "orange", "yellow"],
             "couleur bot":["cyan", "red", "orange", "yellow"]
         }
@@ -197,6 +197,8 @@ class Tjeu(tk.Frame):
             self.iJEUbombe = AddCanvasBouton(self.oJEUcanvas, "images/bouton_bombe.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8 - iHEIGHT//8, iHEIGHT//2), self.JEUactiverModeBombe, True, 20)
             self.iJEUbombe_on = AddCanvasBouton(self.oJEUcanvas, "images/bouton_bombe_press.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8 - iHEIGHT//8, iHEIGHT//2), self.JEUactiverModeBombe, True, 20)
             self.oJEUcanvas.itemconfig(self.iJEUbombe_on, state='hidden')
+        if self.sJEUbonus == "aide" or self.sJEUbonus == "all":
+            self.iJEUaide = AddCanvasBouton(self.oJEUcanvas, "images/bouton_help.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8 + iHEIGHT//8, iHEIGHT//2), self.JEUdemanderAide, True, 20)
 
         # Avatars
         AddCanvasImg(self.oJEUcanvas, "images/gentil_idle.png", (150, (int)(iHEIGHT*0.75)), ((int)(iHEIGHT*0.3), (int)(iHEIGHT*0.3)))
@@ -275,6 +277,77 @@ class Tjeu(tk.Frame):
         self.JEUreactiverJeu()
         self.oJEUcanvas.delete(self.iJEUundo)
         # print("Retour Ok")
+
+    def JEUdemanderAide(self):
+        """!
+        @brief Lance le calcul de l'IA pour aider le joueur 1
+        """
+        if not self.bJEUjeuActif or self.iJEUjoueurActuel != 1 or self.bJEUanimEnCours:
+            return
+
+        self.oJEUcanvas.unbind('<Button-1>')
+
+
+        def ThreadCalculAide():
+            import copy
+            import numpy as np
+            
+            # 1. Créa clone plateau
+            oClone = copy.deepcopy(self.oJEUgrille)
+            
+            # 2. INVERSION DES JOUEURS (sur le clone)
+            # Le bot est codé pour jouer les 2, n change donc les 1 en 2 dans le clone
+            oClone.tPLAmatrice = np.where(oClone.tPLAmatrice == 1, 3, oClone.tPLAmatrice)
+            oClone.tPLAmatrice = np.where(oClone.tPLAmatrice == 2, 1, oClone.tPLAmatrice)
+            oClone.tPLAmatrice = np.where(oClone.tPLAmatrice == 3, 2, oClone.tPLAmatrice)
+
+            oClone.tPLAbitboards[0], oClone.tPLAbitboards[1] = oClone.tPLAbitboards[1], oClone.tPLAbitboards[0]
+
+            tAction = MeilleurCoup(oClone, self.iJEUprofondeur, bHasBomb=False, bHasUndo=False)
+            
+            iMeilleurCol = tAction[1]
+            
+            self.oJEUcanvas.after(0, lambda: self.JEUafficherIndice(iMeilleurCol))
+
+        oThread = threading.Thread(target=ThreadCalculAide)
+        oThread.daemon = True
+        oThread.start()
+
+    def JEUafficherIndice(self, iCol):
+        """!
+        @brief Affiche visuellement où jouer
+        """
+        # Réactiver le jeu
+        if self.bJEUjeuActif:
+            self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
+        
+        dGridData = getattr(self.oJEUcanvas, 'grid_data', None)
+        if not dGridData: return
+        
+        iTaille = dGridData['taille']
+        iStartX = dGridData['start_x']
+        iStartY = dGridData['start_y']
+        
+        iX = iStartX + (iCol * iTaille) + (iTaille // 2)
+        iY = iStartY - (iTaille // 2)
+
+        iIndiceId = self.oJEUcanvas.create_text(iX, iY, text="⬇", font=("Arial", 40, "bold"), fill="#00FF00")
+        
+        # Animation cligno
+        def Clignoter(iCount):
+            if iCount > 6:
+                self.oJEUcanvas.delete(iIndiceId)
+                return
+            
+            sState = self.oJEUcanvas.itemcget(iIndiceId, 'state')
+            sNewState = 'hidden' if sState == 'normal' else 'normal'
+            self.oJEUcanvas.itemconfig(iIndiceId, state=sNewState)
+            
+            self.oJEUcanvas.after(300, lambda: Clignoter(iCount + 1))
+            
+        Clignoter(0)
+
+        self.oJEUcanvas.delete(self.iJEUaide)
 
     def JEUreactiverJeu(self):
         """!
