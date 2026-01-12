@@ -7,7 +7,7 @@ import multiprocessing
 from random import *
 import copy
 
-def VictoireOuNul(oGrille, iJoueur):
+def VictoireOuNul(oGrille: Tplateau, iJoueur: int) ->tuple[bool, int]:
     """!
     @brief Vérifie l'état de la partie pour un joueur donné (Victoire ou nul)
     @param oGrille Plateau du jeu en cours
@@ -22,7 +22,7 @@ def VictoireOuNul(oGrille, iJoueur):
         return (True, 0)
     return (False, -1)
 
-def EstPleine(oGrille):
+def EstPleine(oGrille: Tplateau):
     """!
     @brief Vérifie si la grille est pleine (match nul)
     @param oGrille Plateau du jeu en cours
@@ -31,7 +31,7 @@ def EstPleine(oGrille):
     """
     return all(oGrille.tPLAfillMatrice[iCol] >= oGrille.iPLAlignes for iCol in range(oGrille.iPLAcolonnes))
 
-def CheckVictoireMatrice(oGrille, iJoueur):
+def CheckVictoireMatrice(oGrille: Tplateau, iJoueur: int) ->bool:
     """!
     @brief Vérifie si joueur a gagné. Ici, nous n'utilisons pas les bitboards.
     @param oGrille Plateau du jeu en cours
@@ -68,7 +68,7 @@ def CheckVictoireMatrice(oGrille, iJoueur):
     return False
 
 
-def QuelCoupMatrice(oGrille, iJoueur):
+def QuelCoupMatrice(oGrille: Tplateau, iJoueur: int) ->int:
     """!
     @brief Vérifie si il existe un coup gagnant immédiat pour joueur et le renvoit immédiatement si il existe. Ici, nous n'utilisons pas les bitboards.
     @param oGrille Plateau du jeu en cours
@@ -86,7 +86,7 @@ def QuelCoupMatrice(oGrille, iJoueur):
         oGrille.PLAundo(iCol)
     return -1
 
-def CoupBloquant(oGrille, iAdversaire):
+def CoupBloquant(oGrille: Tplateau, iAdversaire: int) ->int:
     """!
     @brief Vérifie si il existe un coup gagnant immédiat pour adversaire et le renvoit immédiatement si il existe. Ici, nous n'utilisons pas les bitboards.
     @param oGrille Plateau du jeu en cours
@@ -105,7 +105,7 @@ def CoupBloquant(oGrille, iAdversaire):
 
 
 
-def EvaluateWindow(tWindow, iJoueurMax, iJoueurMin):
+def EvaluateWindow(tWindow:np.ndarray, iJoueurMax: int, iJoueurMin: int) ->int:
 
     """!
     @brief Évalue heuristiquement une fenêtre de 4 cases pour le MinMax.
@@ -115,11 +115,11 @@ def EvaluateWindow(tWindow, iJoueurMax, iJoueurMin):
     @return Renvoit le score de la fenêtre (positif si favorable à joueur_max, négatif si favorable à joueur_min)
     """
 
-    iScore = 0
-    tWindow = list(tWindow)
-    iCountMax = tWindow.count(iJoueurMax)
-    iCountMin = tWindow.count(iJoueurMin)
-    iCountEmpty = tWindow.count(0)
+    iScore: int = 0
+    tWindow: np.ndarray = list(tWindow)
+    iCountMax: int = tWindow.count(iJoueurMax)
+    iCountMin: int = tWindow.count(iJoueurMin)
+    iCountEmpty: int = tWindow.count(0)
 
     # Opportunités / menaces
     if iCountMax == 4:
@@ -136,7 +136,7 @@ def EvaluateWindow(tWindow, iJoueurMax, iJoueurMin):
 
     return iScore
 
-def ScorePosition(oGrille, iJoueurMax=2, iJoueurMin=1):
+def ScorePosition(oGrille: Tplateau, iJoueurMax: int=2, iJoueurMin: int=1) ->int:
     """!
     @brief Calcule le score heuristique global d'une position pour le MinMax.
     @param oGrille Plateau du jeu en cours
@@ -145,62 +145,62 @@ def ScorePosition(oGrille, iJoueurMax=2, iJoueurMin=1):
     @return Renvoit le score global (positif si favorable à joueur_max, négatif si favorable à joueur_min)
     """
 
-    tMat = oGrille.tPLAmatrice
+    tMat: np.ndarray = oGrille.tPLAmatrice
     iL, iC, iW = oGrille.iPLAlignes, oGrille.iPLAcolonnes, oGrille.iPLAwin
-    iScore = 0
+    iScore: int = 0
 
     # Bonus centre (favorise colonnes centrales)
-    iCenter = iC // 2
-    tCenterArray = tMat[:, iCenter]
+    iCenter: int = iC // 2
+    tCenterArray: np.ndarray = tMat[:, iCenter]
     iScore += 3 * np.count_nonzero(tCenterArray == iJoueurMax)
 
     # Horizontal
     for iR in range(iL):
         for iCol in range(iC - iW + 1):
-            tWindow = tMat[iR, iCol:iCol+iW].tolist()
+            tWindow: np.ndarray = tMat[iR, iCol:iCol+iW].tolist()
             iScore += EvaluateWindow(tWindow, iJoueurMax, iJoueurMin)
 
     # Vertical
     for iCol in range(iC):
         for iR in range(iL - iW + 1):
-            tWindow = tMat[iR:iR+iW, iCol].tolist()
+            tWindow: np.ndarray = tMat[iR:iR+iW, iCol].tolist()
             iScore += EvaluateWindow(tWindow, iJoueurMax, iJoueurMin)
 
     # Diagonale \
     for iR in range(iL - iW + 1):
         for iCol in range(iC - iW + 1):
-            tWindow = [tMat[iR+i, iCol+i] for i in range(iW)]
+            tWindow: np.ndarray = [tMat[iR+i, iCol+i] for i in range(iW)]
             iScore += EvaluateWindow(tWindow, iJoueurMax, iJoueurMin)
 
     # Diagonale /
     for iR in range(iW - 1, iL):
         for iCol in range(iC - iW + 1):
-            tWindow = [tMat[iR-i, iCol+i] for i in range(iW)]
+            tWindow: np.ndarray = [tMat[iR-i, iCol+i] for i in range(iW)]
             iScore += EvaluateWindow(tWindow, iJoueurMax, iJoueurMin)
 
     return iScore
 
 # === MinMax (BASIQUE, SANS alpha-beta) ===
 
-def ColonnesOrdonnees(oGrille):
+def ColonnesOrdonnees(oGrille: Tplateau):
     """!
     @brief Génère la liste des colonnes jouables dans un ordre optimisé (centre → bords).
     @param oGrille Plateau du jeu en cours
     @return Renvoit la liste des indices de colonnes jouables, triées par priorité (centre en premier)
     """
-    iC = oGrille.iPLAcolonnes
-    iCentre = iC // 2
-    tOrdre = []
+    iC: int = oGrille.iPLAcolonnes
+    iCentre: int = iC // 2
+    tOrdre: Tplateau = []
     for iD in range(iC):
-        iLeft = iCentre - iD
-        iRight = iCentre + iD
+        iLeft: int = iCentre - iD
+        iRight: int = iCentre + iD
         if 0 <= iLeft < iC:
             tOrdre.append(iLeft)
         if 0 <= iRight < iC and iRight != iLeft:
             tOrdre.append(iRight)
     return [iCol for iCol in tOrdre if oGrille.tPLAfillMatrice[iCol] < oGrille.iPLAlignes]
 
-def Minmax(oGrille, iProfondeur, bMaximising=True):
+def Minmax(oGrille: Tplateau, iProfondeur: int, bMaximising: bool=True) ->int:
     """!
     @brief Calcule le score d'une position par MinMax sur la matrice.
     @param oGrille Plateau du jeu en cours
@@ -219,7 +219,7 @@ def Minmax(oGrille, iProfondeur, bMaximising=True):
 
     tCols = ColonnesOrdonnees(oGrille)
     if bMaximising:
-        iBest = -10**9
+        iBest: int = -10**9
         for iCol in tCols:
             oGrille.PLAplay(iCol, 2)
             iVal = Minmax(oGrille, iProfondeur - 1, bMaximising=False)
@@ -237,7 +237,7 @@ def Minmax(oGrille, iProfondeur, bMaximising=True):
                 iBest = iVal
         return iBest
 
-def EvalCoup(tArgs):
+def EvalCoup(tArgs: np.ndarray) -> tuple[int, int]:
     """Fonction pour multiprocessing"""
     oGrille, iCol, iProfondeur = tArgs
     oGrille.PLAplay(iCol, 2)
@@ -245,7 +245,7 @@ def EvalCoup(tArgs):
     oGrille.PLAundo(iCol)
     return iCol, iScore
 
-def MeilleurCoup(oGrille, iProfondeur, bHasBomb=False, bHasUndo=False):
+def MeilleurCoup(oGrille: Tplateau, iProfondeur: int, bHasBomb: bool=False, bHasUndo: bool=False) -> tuple[int, int]:
     """!
     @brief Sélectionne le meilleur coup pour l'IA en priorisant: coup gagnant, blocage, puis MinMax. Pour l'algorithme Minmax, on utilise le multiprocesing.
     @param oGrille Plateau du jeu en cours
@@ -256,20 +256,20 @@ def MeilleurCoup(oGrille, iProfondeur, bHasBomb=False, bHasUndo=False):
     """
 
     # 1) Coup gagnant 
-    iCg = QuelCoupMatrice(oGrille, 2)
+    iCg:int = QuelCoupMatrice(oGrille, 2)
     if iCg != -1: return (0, iCg)
 
     # 2) Coup bloquant
-    iCb = CoupBloquant(oGrille, 1)
+    iCb:int = CoupBloquant(oGrille, 1)
     if iCb != -1: return (0, iCb)
 
     # 3) MinMax pour coup de base
-    tCols = ColonnesOrdonnees(oGrille)
-    tArgsList = []
+    tCols: np.ndarray = ColonnesOrdonnees(oGrille)
+    tArgsList: np.ndarray = []
     
     # deepcopy pour multiprocessing
     for iCol in tCols:
-        oClone = Tplateau(oGrille.iPLAlignes, oGrille.iPLAcolonnes, oGrille.iPLAwin)
+        oClone:Tplateau = Tplateau(oGrille.iPLAlignes, oGrille.iPLAcolonnes, oGrille.iPLAwin)
         oClone.tPLAmatrice = oGrille.tPLAmatrice.copy()
         oClone.tPLAfillMatrice = oGrille.tPLAfillMatrice.copy()
         oClone.tPLAbitboards = oGrille.tPLAbitboards.copy()
@@ -286,13 +286,13 @@ def MeilleurCoup(oGrille, iProfondeur, bHasBomb=False, bHasUndo=False):
     
     # 4) Test de la BOMBE si dispo
     if bHasBomb:
-        iBestBombScore = -10**9
-        iBestBombCol = -1
+        iBestBombScore: int = -10**9
+        iBestBombCol: int = -1
 
         for iCol in range(oGrille.iPLAcolonnes):
             if oGrille.tPLAfillMatrice[iCol] == 0: continue
 
-            oClone = copy.deepcopy(oGrille)
+            oClone: Tplateau = copy.deepcopy(oGrille)
             oClone.PLApowerBomb(iCol)
             
             iScore = Minmax(oClone, iProfondeur=1, bMaximising=False)
@@ -313,10 +313,10 @@ def MeilleurCoup(oGrille, iProfondeur, bHasBomb=False, bHasUndo=False):
     return (0, iBestCol)
 
 ##Il me reste ça refaire et à doxygen
-def PartieVsBot(oGrille, iColones, sMode, iProfondeur=4):
-    iJoueur = 1  # humain commence
-    iBuffer = 0
-    iNbCoups = 0
+def PartieVsBot(oGrille: Tplateau, iColones:int, sMode, iProfondeur:int =4):
+    iJoueur:int = 1  # humain commence
+    iBuffer:int = 0
+    iNbCoups:int = 0
     #print("\n=== DÉBUT DE LA PARTIE ===\n")
 
     while True:
@@ -327,7 +327,7 @@ def PartieVsBot(oGrille, iColones, sMode, iProfondeur=4):
 
         # Tour du joueur humain
         if iJoueur == 1:
-            iCol = input(f"\nÀ toi de jouer ! Choisis une colonne (0-{oGrille.iPLAcolonnes - 1}) : ")
+            iCol:int = input(f"\nÀ toi de jouer ! Choisis une colonne (0-{oGrille.iPLAcolonnes - 1}) : ")
             try:
                 iCol = int(iCol)
             except ValueError:
