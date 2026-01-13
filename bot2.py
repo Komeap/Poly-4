@@ -354,19 +354,19 @@ def PartieVsBot(oGrille: Tplateau, iColones:int, sMode, iProfondeur:int =4):
         else:
             print("\n IA réfléchit...")
             if sMode=="Normal" and iBuffer==1 :
-                iCol = MeilleurCoup(oGrille, iProfondeur)
+                iCol: int = MeilleurCoup(oGrille, iProfondeur)
                 if iNbCoups%3 == 0 :
-                    iBuffer = 0
+                    iBuffer: int = 0
             elif sMode=="Normal" and iBuffer == 0 :
-                iCol = randint(0, iColones)
-                iBuffer = 1
+                iCol: int = randint(0, iColones)
+                iBuffer: int = 1
             elif sMode=="Facile" and iBuffer==1 :
-                iCol = MeilleurCoup(oGrille, iProfondeur)
+                iCol: int = MeilleurCoup(oGrille, iProfondeur)
                 if iNbCoups%2 == 0 :
-                    iBuffer = 0
+                    iBuffer: int = 0
             elif sMode=="Facile" and iBuffer == 0 :
-                iCol = randint(0, iColones)
-                iBuffer = 1
+                iCol: int = randint(0, iColones)
+                iBuffer: int = 1
                 
             else :
                 iCol = MeilleurCoup(oGrille, iProfondeur)

@@ -4,12 +4,14 @@ from tkinter import font
 import cv2
 from PIL import Image, ImageTk
 import time
+from typing import List, Tuple, Dict, Callable, Optional
 
 ##screen size
-iWIDTH, iHEIGHT = 1350, 800
+iWIDTH:int = 1350
+iHEIGHT:int  = 800
 
 
-def AddBackground(oMaster, sImage):
+def AddBackground(oMaster: tk.Canvas, sImage: str) -> None:
     """!
     @brief Met une image en background
     @param sImage lien de l'image
@@ -22,7 +24,7 @@ def AddBackground(oMaster, sImage):
     oMaster.tag_lower(iBgId)
     oMaster.bg_image_cache = oPhoto
 
-def AddCanvasImg(oCanvas, sLink, tPos, tSize):
+def AddCanvasImg(oCanvas: tk.Canvas, sLink: str, tPos: Tuple[int, int], tSize: Tuple[int, int]) -> int:
     """!
     @brief Permet d'ajouter une image sur le canva
     @param sLink lien de l'image
@@ -42,7 +44,7 @@ def AddCanvasImg(oCanvas, sLink, tPos, tSize):
     
     return iImgId
 
-def AddCanvasBouton(oCanvas, sLink, tSize, tPos, fCmd, bHover, iZoom):
+def AddCanvasBouton(oCanvas: tk.Canvas, sLink: str, tSize: Tuple[int, int], tPos: Tuple[int, int], fCmd: Callable[[], None], bHover: bool, iZoom: int) ->int:
     """!
     @brief Permet d'ajouter une image qui est un bouton 
     @param sLink lien de l'image du bouton
@@ -85,7 +87,7 @@ def AddCanvasBouton(oCanvas, sLink, tSize, tPos, fCmd, bHover, iZoom):
 
     return iImgId
 
-def LancerVideo(oCanvas, sCheminVideo, iLargeur=iWIDTH, iHauteur=iHEIGHT +150):
+def LancerVideo(oCanvas: tk.Canvas, sCheminVideo: str, iLargeur: int=iWIDTH, iHauteur: int=iHEIGHT +150) ->None:
     """!
     @brief lancement de la vidéo
     @param sCheminVideo Lien de la video
@@ -121,7 +123,7 @@ def LancerVideo(oCanvas, sCheminVideo, iLargeur=iWIDTH, iHauteur=iHEIGHT +150):
             FermerVideo(oCanvas)
     Stream()
 
-def FermerVideo(oCanvas):
+def FermerVideo(oCanvas: tk.Canvas) ->None:
     """!
     @brief Permet de fermer la vidéo
     """
@@ -132,7 +134,7 @@ def FermerVideo(oCanvas):
 
 ## @brief Class des cases de paramétre du Menu dDéroulant
 class TparamCase:
-    def __init__(self, oCanvas, iX:int, iY:int, sNom, tOptions=None, tStartSize=(iHEIGHT//4, iHEIGHT//3), fScale=1.0, bAffiche=True, iIndex=0, fOnChange=lambda i: None):
+    def __init__(self, oCanvas: tk.Canvas, iX:int, iY:int, sNom: str, tOptions: Optional[List[str]]=None, tStartSize:Tuple[int, int]=(iHEIGHT//4, iHEIGHT//3), fScale: float=1.0, bAffiche: bool =True, iIndex: int=0, fOnChange: Callable[[int], None]=lambda i: None):
         """!
         @brief init
         @param iX, iY position
@@ -141,19 +143,19 @@ class TparamCase:
             fScale valeur entre 0 et 1 du pourcentage de la taille afficher 0.8 affiche la case a une taille de 80%
             bAffiche gére l'affichage ou non de la case
         """
-        self.oPARcanvas = oCanvas
-        self.sPARnom = sNom
-        self.tPARids = []
-        self.fPARonChange = fOnChange
+        self.oPARcanvas: tk.Canvas = oCanvas
+        self.sPARnom: str = sNom
+        self.tPARids: List[int] = []
+        self.fPARonChange: Callable[[int], None] = fOnChange
 
         # choix options
-        self.tPARoptions = tOptions if tOptions else []
-        self.iPARindex = iIndex
+        self.tPARoptions: List[str] = tOptions if tOptions else []
+        self.iPARindex: int = iIndex
 
         # dimension pour la resizer et l'effet de déroulement du menu
         iWRedim = int(tStartSize[0] * fScale)
         iHRedim = int(tStartSize[1] * fScale)
-        tSize = (iWRedim, iHRedim)
+        tSize: Tuple[int, int] = (iWRedim, iHRedim)
 
         if bAffiche:
             # Image de fond
@@ -183,7 +185,7 @@ class TparamCase:
             self.tPARids.append(self.iPARbtnDId)
 
     # Changer de valeur vers HAUT
-    def PARnextValue(self):
+    def PARnextValue(self) ->None:
         if not self.tPARoptions: 
             return
         self.iPARindex = (self.iPARindex + 1) % len(self.tPARoptions) 
@@ -191,56 +193,56 @@ class TparamCase:
         self.fPARonChange(self.iPARindex)  
 
     # Changer de valeur vers BAS
-    def PARprevValue(self):
+    def PARprevValue(self) ->None:
         if not self.tPARoptions: return
         self.iPARindex = (self.iPARindex - 1) % len(self.tPARoptions)
         self.oPARcanvas.itemconfig(self.iPARtexteValeur, text=self.tPARoptions[self.iPARindex])
         self.fPARonChange(self.iPARindex)
 
     # détruit la case pour l'animation
-    def PARdestroy(self):
+    def PARdestroy(self) ->None:
         for iItemId in self.tPARids:
             self.oPARcanvas.delete(iItemId) 
 
 ## @brief Class qui gérte le Menu déroulant 
 class TmenuDeroulant:
-    def __init__(self, oCanvas, iX, iYStart, dConfigData):
+    def __init__(self, oCanvas: tk.Canvas, iX: int, iYStart: int, dConfigData: Dict[str, List[str]]):
         """!
         @brief init
         @param iX Positon x du MEnue déroulant
             iYStart Position y de la premier case
             dConfigData Dictionnaire contenant les Nom des case de parametre du menu (TparamCase)
         """
-        self.oMENcanvas = oCanvas
-        self.iMENx = iX
-        self.iMENyStart = iYStart
+        self.oMENcanvas: tk.Canvas = oCanvas
+        self.iMENx: int = iX
+        self.iMENyStart: int = iYStart
         # Gestion des valeur des paramétres
-        self.tMENparamsData = list(dConfigData.keys())
-        self.dMENconfig =  dConfigData
-        self.dMENchoices = {key: 0 for key in dConfigData}
+        self.tMENparamsData:List[str] = list(dConfigData.keys())
+        self.dMENconfig: Dict[str, List[str]] =  dConfigData
+        self.dMENchoices: Dict[str, int] = {key: 0 for key in dConfigData}
         
         #Gestion des index
-        self.iMENcurrentIndex = 0
-        self.iMENmaxVisible = 3
-        self.iMENecart = iHEIGHT // 3 + 20
+        self.iMENcurrentIndex: int = 0
+        self.iMENmaxVisible: int = 3
+        self.iMENecart: int = iHEIGHT // 3 + 20
         
         # Positions cible après mouvement
-        self.tMENpositionsYFixes = [
+        self.tMENpositionsYFixes: List[int] = [
             self.iMENyStart,                # Position haut
             self.iMENyStart + self.iMENecart,   # Position millieu
             self.iMENyStart + self.iMENecart*2  # Position bas
         ]
         
         # % de la taille pour l'effet de style
-        self.tMENtaillesFixes = [0.7, 1.0, 0.7] 
+        self.tMENtaillesFixes: List[float] = [0.7, 1.0, 0.7] 
 
-        self.tMENactiveCases = []
+        self.tMENactiveCases: List[TparamCase] = []
         
-        self.bMENisAnimating = False
+        self.bMENisAnimating: bool = False
         
         self.MENupdateDisplayInstantane()
 
-    def MENupdateDisplayInstantane(self):
+    def MENupdateDisplayInstantane(self) -> None:
         """!
         @brief Update le menu déroulant et l'afficahge
         """
@@ -266,13 +268,13 @@ class TmenuDeroulant:
                 oNewCase = TparamCase(self.oMENcanvas, self.iMENx, iY, sNom, tOptions, fScale=fS ,iIndex=self.dMENchoices[sNom], fOnChange=lambda iIdx, sCle=sNom: self.MENsaveChoice(sCle, iIdx))
                 self.tMENactiveCases.append(oNewCase)
     
-    def MENsaveChoice(self, sNom, iIdx):
+    def MENsaveChoice(self, sNom: str, iIdx: int) -> None:
         """!
         @brief POur pas perdre la selection quand on change l'affichage
         """
         self.dMENchoices[sNom] = iIdx
 
-    def MENscroll(self, iDirection):
+    def MENscroll(self, iDirection: int) ->None:
         """!
         @brief Permet de scroll en haut ou en bas celon iDirection
         """
@@ -284,7 +286,7 @@ class TmenuDeroulant:
 
         self.MENanimateTransition(iDirection)
 
-    def MENanimateTransition(self, iDirection):
+    def MENanimateTransition(self, iDirection: int) ->None:
         """!
         @brief Exécute la transition/ Déplacement
         Calcul le décalage de postion et de proportion et affiche chaque image une par une
@@ -347,7 +349,7 @@ class TmenuDeroulant:
 
         StepProcess(1)
 
-    def MENprintAllChoices(self):
+    def MENprintAllChoices(self) -> None:
         """!
         @brief Affiche les choix de valeur utilisé pour les test
         """
@@ -360,7 +362,7 @@ class TmenuDeroulant:
             print(f"{sNom}: {sValeur}")
         print("==========================\n")
 
-def InitFleche(oCanvas):
+def InitFleche(oCanvas: tk.Canvas) -> int:
     """!
     @brief Initialise l'image de la fléche pour le jeu
     """
@@ -376,7 +378,7 @@ def InitFleche(oCanvas):
     
     return iFlecheId
 
-def BougerFleche(oEvent, oCanvas, iFlecheId):
+def BougerFleche(oEvent: tk.Event, oCanvas: tk.Canvas, iFlecheId: int) -> None:
     """!
     @brief Gére le mouvemnt de la fléche de jeu
     """
@@ -406,7 +408,7 @@ def BougerFleche(oEvent, oCanvas, iFlecheId):
             oCanvas.itemconfigure(iFlecheId, state='normal')
             return
 
-def AjouterPion(oCanvas, iLigne, iCol, sCouleur, fFinish=None):
+def AjouterPion(oCanvas: tk.Canvas, iLigne: int, iCol: int, sCouleur: str, fFinish: Optional[Callable[[], None]]=None) -> int:
     """!
     @brief Gére l'animation d'ajout de jeton, chute physique + rebond
     """
@@ -464,7 +466,7 @@ def AjouterPion(oCanvas, iLigne, iCol, sCouleur, fFinish=None):
     AnimChute()
     return iPionId
 
-def AfficherPlateau(oCanvas, iLargeur, iHauteur):
+def AfficherPlateau(oCanvas: tk.Canvas, iLargeur: int, iHauteur: int) -> None:
     """!
     @brief Affiche le plateau en fonction du nombre de colone et lignes
     Calcul pour qu'il soit tpoujours bien centré peut uimport la taille

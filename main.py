@@ -5,29 +5,30 @@ import threading
 import random
 import time
 import os
+from typing import List, Tuple, Dict, Callable, Optional, Any, Type
 
 # ------- Différentes page -------- #
 
 ## @brief class maitre qui gére les différentes pages
 class Tapp(tk.Tk):
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.title("POLIC")
         ## Génération des taille de page
-        iScreenWidth = self.winfo_screenwidth()
-        iScreenHeight = self.winfo_screenheight()
-        iXCordinate = int((iScreenWidth/2) - (iWIDTH/2))
-        iYCordinate = int((iScreenHeight/2) - (iHEIGHT/2))
+        iScreenWidth: int = self.winfo_screenwidth()
+        iScreenHeight: int = self.winfo_screenheight()
+        iXCordinate: int = int((iScreenWidth/2) - (iWIDTH/2))
+        iYCordinate: int = int((iScreenHeight/2) - (iHEIGHT/2))
         ## iWIDTH et iHEIGHT valeur global
         self.geometry("{}x{}+{}+{}".format(iWIDTH, iHEIGHT, iXCordinate, iYCordinate))
-        self.oAPPpageEnCours = None
+        self.oAPPpageEnCours: Optional[tk.Frame] = None
 
-        self.dSauvegardeParametres = None
+        self.dSauvegardeParametres: Optional[Dict[str, Any]] = None
         self.resizable(width=False, height=False)
 
     ## @brief Changement de page, supprime celle en cours
     ## et en met une autre sans oublier de redéfinir le self
-    def APPchangerDePage(self, oPage, **dData):
+    def APPchangerDePage(self, oPage: Type[tk.Frame], **dData: Any) -> None:
         if self.oAPPpageEnCours:
             self.oAPPpageEnCours.destroy()
 
@@ -36,7 +37,7 @@ class Tapp(tk.Tk):
 
 ## @brief Page d'accueil
 class Tacceuil(tk.Frame):
-    def __init__(self, oParent):
+    def __init__(self, oParent: Tapp) ->None:
         super().__init__(oParent, bg="")
 
         self.oACCcanva = tk.Canvas(self, width=iWIDTH, height=iHEIGHT, highlightthickness=0, bg="grey")
@@ -47,7 +48,7 @@ class Tacceuil(tk.Frame):
         AddCanvasBouton(self.oACCcanva, "images/bouton_close.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT//10)//2 + 5), oApp.destroy, True, 20)
 
 class TparamJeu(tk.Frame):
-    def __init__(self, oParent, **dKwargs):
+    def __init__(self, oParent: Tapp, **dKwargs: Any) -> None:
         super().__init__(oParent, bg="")
 
         # 1. Création du canva et background
@@ -55,7 +56,7 @@ class TparamJeu(tk.Frame):
         self.oPAJcanva.pack(fill="both", expand=True)
         AddBackground(self.oPAJcanva, "images/parametre_bg.png")
 
-        dCONFIG_DATA = {
+        dCONFIG_DATA: Dict[str, List[Any]] = {
             "": [],
             "Win Condition": [i for i in range(3,50)],
             "Largeur": [i for i in range(4,50)], 
@@ -67,7 +68,7 @@ class TparamJeu(tk.Frame):
             "couleur bot":["cyan", "red", "orange", "yellow"]
         }
 
-        dDEFAUTS = {
+        dDEFAUTS: Dict[str, Any] = {
             "Largeur": 7,          
             "Hauteur": 6,          
             "Win Condition": 4,    
@@ -96,7 +97,7 @@ class TparamJeu(tk.Frame):
         
         AddCanvasBouton(self.oPAJcanva, "images/boutonNext.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT) - iHEIGHT//10), self.PAJlancerPartie,True, 20)
 
-    def PAJlancerPartie(self):
+    def PAJlancerPartie(self) -> None:
         
         # Récupération des choix
         dChoix = self.oPAJmenu.dMENchoices
@@ -112,7 +113,7 @@ class TparamJeu(tk.Frame):
         sBonus = dConfig["Bonus"][dChoix["Bonus"]]
         sNomDiff = dConfig["Difficulté"][dChoix["Difficulté"]]
         
-        dSauvegarde = {
+        dSauvegarde: Dict[str, Any] = {
             "Largeur": iLargeur,          
             "Hauteur": iHauteur,          
             "Win Condition": iWinCond,    
@@ -125,7 +126,7 @@ class TparamJeu(tk.Frame):
         self.master.dSauvegardeParametres = dSauvegarde
 
         # Création du dic de données
-        dParametres = {
+        dParametres: Dict[str, Any] = {
             "largeur": iLargeur,
             "hauteur": iHauteur,
             "win": iWinCond,
@@ -143,24 +144,24 @@ class Tjeu(tk.Frame):
     """!
     @brief Réprésente la page de jeu 
     """
-    def __init__(self, oParent, **dSettings):
+    def __init__(self, oParent: Tapp, **dSettings: Any) -> None:
         super().__init__(oParent, bg="")
 
-        self.iJEUnbCols = dSettings.get("largeur")
-        self.iJEUnbLignes = dSettings.get("hauteur")
-        self.iJEUwinCond = dSettings.get("win")
-        self.sJEUdiff = dSettings.get("diff")
-        self.sJEUcouleurIa = dSettings.get("couleur_b")
-        self.sJEUcouleurJ = dSettings.get("couleur_j")
-        self.sJEUpremierCoup = dSettings.get("premier_c")
-        self.sJEUbonus = dSettings.get("bonus")
-        self.iJEUprofondeur = 4
+        self.iJEUnbCols: int = dSettings.get("largeur")
+        self.iJEUnbLignes: int = dSettings.get("hauteur")
+        self.iJEUwinCond:int = dSettings.get("win")
+        self.sJEUdiff: str = dSettings.get("diff")
+        self.sJEUcouleurIa: str = dSettings.get("couleur_b")
+        self.sJEUcouleurJ: str = dSettings.get("couleur_j")
+        self.sJEUpremierCoup: str = dSettings.get("premier_c")
+        self.sJEUbonus: str = dSettings.get("bonus")
+        self.iJEUprofondeur: int = 4
 
-        self.iJEUbuffer = 1
-        self.iJEUnbCoupsIa = 0
+        self.iJEUbuffer: int = 1
+        self.iJEUnbCoupsIa: int = 0
         
-        self.bJEUbotHasBomb = False
-        self.bJEUbotHasUndo = False
+        self.bJEUbotHasBomb: bool = False
+        self.bJEUbotHasUndo: bool = False
 
         # Gestion du premier tour
         if self.sJEUpremierCoup == "bot" : 
@@ -178,7 +179,7 @@ class Tjeu(tk.Frame):
                 self.sJEUcouleurIa = "yellow"
 
         self.oJEUgrille = Tplateau(iLignes=self.iJEUnbLignes, iColonnes=self.iJEUnbCols, iWinCondition=self.iJEUwinCond)
-        self.bJEUjeuActif = False # attendre l'affichage complet avant de lancer sinon ca bug 
+        self.bJEUjeuActif: bool = False # attendre l'affichage complet avant de lancer sinon ca bug 
 
         # Configuration UI
         self.oJEUcanvas = tk.Canvas(self, width=oParent.winfo_screenwidth(), height=oParent.winfo_screenheight(), highlightthickness=0, bg="grey")
@@ -214,13 +215,13 @@ class Tjeu(tk.Frame):
         
         self.tJEUpionsVisuels = [[] for i in range(self.iJEUnbCols)]
         self.tJEUhistoriqueCoups = []
-        self.bJEUactiveBombe = False
-        self.bJEUanimEnCours = False
+        self.bJEUactiveBombe: bool = False
+        self.bJEUanimEnCours: bool = False
 
         # Play
         self.iJEUbtnStartId = AddCanvasBouton(self.oJEUcanvas, "images/bouton_ready.png",(150, 150), (iWIDTH//6, iHEIGHT//2), self.JEUlancerLaGame,True, 20)
 
-    def JEUlancerLaGame(self):
+    def JEUlancerLaGame(self) -> None:
         """!
         @brief Pour lancer la partie de puissance 4
         """
@@ -234,7 +235,7 @@ class Tjeu(tk.Frame):
         if self.iJEUjoueurActuel == 2: # lancer le tours du bot, avec un delay pour pas qu'il joue avant l'affichage
             self.oJEUcanvas.after(500, self.JEUtourBot)
     
-    def JEUannulerUnSeulCoup(self):
+    def JEUannulerUnSeulCoup(self) -> bool:
         """!
         @brief Annule un seul coup, use in JEUactionUndo
         """
@@ -246,7 +247,7 @@ class Tjeu(tk.Frame):
         self.oJEUgrille.PLAundo(iCol)
         return True
 
-    def JEUactionUndo(self):
+    def JEUactionUndo(self)-> None:
         """!
         @brief suppr le bon nombre de jeton celon le cas
             Cas 1 partie encore en cours -> suppr deux jetons tours du joueur
@@ -278,7 +279,7 @@ class Tjeu(tk.Frame):
         self.oJEUcanvas.delete(self.iJEUundo)
         # print("Retour Ok")
 
-    def JEUdemanderAide(self):
+    def JEUdemanderAide(self) -> None:
         """!
         @brief Lance le calcul de l'IA pour aider le joueur 1
         """
@@ -313,7 +314,7 @@ class Tjeu(tk.Frame):
         oThread.daemon = True
         oThread.start()
 
-    def JEUafficherIndice(self, iCol):
+    def JEUafficherIndice(self, iCol: int) -> None:
         """!
         @brief Affiche visuellement où jouer
         """
@@ -349,7 +350,7 @@ class Tjeu(tk.Frame):
 
         self.oJEUcanvas.delete(self.iJEUaide)
 
-    def JEUreactiverJeu(self):
+    def JEUreactiverJeu(self)-> None:
         """!
         @brief réactivation du jeu -> suppr les affichage de fin, et réactive le clic souris
         """
@@ -357,7 +358,7 @@ class Tjeu(tk.Frame):
         self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
         self.oJEUcanvas.delete("message_fin")
 
-    def JEUactiverModeBombe(self):
+    def JEUactiverModeBombe(self)-> None:
         """!
         @brief active le bonus bombe
         """
@@ -372,7 +373,7 @@ class Tjeu(tk.Frame):
             self.oJEUcanvas.itemconfig(self.iJEUbombe_on, state='hidden')
             self.oJEUcanvas.itemconfig(self.iJEUbombe, state='normal')
         
-    def JEUlacherBombe(self, iCol):
+    def JEUlacherBombe(self, iCol: int) -> None:
         """!
         @brief Joue la bombe (Compatible IA et Joueur)
         """
@@ -407,7 +408,7 @@ class Tjeu(tk.Frame):
             if self.bJEUjeuActif:
                 self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
 
-    def JEUobtenirColonneAleatoire(self):
+    def JEUobtenirColonneAleatoire(self) -> int:
         """!
         @brief Prend une colone aléatoire, pour la gestion du niveau de bot
         """
@@ -416,7 +417,7 @@ class Tjeu(tk.Frame):
             return random.choice(tColsValides)
         return 0
 
-    def JEUclicSouris(self, oEvent):
+    def JEUclicSouris(self, oEvent: tk.Event) -> None:
         """!
         @brief gére le clic souris, pour jouer un coup
         """
@@ -435,7 +436,7 @@ class Tjeu(tk.Frame):
                 else :
                     self.JEUjouerCoup(iCol) # joue normalement
     
-    def JEUjouerCoup(self, iCol):
+    def JEUjouerCoup(self, iCol: int) -> None:
         """!
         @brief Joue un coup sur le plateau
         """
@@ -485,7 +486,7 @@ class Tjeu(tk.Frame):
         self.tJEUpionsVisuels[iCol].append(iPionId)
         self.tJEUhistoriqueCoups.append((iCol, iPionId))
     
-    def JEUtrouverPionsGagnants(self, iJoueur):
+    def JEUtrouverPionsGagnants(self, iJoueur: int) -> List[Tuple[int, int]]:
         """!
         @brief scanne le plateau pour trouver les pions gagnant
         @return une liste de tuples (ligne, colonne).
@@ -528,7 +529,7 @@ class Tjeu(tk.Frame):
                         return tLigneTest
         return []
     
-    def JEUsurlignerVictoire(self, tPions):
+    def JEUsurlignerVictoire(self, tPions: List[Tuple[int, int]]) -> None:
         """!
         @brief entour les piosn gagnant du jeu
         """
@@ -556,7 +557,7 @@ class Tjeu(tk.Frame):
 
             self.oJEUcanvas.create_oval(iX0, iY0, iX1, iY1, outline=sCOULEUR_VICTOIRE, width=iEPAISSEUR, tags="message_fin")
     
-    def JEUtourBot(self):
+    def JEUtourBot(self) -> None:
         """!
         @brief Gestion du jeu bot avec intelligence adaptative
         """
@@ -619,7 +620,7 @@ class Tjeu(tk.Frame):
         oThread.daemon = True 
         oThread.start()
 
-    def JEUactionBotPostCalcul(self, tAction):
+    def JEUactionBotPostCalcul(self, tAction: Tuple[int, int]) -> None:
         """!
         @brief Joue l'action choisie par l'IA
         @param tAction Tuple (TypeAction, Colonne)
@@ -647,7 +648,7 @@ class Tjeu(tk.Frame):
             if self.bJEUjeuActif:
                 self.oJEUcanvas.bind('<Button-1>', self.JEUclicSouris)
 
-    def JEUobtenirCoupAleatoireSemiIntelligent(self):
+    def JEUobtenirCoupAleatoireSemiIntelligent(self)-> int:
         """!
         @brief Trouve une colonne aléatoire, mais évite de donner une victoire immédiate à l'adversaire.
         """
@@ -672,7 +673,7 @@ class Tjeu(tk.Frame):
 
         return tColsValides[0]
 
-    def JEUfinDePartie(self, iEtat):
+    def JEUfinDePartie(self, iEtat: int) -> None:
         """!
         @brief GEstion de fin de partie
         """
@@ -692,6 +693,6 @@ class Tjeu(tk.Frame):
         self.oJEUcanvas.create_text(iWIDTH//2, 100, text=sMsg, font=("Arial", 40, "bold"), fill=sCouleurTexte, tags="message_fin")
 
 if __name__ == "__main__":
-    oApp = Tapp()
+    oApp: Tapp = Tapp()
     oApp.APPchangerDePage(Tacceuil)
     oApp.mainloop()
