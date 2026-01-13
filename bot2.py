@@ -312,7 +312,7 @@ def MeilleurCoup(oGrille: Tplateau, iProfondeur: int, bHasBomb: bool=False, bHas
 
     return (0, iBestCol)
 
-##Il me reste ça refaire et à doxygen
+## inutile maintenant mais on garde
 def PartieVsBot(oGrille: Tplateau, iColones:int, sMode, iProfondeur:int =4):
     iJoueur:int = 1  # humain commence
     iBuffer:int = 0
