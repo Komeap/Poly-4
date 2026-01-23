@@ -62,7 +62,7 @@ class TparamJeu(tk.Frame):
             "Largeur": [i for i in range(4,50)], 
             "Hauteur": [i for i in range(4,50)],
             "Difficulté": ["Facile", "Normal", "Hardcore"],
-            "Permier coup": ["bot", "joueur", "random"],
+            "Premier coup": ["bot", "joueur", "random"],
             "Bonus": ["nothing","bombe", "undo", "aide", "all"],
             "couleur joueur": ["cyan", "red", "orange", "yellow"],
             "couleur bot":["cyan", "red", "orange", "yellow"]
@@ -73,7 +73,7 @@ class TparamJeu(tk.Frame):
             "Hauteur": 6,          
             "Win Condition": 4,    
             "Difficulté": "Normal",
-            "Permier coup": "random",
+            "Premier coup": "random",
             "Bonus": "nothing",
             "couleur joueur": "red",
             "couleur bot": "yellow"
@@ -109,7 +109,7 @@ class TparamJeu(tk.Frame):
         iWinCond = dConfig["Win Condition"][dChoix["Win Condition"]]
         sNomCoulJ = dConfig["couleur joueur"][dChoix["couleur joueur"]]
         sNomCoulB = dConfig["couleur bot"][dChoix["couleur bot"]]
-        sPremierC = dConfig["Permier coup"][dChoix["Permier coup"]]
+        sPremierC = dConfig["Premier coup"][dChoix["Premier coup"]]
         sBonus = dConfig["Bonus"][dChoix["Bonus"]]
         sNomDiff = dConfig["Difficulté"][dChoix["Difficulté"]]
         
@@ -118,7 +118,7 @@ class TparamJeu(tk.Frame):
             "Hauteur": iHauteur,          
             "Win Condition": iWinCond,    
             "Difficulté": sNomDiff,
-            "Permier coup": sPremierC,
+            "Premier coup": sPremierC,
             "Bonus": sBonus,
             "couleur joueur": sNomCoulJ,
             "couleur bot": sNomCoulB
@@ -155,7 +155,7 @@ class Tjeu(tk.Frame):
         self.sJEUcouleurJ: str = dSettings.get("couleur_j")
         self.sJEUpremierCoup: str = dSettings.get("premier_c")
         self.sJEUbonus: str = dSettings.get("bonus")
-        self.iJEUprofondeur: int = 4
+        self.iJEUprofondeur: int = 5
 
         self.iJEUbuffer: int = 1
         self.iJEUnbCoupsIa: int = 0
@@ -188,8 +188,8 @@ class Tjeu(tk.Frame):
         AddBackground(self.oJEUcanvas, "images/bg.jpg")
         
         # Boutons de navigation
-        AddCanvasBouton(self.oJEUcanvas, "images/bouton_back.png", (iHEIGHT//10, iHEIGHT//10), ((iHEIGHT//10)//2 + 5, (iHEIGHT//10)//2 + 5), lambda: oApp.APPchangerDePage(TparamJeu), True, 20)
-        AddCanvasBouton(self.oJEUcanvas, "images/bouton_close.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT//10)//2 + 5), oApp.destroy, True, 20)
+        self.bBackButon = AddCanvasBouton(self.oJEUcanvas, "images/bouton_back.png", (iHEIGHT//10, iHEIGHT//10), ((iHEIGHT//10)//2 + 5, (iHEIGHT//10)//2 + 5), lambda: oApp.APPchangerDePage(TparamJeu), True, 20)
+        self.bCloseButon = AddCanvasBouton(self.oJEUcanvas, "images/bouton_close.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT//10)//2 + 5), oApp.destroy, True, 20)
         if self.sJEUbonus == "undo" or self.sJEUbonus == "all" :
             self.bJEUbotHasUndo = True
             self.iJEUundo = AddCanvasBouton(self.oJEUcanvas, "images/undo_bonus.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH//8, iHEIGHT//2), self.JEUactionUndo, True, 20)
@@ -677,20 +677,23 @@ class Tjeu(tk.Frame):
         """!
         @brief GEstion de fin de partie
         """
-        sMsg = "MATCH NUL"
-        sCouleurTexte = "white"
+
+        self.oJEUcanvas.itemconfig(self.bCloseButon, state='hidden')
+        self.oJEUcanvas.itemconfig(self.bBackButon, state='hidden')
+
+        self.bReplayButon = AddCanvasBouton(self.oJEUcanvas, "images/rejouer.png", (iHEIGHT//3, iHEIGHT//10), ((iHEIGHT//3)//2 + 10, iHEIGHT//2), lambda: oApp.APPchangerDePage(TparamJeu), True, 20)
+        self.bQuitButon = AddCanvasBouton(self.oJEUcanvas, "images/quitter.png", (iHEIGHT//3, iHEIGHT//10), (iWIDTH - (iHEIGHT//3)//2 - 10, iHEIGHT//2), oApp.destroy, True, 20)
         
+        sImagePath = ""
+
         if iEtat == 1:
             if self.iJEUjoueurActuel == 1:
-                sMsg = "VICTOIRE !"
-                sCouleurTexte = "#00FF00"
+                sImagePath = "images/Victoire.png"
             else:
-                sMsg = "DÉFAITE..."
-                sCouleurTexte = "#FF0000"
-
-        self.oJEUcanvas.create_rectangle(iWIDTH//2 - 200, 50, iWIDTH//2 + 200, 150, fill="black", outline="white", width=2, tags="message_fin")
+                sImagePath = "images/Defaite.png"
         
-        self.oJEUcanvas.create_text(iWIDTH//2, 100, text=sMsg, font=("Arial", 40, "bold"), fill=sCouleurTexte, tags="message_fin")
+        AddCanvasImg(self.oJEUcanvas, sImagePath, (iWIDTH//2, 100) , (iWIDTH//2, 150))
+
 
 if __name__ == "__main__":
     oApp: Tapp = Tapp()

@@ -180,7 +180,7 @@ def ScorePosition(oGrille: Tplateau, iJoueurMax: int=2, iJoueurMin: int=1) ->int
 
     return iScore
 
-# === MinMax (BASIQUE, SANS alpha-beta) ===
+# === MinMax ===
 
 def ColonnesOrdonnees(oGrille: Tplateau):
     """!
