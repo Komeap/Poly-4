@@ -90,8 +90,8 @@ class TparamJeu(tk.Frame):
             self.oPAJmenu.dMENchoices[sCle] = iIndexParDefaut
 
 
-        AddCanvasBouton(self.oPAJcanva, "images/bouton_up.png", (50, 50), (iWIDTH//2 + 250, iHEIGHT//2 - 50), lambda: self.oPAJmenu.MENscroll(-1), True, 5)
-        AddCanvasBouton(self.oPAJcanva, "images/bouton_down.png", (50, 50), (iWIDTH//2 + 250, iHEIGHT//2 + 50), lambda: self.oPAJmenu.MENscroll(1), True, 5)
+        AddCanvasBouton(self.oPAJcanva, "images/bouton_up.png", (100, 100), (iWIDTH//2 + 250, iHEIGHT//2 - 100), lambda: self.oPAJmenu.MENscroll(-1), True, 5)
+        AddCanvasBouton(self.oPAJcanva, "images/bouton_down.png", (100, 100), (iWIDTH//2 + 250, iHEIGHT//2 + 100), lambda: self.oPAJmenu.MENscroll(1), True, 5)
 
         AddCanvasBouton(self.oPAJcanva, "images/bouton_back.png", (iHEIGHT//10, iHEIGHT//10), (iWIDTH - (iHEIGHT//10)//2 - 5, (iHEIGHT//10)//2 + 5), lambda: oApp.APPchangerDePage(Tacceuil), True, 20)
         
@@ -691,6 +691,8 @@ class Tjeu(tk.Frame):
                 sImagePath = "images/Victoire.png"
             else:
                 sImagePath = "images/Defaite.png"
+        else:
+            sImagePath = "images/null.png"
         
         AddCanvasImg(self.oJEUcanvas, sImagePath, (iWIDTH//2, 100) , (iWIDTH//2, 150))
 

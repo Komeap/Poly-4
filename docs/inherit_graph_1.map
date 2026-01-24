@@ -1,9 +1,0 @@
-<map id="Graphical Class Hierarchy" name="Graphical Class Hierarchy">
-<area shape="rect" id="Node000000" title=" " alt="" coords="5,55,85,80"/>
-<area shape="rect" id="Node000001" href="$classmain_1_1Tacceuil.html" title="Page d&#39;accueil." alt="" coords="143,5,253,31"/>
-<area shape="poly" id="edge1_Node000000_Node000001" title=" " alt="" coords="97,48,157,28,158,33,99,53"/>
-<area shape="rect" id="Node000002" href="$classmain_1_1Tjeu.html" title="Réprésente la page de jeu." alt="" coords="155,55,241,80"/>
-<area shape="poly" id="edge2_Node000000_Node000002" title=" " alt="" coords="99,65,154,65,154,70,99,70"/>
-<area shape="rect" id="Node000003" href="$classmain_1_1TparamJeu.html" title=" " alt="" coords="133,104,263,129"/>
-<area shape="poly" id="edge3_Node000000_Node000003" title=" " alt="" coords="99,82,158,101,157,106,97,87"/>
-</map>
